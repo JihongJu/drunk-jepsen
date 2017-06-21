@@ -1,0 +1,58 @@
+\section{Positive and Unlabelled Learning}
+\label{pulearning}
+
+
+%%%%%%%% FIGURE
+\begin{figure*}
+\begin{center}
+% \fbox{\rule{0pt}{2in} \rule{.9\linewidth}{0pt}}
+   \includegraphics[width=0.95\linewidth]{img/moons.png}
+\end{center}
+   \caption{MOONS}
+\label{fig:moons}
+\end{figure*}
+
+
+%%%%%%%% FIGURE
+\begin{figure}[t]
+\begin{center}
+% \fbox{\rule{0pt}{2in} \rule{0.9\linewidth}{0pt}}
+   \includegraphics[width=0.95\linewidth]{img/losses.png}
+\end{center}
+   \caption{Losses}
+\label{fig:losses}
+\end{figure}
+
+
+%%%%%%%% TABLE
+\begin{table}
+\begin{center}
+\begin{tabular}{ll|llll}
+Annotation  & Loss & acc. & prec. & rec. & $F_1$ \\
+\hline
+Complete    & CrossEntropyU  &  &  & & \\
+Missing50\% & CrossEntropyU & & & & \\
+Missing50\% & WeightedU   &  &  & & \\
+Missing50\% & BootstrapHardU  &  &  & & \\
+Missing50\% & ExponentialU  &  &  & & \\
+\end{tabular}
+\end{center}
+\caption{CIFAR10+CIFAR100}
+\end{table}
+
+
+%%%%%%%% TABLE
+\begin{table}
+\begin{center}
+\begin{tabular}{ll|llll}
+Annotation  & Loss & pixel acc. & mean acc. & mean IU & f.w. IU \\
+\hline
+Complete    & CrossEntropyU  &  &  & & \\
+Missing50\% & CrossEntropyU & & & & \\
+Missing50\% & WeightedU   &  &  & & \\
+Missing50\% & BootstrapHardU  &  &  & & \\
+Missing50\% & ExponentialU  &  &  & & \\
+\end{tabular}
+\end{center}
+\caption{PASCAL\ VOC}
+\end{table}
