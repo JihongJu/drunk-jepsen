@@ -2,7 +2,7 @@
 \label{pulearning}
 
 
-%%%%%%%% FIGURE
+%%%%%%%% FIGURE MOONS
 \begin{figure*}
 \begin{center}
 % \fbox{\rule{0pt}{2in} \rule{.9\linewidth}{0pt}}
@@ -13,31 +13,42 @@
 \end{figure*}
 
 
-%%%%%%%% FIGURE
+%%%%%%%% FIGURE Losses
 \begin{figure}[t]
 \begin{center}
 % \fbox{\rule{0pt}{2in} \rule{0.9\linewidth}{0pt}}
    \includegraphics[width=0.95\linewidth]{img/losses.png}
 \end{center}
-   \caption{Losses}
+   \caption{The Logistic Loss, Weighted Logistic Loss, Exponential Loss and their dirivatives.}
 \label{fig:losses}
 \end{figure}
 
 
-%%%%%%%% TABLE
+%%%%%%%% FIGURE Varying positive annotating percetage
+\begin{figure}[t]
+\begin{center}
+\fbox{\rule{0pt}{2in} \rule{0.9\linewidth}{0pt}}
+  %  \includegraphics[width=0.95\linewidth]{img/}
+\end{center}
+   \caption{VGG8 CIFAR10 with 10\%, 20\%, 50\%, 80\% and 100\% of the positive examples annotated}
+\label{fig:percentage}
+\end{figure}
+
+%%%%%%%% TABLE CIFAR10
 \begin{table}
 \begin{center}
 \begin{tabular}{ll|llll}
 Annotation  & Loss & acc. & prec. & rec. & $F_1$ \\
 \hline
 Complete    & CrossEntropyU  &  &  & & \\
-Missing50\% & CrossEntropyU & & & & \\
-Missing50\% & WeightedU   &  &  & & \\
-Missing50\% & BootstrapHardU  &  &  & & \\
-Missing50\% & ExponentialU  &  &  & & \\
+50\%Positive+50\%Negative & CrossEntropyU & & & & \\
+50\%Positive+Unlabelled & CrossEntropyU & & & & \\
+50\%Positive+Unlabelled & WeightedU   &  &  & & \\
+50\%Positive+Unlabelled & BootstrapHardU  &  &  & & \\
+50\%Positive+Unlabelled & ExponentialU  &  &  & & \\
 \end{tabular}
 \end{center}
-\caption{CIFAR10+CIFAR100}
+\caption{WRN-28-8 CIFAR10}
 \end{table}
 
 
