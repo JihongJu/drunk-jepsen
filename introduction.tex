@@ -22,11 +22,23 @@ Huge efforts would be made to correct the mistakes being made, including double-
 Otherwise, these mistakes may lead to annotations that contain misannotated instances, misclassification of instances and unannotated instances.
 
 
+%%%%%%%% TEXT Noise model
+\noindent
+\textit{Briefly formulate the problem.}
+
+\noindent
+\noindent
+The Semantic Segmentation problem can be considered as per-pixel classification. Each of the pixels is assigned a label of either $0$, indicating a pixel for the background, or $k \in {1, \ldots, K}$, indicating a pixel for an instance from one of the $K$ categories.
+The aforementioned errors can be interpreted by the pixel label flipping:
+\textit{misannotation} from $0$ to $k$, \textit{missing annotation} from $k$ to $0$, and \textit{misclassification} from $i$ to $j$, where $i, j, k \in {1, \ldots, K}$.
+
 %%%%%%%% TEXT Reasoning method
 \noindent
 \textit{This paragraph should reason the idea obtain pre-trained features by learning ``objectness'' with Positive and Unlabeled examples.}
 
 \noindent
+It is obvious that training with the noisy annotations would lead to higher classification errors than training with the correct annotations, if the validation samples had also correct annotations.
+
 The noises in the annotations introduce bias to the training samples and extra difficulties to train the segmentation algorithms. {TODO references}
 
 In the context of deep learning, the purpose of a cost sensitive objective is
@@ -35,12 +47,8 @@ not only to change the output of the model, but first and foremost to learn a re
 We will show in Section \ref{sec:results} that the annotation noises can influence the performance for both classification and segmentation problems.
 The cortex of this work is to compensate the aforementioned errors via modifications to the neural networks design, conditioning on a few assumptions.
 
-%%%%%%%% TEXT Noise model
-\noindent
-\textit{Briefly formulate the problem.}
 
-\noindent
-The Semantic Segmentation problem can be considered as per-pixel classification. For each pixel, a label of 0, if the pixel is corresponding to the background, or a label from 1 to K ,if it is corresponding to an instance from K categories, is assigned to it.
+
 The aforementioned annotation errors can be then described with a noise model
 
 Becomes classification with label noise
