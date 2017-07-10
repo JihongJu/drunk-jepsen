@@ -1,2 +1,56 @@
 \section{Introduction}
 \label{introduction}
+
+%%%%%%%% TEXT Lack of perfect annotations
+\noindent
+\textit{The lack of ``gold standard'' annotations becomes the bottleneck for semantic segmentation.}
+
+\noindent
+The state-of-art deep learning algorithms for semantic segmentation \cite{long2015fully} usually suffer from the lack of large-scale annotated dataset.
+Most of these methods assume the existence of precise, consistent and exaustive annotations. However, collecting such manual segmentations in a large scale can be expensive and time-consuming.
+Millions of images are available through Flikr, ImageNet and many other sources on the Internet but only a few of them were well annotated for semantic segmentation tasks. \cite{everingham2015pascal,mottaghi2014role,lin2014microsoft}
+
+
+%%%%%%%% TEXT Annotation Errors
+\noindent
+\textit{This paragraph should explain the difficulties for collecting segmentation annotation, including what could be the main errors in annotation.}
+
+\noindent
+The benchmark datasets usually provide perfect segmentations with all instance annotated (exaustive) and no mis-annotated instance (precise and consistent).
+However, it is natural for human being to make mistakes while annotating due to the lack of expertise, the intrisic ambiguity of tasks or unconscious bias.
+Huge efforts would be made to correct the mistakes being made, including double-checking the annotations over and over again and ensembling opinions from multiple annotators.
+Otherwise, these mistakes may lead to annotations that contain misannotated instances, misclassification of instances and unannotated instances.
+
+
+%%%%%%%% TEXT Reasoning method
+\noindent
+\textit{This paragraph should reason the idea obtain pre-trained features by learning ``objectness'' with Positive and Unlabeled examples.}
+
+\noindent
+The noises in the annotations introduce bias to the training samples and extra difficulties to train the segmentation algorithms. {TODO references}
+
+In the context of deep learning, the purpose of a cost sensitive objective is
+not only to change the output of the model, but first and foremost to learn a representation in intermediate layers of the network that is able to better capture the aspects of the data that are important according to the relative cost of the different types of error.
+
+We will show in Section \ref{sec:results} that the annotation noises can influence the performance for both classification and segmentation problems.
+The cortex of this work is to compensate the aforementioned errors via modifications to the neural networks design, conditioning on a few assumptions.
+
+%%%%%%%% TEXT Noise model
+\noindent
+\textit{Briefly formulate the problem.}
+
+\noindent
+The Semantic Segmentation problem can be considered as per-pixel classification. For each pixel, a label of 0, if the pixel is corresponding to the background, or a label from 1 to K ,if it is corresponding to an instance from K categories, is assigned to it.
+The aforementioned annotation errors can be then described with a noise model
+
+Becomes classification with label noise
+
+
+%%%%%%%% TEXT Semantic segmentation is different from classification
+\textit{This paragraph should explain the difference between classification and semantic segmentation.}
+
+%%%%%%%% TEXT Missing positive label is different
+\textit{This paragraph should explain the difference between inexaustive/imprecise and misclassification.}
+Classification with label noise
+
+%%%%%%%% TEXT Table of contents

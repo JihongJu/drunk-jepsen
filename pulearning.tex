@@ -1,5 +1,32 @@
-\section{Positive and Unlabelled Learning}
+\section{Positive and Unlabeled Learning}
 \label{pulearning}
+
+\textit{One sentence summary of Positive and Unlabeled Learning}
+
+%%%%%%%% TEXT PU Learning setup
+
+\paragraph{Formulation}
+
+\textit{This part should explain the Positive and Unlabeled Learning setup with mathematical representation when necessary.}
+
+
+%%%%%%%% TEXT Modeling
+% \paragraph{Class weight}
+\textit{This part should discuss the linear model for observing positive conditioning on true positive and its relationship to changing the class weight.}
+
+
+%%%%%%%% TEXT Imbalanced
+\textit{This part should explain the influence of the imbalanced problem and how to overcome.}
+
+
+%%%%%%%% TEXT Exponential loss
+\textit{This part should explain why the exponential loss could perform better than the cross-entropy loss, potentially with a figure of 2D Gaussians.}
+
+
+%%%%%%%% TEXT Expontial loss FADE IN
+\textit{This paragraph should explain why fade-in was introduced to avoid all-positive prediction}
+
+
 
 
 %%%%%%%% FIGURE MOONS
@@ -40,15 +67,17 @@
 \begin{tabular}{ll|llll}
 Annotation  & Loss & acc. & prec. & rec. & $F_1$ \\
 \hline
-Complete    & CrossEntropyU  &  &  & & \\
-50\%Positive+50\%Negative & CrossEntropyU & & & & \\
-50\%Positive+Unlabelled & CrossEntropyU & & & & \\
-50\%Positive+Unlabelled & WeightedU   &  &  & & \\
-50\%Positive+Unlabelled & BootstrapHardU  &  &  & & \\
-50\%Positive+Unlabelled & ExponentialU  &  &  & & \\
+Complete    & CrossEntropyU    & 0.87 & 0.88 & 0.82 & 0.85 \\
+50\%P+50\%N & CrossEntropyU    & 0.83 & 0.84 & 0.78 & 0.80 \\
+50\%P+U     & CrossEntropyU    & 0.61 & 0.92 & 0.30 & 0.38 \\
+50\%P+U     & WeightedU        & 0.66 & 0.93 & 0.39 & 0.51 \\
+50\%P+U     & ExponentialU     & 0.82 & 0.86 & 0.73 & 0.78 \\
+50\%P+U     & BootstrapHard    & 0.74 & 0.81 & 0.60 & 0.67 \\
+50\%P+U     & LinearNoiseModel & & & & \\
+50\%P+U     & DropoutRegularization & & & & \\
 \end{tabular}
 \end{center}
-\caption{WRN-28-8 CIFAR10}
+\caption{VGG8 CIFAR10}
 \end{table}
 
 
@@ -58,11 +87,14 @@ Complete    & CrossEntropyU  &  &  & & \\
 \begin{tabular}{ll|llll}
 Annotation  & Loss & pixel acc. & mean acc. & mean IU & f.w. IU \\
 \hline
-Complete    & CrossEntropyU  &  &  & & \\
-Missing50\% & CrossEntropyU & & & & \\
-Missing50\% & WeightedU   &  &  & & \\
-Missing50\% & BootstrapHardU  &  &  & & \\
-Missing50\% & ExponentialU  &  &  & & \\
+Complete    & CrossEntropyU    &  &  & & \\
+50\%P+50\%N & CrossEntropyU    & & & & \\
+50\%P+U     & CrossEntropyU    & & & & \\
+50\%P+U     & WeightedU        &  &  & & \\
+50\%P+U     & ExponentialU     &  &  & & \\
+50\%P+U     & BootstrapHard    &  &  & & \\
+50\%P+U     & LinearNoiseModel & & & & \\
+50\%P+U     & DropoutRegularization & & & & \\
 \end{tabular}
 \end{center}
 \caption{PASCAL\ VOC}
