@@ -7,8 +7,14 @@
 
 \noindent
 The state-of-art deep learning algorithms for semantic segmentation \cite{long2015fully} usually suffer from the lack of large-scale annotated dataset.
-Most of these methods assume the existence of precise, consistent and exaustive annotations. However, collecting such manual segmentations in a large scale can be expensive and time-consuming.
+Most of these methods assume the existence of precise, consistent and exaustive annotations. However, collecting such perfect segmentations manuallt in a large scale is expensive and time-consuming.
 Millions of images are available through Flikr, ImageNet and many other sources on the Internet but only a few of them were well annotated for semantic segmentation tasks. \cite{everingham2015pascal,mottaghi2014role,lin2014microsoft}
+A common method to overcome the lack of training samples is to use the pre-trained weights of the convolutional layers from the classification models.
+However, the neural network architecture design for semantic segmentation does not nessarily follows the architecture design of image classification.
+For instance, the segmentation models require less subsample pooling layers than the classification models do to keep more local information to locate the object.
+However, the difficulty for pre-training comparable representation of the images in the context of semantic segmentation arises from the lack of ``gold standard'' in large scale.
+We wanted to tackle the problem by alleviating the ``gold standard'' annotation assumption and scaling up the training dataset accordingly.
+This would require methods to learn good representation of images in the precense of annotation noise.
 
 
 %%%%%%%% TEXT Annotation Errors
@@ -22,43 +28,64 @@ Huge efforts would be made to correct the mistakes being made, including double-
 Otherwise, these mistakes may lead to annotations that contain misannotated instances, misclassification of instances and unannotated instances.
 
 
+
+%%%%%%%% TEXT Reasoning problem
+\noindent
+\textit{This paragraph should reason the idea obtain pre-trained features by learning ``objectness'' with Positive and Unlabeled examples.}
+
+\noindent
+It is obvious that training with the noisy annotations would lead to higher segmenting errors than training with the correct annotations, if the validation samples had also correct annotations. It is nevertheless unclear how the annotation noises influence the learned image representation.
+With end-to-end models contained convolutional neural networks, the purpose of a learning objective is not only to train a classifier with minimum errors but also to learn satisfactory convolutaional filters.
+
+\noindent
+That leads to our research questions:
+\begin{enumerate}
+  \item How to compensate the classification bias introduced by the annoation noises with corresponding prior knowledges.
+  \item How to learn satisfactory image representation in the presence of annotation noises.
+\end{enumerate}
+
+
 %%%%%%%% TEXT Noise model
 \noindent
 \textit{Briefly formulate the problem.}
 
 \noindent
-\noindent
 The Semantic Segmentation problem can be considered as per-pixel classification. Each of the pixels is assigned a label of either $0$, indicating a pixel for the background, or $k \in {1, \ldots, K}$, indicating a pixel for an instance from one of the $K$ categories.
 The aforementioned errors can be interpreted by the pixel label flipping:
-\textit{misannotation} from $0$ to $k$, \textit{missing annotation} from $k$ to $0$, and \textit{misclassification} from $i$ to $j$, where $i, j, k \in {1, \ldots, K}$.
-
-%%%%%%%% TEXT Reasoning method
-\noindent
-\textit{This paragraph should reason the idea obtain pre-trained features by learning ``objectness'' with Positive and Unlabeled examples.}
+\textit{misannotation} flipped from $0$ to $k$, \textit{inexaustive annotation} flipped from $k$ to $0$, and \textit{misclassification} flipped from $i$ to $j$, where $i, j, k \in {1, \ldots, K}$.
 
 \noindent
-It is obvious that training with the noisy annotations would lead to higher classification errors than training with the correct annotations, if the validation samples had also correct annotations.
+\textit{Misannotating and misclassification}
 
-The noises in the annotations introduce bias to the training samples and extra difficulties to train the segmentation algorithms. {TODO references}
-
-In the context of deep learning, the purpose of a cost sensitive objective is
-not only to change the output of the model, but first and foremost to learn a representation in intermediate layers of the network that is able to better capture the aspects of the data that are important according to the relative cost of the different types of error.
-
-We will show in Section \ref{sec:results} that the annotation noises can influence the performance for both classification and segmentation problems.
-The cortex of this work is to compensate the aforementioned errors via modifications to the neural networks design, conditioning on a few assumptions.
+\noindent
+One of the main hypothesis made in this work is that the misannotation and misclassification of instances can still possibly provide information for learning visual representation of object, asumming the errors are not dorminant.
+Supposing an instance of a dog toy is annotated as a dog, given that ``toy'' is not one of the pre-defined categories whereas the ``dog'' is, the misannotation error would introduce bias to the classification layer but not necessarily to the convolutional layers, especially the bottom ones.
+The bottom-level features are believed to be shared among different categories and thus should be more robust to the misannotation error than the top-level features, assumming that the misannotated instance is still visually distinguishable and semantically meaningful.
 
 
+\noindent
+\textit{Inexaustive annotating}
 
-The aforementioned annotation errors can be then described with a noise model
+\noindent
+The inexaustive annotations, on the other hand, can introduce bias to both the decoding layer and the encoding layers because they negatively contribute to the activations in all the layers.
+Therefore, the inexaustive annotation needs to be properly handled with the prior knowledge modeling the annotation missing pattern.
+Given that we treat any annotated instance as ``reliable'' annotation, an extra prior knowledge can be added that all the annotated instances, i.e.the foreground, are reliable and the unannotated pixels, i.e.the background, may contain missing instances.
+That satisfies a Positive and Unlabeled learning setup where the training dataset contain only the positive examples and unlabeled examples that could be either positive or negative.
 
-Becomes classification with label noise
-
-
-%%%%%%%% TEXT Semantic segmentation is different from classification
-\textit{This paragraph should explain the difference between classification and semantic segmentation.}
-
-%%%%%%%% TEXT Missing positive label is different
-\textit{This paragraph should explain the difference between inexaustive/imprecise and misclassification.}
-Classification with label noise
 
 %%%%%%%% TEXT Table of contents
+\noindent
+\textit{Table of contents}
+
+\noindent
+In the next section, we review related works on deep learning with label noises.
+In Section \ref{sec:objectness} we judge the possibility of learning convolutional representation with misannotations by learning to predict the pixel objectness.
+Section \ref{sec:pulearning} explored the methods to compensate the inexaustive annotations in a Positive and Unlabeled Learning setup.
+Features learned by predicting the pixel objectness with inexaustive annotations were then validated with experiments described in Section \ref{sec:results}.
+
+% %%%%%%%% TEXT Semantic segmentation is different from classification
+% \textit{This paragraph should explain the difference between classification and semantic segmentation.}
+%
+% %%%%%%%% TEXT Missing positive label is different
+% \textit{This paragraph should explain the difference between inexaustive/imprecise and misclassification.}
+% Classification with label noise
