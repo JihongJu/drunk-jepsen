@@ -2,15 +2,32 @@
 \label{sec:objectness}
 
 %%%%%%%% Table Learn Pixel Objectness for pre-training
-\begin{table}
-\begin{center}
+\begin{table}[t]
+\resizebox{\columnwidth}{!}{
+\centering
 \begin{tabular}{l|llll}
 Initial Repr.  & pixel acc. & mean acc. & mean IU & f.w. IU \\
 \hline
-ImageNetModel         &  &  & & \\
-PixelObjectness  & & & & \\
-Scratch          & & & & \\
+ImageNetModel         &  &  &  & \\
+CompleteCategory      &  &  &  & \\
+PixelObjectness       &  &  & & \\
+RandomCategory        &  &  &  & \\
+FromScratch           &  &  & & \\
 \end{tabular}
-\end{center}
-\caption{}
+}
+\caption{Performances of FCN with Alexnet trained to segment 5 categories from the PASCAL VOC2011 dataset with different representation initializations.
+% \textit{ImageNetModel} represents the ImageNet pre-trained model;
+% \textit{FromScratch} indicates that the representation is randomly initialization using Xavier Initialization;
+\textit{CompleteCategory} is the model pre-trained to segment the other 15 categories from the PASCAL VOC2011 dataset; The \textit{PixelObjectness} model was pre-trained to distinguish the instance against the background; The \textit{RandomCategory} model was pre-trained with instances assigned random categories from the other 15 categories.}
+\label{tab:objectness}
 \end{table}
+
+
+%%%%%%%% FIGURE Varying positive annotating percetage
+\begin{figure}[t]
+\centering
+\fbox{\rule{0pt}{2in} \rule{0.9\linewidth}{0pt}}
+  %  \includegraphics[width=0.95\linewidth]{img/}
+\caption{Varying the number of categories while pre-training the representation and the pre-trained weights were fine-tuned to segment 5 categories from the PASCAL VOC2011 dataset.}
+\label{fig:categories}
+\end{figure}
