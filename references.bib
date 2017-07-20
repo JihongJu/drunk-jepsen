@@ -6,8 +6,36 @@
   pages={3431--3440},
   year={2015}
 }
-
-%%%%%%%% Segmentation Datasets
+@inproceedings{zheng2015conditional,
+  title={Conditional random fields as recurrent neural networks},
+  author={Zheng, Shuai and Jayasumana, Sadeep and Romera-Paredes, Bernardino and Vineet, Vibhav and Su, Zhizhong and Du, Dalong and Huang, Chang and Torr, Philip HS},
+  booktitle={Proceedings of the IEEE International Conference on Computer Vision},
+  pages={1529--1537},
+  year={2015}
+}
+@article{chen2016deeplab,
+  title={Deeplab: Semantic image segmentation with deep convolutional nets, atrous convolution, and fully connected crfs},
+  author={Chen, Liang-Chieh and Papandreou, George and Kokkinos, Iasonas and Murphy, Kevin and Yuille, Alan L},
+  journal={arXiv preprint arXiv:1606.00915},
+  year={2016}
+}
+@article{yu2015multi,
+  title={Multi-scale context aggregation by dilated convolutions},
+  author={Yu, Fisher and Koltun, Vladlen},
+  journal={arXiv preprint arXiv:1511.07122},
+  year={2015}
+}
+%%%%%%%% Datasets
+@article{russakovsky2015imagenet,
+  title={Imagenet large scale visual recognition challenge},
+  author={Russakovsky, Olga and Deng, Jia and Su, Hao and Krause, Jonathan and Satheesh, Sanjeev and Ma, Sean and Huang, Zhiheng and Karpathy, Andrej and Khosla, Aditya and Bernstein, Michael and others},
+  journal={International Journal of Computer Vision},
+  volume={115},
+  number={3},
+  pages={211--252},
+  year={2015},
+  publisher={Springer}
+}
 @article{everingham2015pascal,
   title={The pascal visual object classes challenge: A retrospective},
   author={Everingham, Mark and Eslami, SM Ali and Van Gool, Luc and Williams, Christopher KI and Winn, John and Zisserman, Andrew},
@@ -33,7 +61,6 @@
   year={2014},
   organization={Springer}
 }
-
 %%%%%%%% Label Noise
 % Robustness analysis
 @article{rolnick2017deep,
@@ -55,7 +82,7 @@
   journal={arXiv preprint arXiv:1701.06548},
   year={2017}
 }
-% Linear noise model
+% Label noise model
 @article{sukhbaatar2014training,
   title={Training convolutional networks with noisy labels},
   author={Sukhbaatar, Sainbayar and Bruna, Joan and Paluri, Manohar and Bourdev, Lubomir and Fergus, Rob},
@@ -68,6 +95,20 @@
   journal={arXiv preprint arXiv:1609.03683},
   year={2016}
 }
+@inproceedings{mnih2012learning,
+  title={Learning to label aerial images from noisy data},
+  author={Mnih, Volodymyr and Hinton, Geoffrey E},
+  booktitle={Proceedings of the 29th International Conference on Machine Learning (ICML-12)},
+  pages={567--574},
+  year={2012}
+}
+@inproceedings{xiao2015learning,
+  title={Learning from massive noisy labeled data for image classification},
+  author={Xiao, Tong and Xia, Tian and Yang, Yi and Huang, Chang and Wang, Xiaogang},
+  booktitle={Proceedings of the IEEE Conference on Computer Vision and Pattern Recognition},
+  pages={2691--2699},
+  year={2015}
+}
 % Dropout regularization
 @inproceedings{jindal2016learning,
   title={Learning Deep Networks from Noisy Labels with Dropout Regularization},
@@ -76,4 +117,86 @@
   pages={967--972},
   year={2016},
   organization={IEEE}
+}
+
+%%%%%%%% Transfer Learning
+@inproceedings{yosinski2014transferable,
+  title={How transferable are features in deep neural networks?},
+  author={Yosinski, Jason and Clune, Jeff and Bengio, Yoshua and Lipson, Hod},
+  booktitle={Advances in neural information processing systems},
+  pages={3320--3328},
+  year={2014}
+}
+@article{vincent2010stacked,
+  title={Stacked denoising autoencoders: Learning useful representations in a deep network with a local denoising criterion},
+  author={Vincent, Pascal and Larochelle, Hugo and Lajoie, Isabelle and Bengio, Yoshua and Manzagol, Pierre-Antoine},
+  journal={Journal of Machine Learning Research},
+  volume={11},
+  number={Dec},
+  pages={3371--3408},
+  year={2010}
+}
+@article{masci2011stacked,
+  title={Stacked convolutional auto-encoders for hierarchical feature extraction},
+  author={Masci, Jonathan and Meier, Ueli and Cire{\c{s}}an, Dan and Schmidhuber, J{\"u}rgen},
+  journal={Artificial Neural Networks and Machine Learning--ICANN 2011},
+  pages={52--59},
+  year={2011},
+  publisher={Springer}
+}
+@article{hinton2006fast,
+  title={A fast learning algorithm for deep belief nets},
+  author={Hinton, Geoffrey E and Osindero, Simon and Teh, Yee-Whye},
+  journal={Neural computation},
+  volume={18},
+  number={7},
+  pages={1527--1554},
+  year={2006},
+  publisher={MIT Press}
+}
+@inproceedings{lee2009convolutional,
+  title={Convolutional deep belief networks for scalable unsupervised learning of hierarchical representations},
+  author={Lee, Honglak and Grosse, Roger and Ranganath, Rajesh and Ng, Andrew Y},
+  booktitle={Proceedings of the 26th annual international conference on machine learning},
+  pages={609--616},
+  year={2009},
+  organization={ACM}
+}
+@inproceedings{erhan2009difficulty,
+  title={The difficulty of training deep architectures and the effect of unsupervised pre-training},
+  author={Erhan, Dumitru and Manzagol, Pierre-Antoine and Bengio, Yoshua and Bengio, Samy and Vincent, Pascal},
+  booktitle={Artificial Intelligence and Statistics},
+  pages={153--160},
+  year={2009}
+}
+@article{erhan2010does,
+  title={Why does unsupervised pre-training help deep learning?},
+  author={Erhan, Dumitru and Bengio, Yoshua and Courville, Aaron and Manzagol, Pierre-Antoine and Vincent, Pascal and Bengio, Samy},
+  journal={Journal of Machine Learning Research},
+  volume={11},
+  number={Feb},
+  pages={625--660},
+  year={2010}
+}
+@inproceedings{bengio2012deep,
+  title={Deep learning of representations for unsupervised and transfer learning},
+  author={Bengio, Yoshua},
+  booktitle={Proceedings of ICML Workshop on Unsupervised and Transfer Learning},
+  pages={17--36},
+  year={2012}
+}
+@inproceedings{le2013building,
+  title={Building high-level features using large scale unsupervised learning},
+  author={Le, Quoc V},
+  booktitle={Acoustics, Speech and Signal Processing (ICASSP), 2013 IEEE International Conference on},
+  pages={8595--8598},
+  year={2013},
+  organization={IEEE}
+} %excluded
+@inproceedings{glorot2010understanding,
+  title={Understanding the difficulty of training deep feedforward neural networks},
+  author={Glorot, Xavier and Bengio, Yoshua},
+  booktitle={Proceedings of the Thirteenth International Conference on Artificial Intelligence and Statistics},
+  pages={249--256},
+  year={2010}
 }
