@@ -1,0 +1,42 @@
+\section{Problem Formulation}
+\label{sec:formulation}
+
+%%%%%%%% TEXT Noise model
+\noindent
+\textit{Briefly formulate the problem.}
+
+\noindent
+Semantic Segmentation tasks can be considered as per-pixel classification problem. Each of the pixels is assigned a label of either $0$, indicating a background pixel, or $k \in {1, \ldots, K}$ denoting a foreground pixel corresponding to an instance from one of the $K$ categories.
+The aforementioned errors can be interpreted by the pixel label flipping:
+\textit{misannotation} is label flipped from $0$ to $k$, \textit{inexaustive annotation} flipped from $k$ to $0$, and \textit{misclassification} flipped from $i$ to $j$, where $i, j, k \in {1, \ldots, K}$.
+The misannotated instances are assumed to be visually distinguishable against the background and have natural semantic meaning. All the label flips have one instance as the minimum fliping unit.
+
+\noindent
+\textit{Instance Misannotation and Instance Misclassification}
+\noindent
+One hypothesis made in this work is that the \textit{misannotated and misclassified} instances can still provide information for training multi-scaled features that are \textit{transferable}\cite{yosinski2014transferable} to the other datasets and categories.
+Supposing a dog toy is wrongly annotated as a dog, given that the ``dog'' is one of the target categories while the ``toy'' is not, the error would introduce bias into the last layer but not necessarily into the first convolutional layers.
+The high-level features were found more dependent on a particular category, i.e. more \textit{specific}, than the low-level features, whereas the low-level features were found less category-dependent, i.e. more \textit{general}. \cite{yosinski2014transferable}
+We wanted to explore whether the ``generality'' of low-level features contributes to the annotation error robustness when we transfer the learned features to a new dataset with new categories.
+That leads us to the following research question:
+\begin{enumerate}
+  \item How do misannotation and misclassification of instances influence the ``transferability'' of the learned features respectively?
+\end{enumerate}
+We experimented, in Section \ref{sec:objectness}, how transferable the learned features are in two special cases for the two types of annotation error:
+\begin{description}
+  \item [instance misannotation] all instances from the non-target categories are misannotated as instance from the target category
+  \item [instance misclassification] the classes for all the instances are completely randomly assigned
+\end{description}
+\footnote{M: So, to what extent is this the actual research question that you would like to answer? J: I think this section answers your question now.}
+The \textit{transferability} of the features can be evaluated by how much they can boost the performance of training a new dataset. \cite{yosinski2014transferable}
+\textit{TODO One sentence summarizes the results.}
+
+\noindent
+\textit{Inexaustive annotating}
+
+\noindent
+The exhaustive annotations can introduce bias to both the decoding layer and the encoding layers because they negatively contribute to the activations in all the layers.
+\footnote{J: This argument need evidence too, or experiment/discussions in details in Section \ref{sec:pulearning}}
+The inexhaustive annotations need to be properly handled given the prior knowledge modeling the missing pattern of the annotations.
+Given that we believe any annotated instance provide information, all the foreground pixels that correspond to the annotated instances become reliable and the background pixels may contain both the true background pixels and object pixels unannotated.
+That satisfies a Positive and Unlabeled learning setup where the training dataset contains only the positive examples and unlabeled examples that are the mixed of the positive samples and negative samples.

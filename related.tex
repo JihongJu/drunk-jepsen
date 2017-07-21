@@ -1,17 +1,17 @@
 \section{Related work}
 \label{sec:related}
 
-\paragraph{Semantic Image Segmentation with Deep Neural Nets}
-
-J. Long et.al.\cite{long2015fully} defined a skip architecture to combine semantic information from a deep, coarse layer with appearance information from a shallow, fine layer to produce accurate and detailed segmentations and transfered the learned representations from the contemporray classification networks into fully convolutional networks.
-L. Chen et.al.\cite{chen2016deeplab} removed the last few max pooling layers of the CNNs and upsampled the corresponding filters to avoid the reduced feature resolution by the pooling layers. An additional fully connected Conditional Random Field (CRF) was added to refine the coarse last layer output for better localization performance.
-S. Zheng et.al.\cite{zheng2015conditional} integrate the CRFs-based probabilistic graphical modeling with CNNs in an end-to-end framework.
+% \paragraph{Semantic Image Segmentation with Deep Neural Nets}
+%
+% J. Long et.al.\cite{long2015fully} defined a skip architecture to combine semantic information from a deep, coarse layer with appearance information from a shallow, fine layer to produce accurate and detailed segmentations and transfered the learned representations from the contemporray classification networks into fully convolutional networks.
+% L. Chen et.al.\cite{chen2016deeplab} removed the last few max pooling layers of the CNNs and upsampled the corresponding filters to avoid the reduced feature resolution by the pooling layers. An additional fully connected Conditional Random Field (CRF) was added to refine the coarse last layer output for better localization performance.
+% S. Zheng et.al.\cite{zheng2015conditional} integrate the CRFs-based probabilistic graphical modeling with CNNs in an end-to-end framework.
 
 \paragraph{Transfer Learning}
-The first-layer features in the modern CNNs are often observed converging to either Gabor filters or color blobs, regardless the exact learning objectives and the training dataset.
-This pheonomen is called the \textit{generality} of the first-layer features.
-By contrast, the last-layer features depend significantly on the learning objective and dataset and they are called \textit{specific}.
-Yosinski et.al.\cite{yosinski2014transferable} studied the transition from general to specific for the features in the intermediate layers by measuring how much the tranformed  pre-trained features boost the fine-tuning performance on a new dataset, i.e. the ``transferability'' of the features.
+The first-layer features in the modern CNNs are often observed converged to either Gabor filters or color blobs, regardless the exact learning objectives and the training dataset.
+These first-layer features are then often described as \textit{general}.
+By contrast, the last-layer features significantly depend on the learning objective and dataset and they are denoted \textit{specific}.
+Yosinski et.al.\cite{yosinski2014transferable} studied the features in the intermediate layers, transiting from general to specific by measuring how much the tranformed  pre-trained features boost the fine-tuning performance on a new dataset, i.e. the ``transferability'' of the features.
 They found features from several bottom layers, not only the first layer, were ``transferable'' to a new dataset, meaning that they were not specific for a particular category but were shared across categories.
 This discovery led to our hypothesis that the general features can be more robust to annotation errors, either object misannotation or instance misclassidication, than the specific features.
 We used the same measure as Yosinki et.al. did to quantitatively measure the ``transferability'' of the features and reported the robustness to instance misannotation and instance misclassification for the learned representation.
@@ -37,15 +37,17 @@ They found a significant decrease of classification performance along with the i
 They then proposed methods to handle this label noise at random (NAR)\cite{frenay2014classification} situation by either introducing a linear noise layer on top of the output layer\cite{sukhbaatar2014training} or correcting the loss functions with an estimation of the noise transition matrix\cite{patrini2016making}.
 Xiao et al.\cite{xiao2015learning} integrated a probabilitic graphic model to an end-to-end deep learning system to train predicting class labels, either correct or wrong, together with correcting the wrong labels.
 Reed \& Lee\cite{reed2014training} proposed an empricaly way of taking into account the \textit{perceptual consistency} for large-scale object recognition and detection when incomplete and noisy labels exist by introducing a bootstrpping modification to the negative log-likelihood, in either a ``Hard'' or a ``soft'' favor.
-The ``soft'' bootstrapping loss is actually equivalent to a softmax regression with \textit{minimum entropy regularization}\cite{grandvalet2005semi} which was originally proposed for semi-supervised learning.
-Minimum entropy regularization encourages the model to have a high confidence in predicting labels.
 %Pereyra et al.\cite{pereyra2017regularizing} argued that the maximum entropy principle can prevent the model to have high confident predictions and result in better genralization.
 
 \textit{Noise robustness}
 In contrast to the aforementioned works, Rolnick et al.\cite{rolnick2017deep} argued that deep neural networks can learn robustly from noisy dataset as long as approriate hyperparameters choice are made.
 They studied instead of replacing the correct labels with noisy labels but diluting correct labels with noisy labels to support their argument.
 They then concluded sufficiently large training set is of more importance than lower the level of noise.
-This work is closely related to our work in Section \ref{sec:objectness}, except that we focus on the label noise robustness with respect to the feature ``transferability'' instead of the classification performance.
+This work is closely related to our work in Section \ref{sec:objectness}, except that we focus on the label noise robustness regarding the feature ``transferability'' instead of the classification performance.
+In addition, most of the these studies focus on the classification problems, whereas our work inclined more to the semantic segmentation problem.
 
 \paragraph{Positive and Unlabeled Learning}
-Most of the current studies for deep learning with noisy labels focus on classification problems.
+If we consider the inexaustive annotation issue only, i.e., only a proportion of the target instances were annotated, the problem becomes similiar to a so-called \textit{positive and unlabelled learning} (PU learning) setup\cite{li2005learning}.
+In the positive and unlabeled learning setup, the training dataset is made up with two sets of examples: the \textit{positive (P) set}, contained only positve examples, and the \textit{unlabeled (U) set}, contained a mix of positive or negative examples.
+If we categorize the pixels into either \textit{foreground pixels} or \textit{background pixels}, the correctly annotated target instances would form the positive set and the unannotated instances would mix with the background pixels, forming an unlabeled set.
+The previous studies about PU learning mostly focus on the binary classification for linear-separable problems\cite{elkan2008learning,lee2003learning},  whereas we showed in Section \ref{sec:pulearning} that it is possible to train deep neural networks for multiple classes with only ``positive'' and unlabeled examples.

@@ -20,7 +20,8 @@
 \paragraph{Exponential Loss for unlabeled examples}
 \noindent
 \textit{This part should explain why the exponential loss could perform better than the cross-entropy loss, potentially with a figure of 2D Gaussians.}
-
+The ``soft'' bootstrapping loss in \cite{reed2014training} is actually equivalent to a softmax regression with \textit{minimum entropy regularization}\cite{grandvalet2005semi} which was originally proposed for semi-supervised learning.
+Minimum entropy regularization encourages the model to have a high confidence in predicting labels.
 
 %%%%%%%% TEXT Expontial loss FADE IN
 \noindent
