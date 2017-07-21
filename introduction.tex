@@ -3,116 +3,75 @@
 
 %%%%%%%% TEXT Lack of perfect annotations
 \noindent
-\textit{The lack of ``gold standard'' annotations becomes the bottleneck for semantic segmentation.}
+\textit{Why noisy labels?:This paragraph should discuss the difficulties for collecting perfect segmentation annotations on a large scale}
 
 \noindent
-The state-of-art Convolutional Neural Networks (CNNs) based semantic image segmentation models usually rely on the present pre-trained convolutional filters. \cite{long2015fully}
-A typical method to pre-train the convolutional filters is to train a classification model with the large-scale ILSVRC dataset \cite{russakovsky2015imagenet} which contains 1000 categories and 1.2 million images.
+The recent success of deep neural networks benefits from the availability of large-scale supervised datasets such as ILSVRC\cite{russakovsky2015imagenet}.
+However, collecting a dataset for semantic image segmentation on a large scale can be expensive and time-consuming, especially when error-free labels are required.
+Enormous efforts have been made to create the ``gold standard'' annotations for the current benchmark segmentation datasets\cite{everingham2015pascal,mottaghi2014role,lin2014microsoft}.
+\footnote{M: Do we actually have a reference for that?  Or other proof?\\J: I think the preparation methods described in these papers can be supportive. Microsoft COCO even mentioned the total working hours in the paper.}
+%Millions of images are available through Flikr, ImageNet and many other sources on the Internet but only a few of them \cite{everingham2015pascal,mottaghi2014role,lin2014microsoft} have been well-annotated for semantic segmentation tasks.
+%The largest segmentation dataset, COCO2014\cite{lin2014microsoft}, contains annotations for only 164,000 training images, smaller by a factor of 10 than the ILSVRC2012 dataset with 1,281,167 labeled training images.
+These datasets allow the deep neural network models for semantic segmentation \cite{long2015fully,zheng2015conditional} to develop assuming the perfect segmentation ground truth exists, where perfect means that all the instances are annotated, no non-target object is misannotated, and no instance is misclassified.
+However, it is natural for human beings to make mistakes due to the lack of expertise, the inherent ambiguity of tasks or unconscious bias.
+Strong supervision is required to correct the mistakes, including double-checking the annotations over and over again and ensembling opinions from multiple annotators.
+%Otherwise, it may lead to annotations that contain misannotated objects, unannotated instances and misclassified instances.
+In some cases, for example in the medical imaging, the ``gold standard'' itself can be ambiguous and cause disagreement among different annotators.
+Also, there are some freely available labels, which may or may not be accurate, for specific problems.
+For example, one can use digital maps, like OpenStreetMap, to annotate aerial images, but such segmentation annotations constructed from maps suffer from the incomplete annotation as well as registration problems.\cite{mnih2012learning}
+%There are also crowdsourcing platforms like Pl\@ntNet can provide noisy labels on a large scale.
+This motivates us to explore how to learn from these noisy annotations.
+
+\noindent
+\textit{Why representation?: This paragraph should discuss the idea of noise-robust representation}
+
+\noindent
+Deep convolutional neural networks (DCNN) based models often contain two principle components: a stack of convolutional layers to extract hierarchical features and a few  task-specific layers to fit the training objectives.
+Both parts are important to achieve good performance because they are trained jointly in an end-to-end manner via back propagation.
+The convolutional features were proved ``transferable'' to a new dataset\cite{yosinski2014transferable} or even to a different task\cite{girshick2014rich}.
+The state-of-art DCNN based semantic image segmentation models relies on transfering the pre-trained convolutional filters as well.\cite{long2015fully}
+A typical method to pre-train the convolutional filters is to train a classification model with the large-scale ILSVRC dataset \cite{russakovsky2015imagenet}
 However, this method constrains the semantic image segmentation models to have the same CNN architecture as the image classification models.
 The CNN design for semantic image segmentation does not necessarily follow the design of image classification architectures.
-The segmentation models need both global and local information to generate fine segmentations, whereas the classification models care less about local information that gives information about the object localization.
+The segmentation models need both global and local information to predict the category and give a fine segmentation, whereas the classification models care less about local information for object localization.
 For instance, the presence of the max-pooling layers enable the following convolutional filters to have larger receptive fields but, at the same time, reduce the resolution of the features.
 Additional upsampling layers, can recover the shape of the output segmentation but cannot fully recover the information thrown away.
 This first-pooling-and-then-upsampling pipeline can result in coarse segmentation output \cite{chen2016deeplab} with non-shape boundaries and blob-like shapes.
-\footnote{M: Also for this claim, I think we need a reference or something like that.  Or other proof indeed...  In addition, I wonder whether we can explain why this may be the case? J: Yes, I can refer to a paragraph in the intro of CRFasRNN and enrich the discussion a bit.}
-The coarse output can be refined with Conditional Random Field (CRF) inference\cite{zheng2015conditional,chen2016deeplab}.
+\footnote{M: Also for this claim, I think we need a reference or something like that. Or other proof indeed...  In addition, I wonder whether we can explain why this may be the case? J: Yes, I can refer to a paragraph in the intro of CRFasRNN and enrich the discussion a bit.}
+%The coarse output can be refined with Conditional Random Field (CRF) inference\cite{zheng2015conditional,chen2016deeplab}.
+\noindent
+Alternatively, one can also extract convolutional features with semantic segmentation tasks.
+But it is more difficult to collect well-annotated dataset for semantic image segmentation than for object recognition.
+A large number of annotated images are of great value to train sufficiently generalised representation and avoid overfitting, given the ``data-hungry'' nature of DCNNs.
+\footnote{M: For the rest a bit vague... what do we really mean by suffer? Maybe this becomes clear later in the intro...? J: Refrased.}
+Allowing the existence noisy annotations could help signicantly increase the number of annotated images and the number of training samples could compensate the impact of annotation errors.
+We will further discuss this in the related works.
+
+% %%%%%%%% TEXT Summarize
+\noindent
+\textit{This paragraph should summarize the main ideas.}
 
 \noindent
-\textit{This paragraph should explain the difficulties for collecting perfect segmentation annotations on a large scale}
-Alternatively, one can also pre-train CNNs by semantic segmentation tasks directly.
-Given the ``data-hungry'' nature of CNNs, one major challenge to train ``good representation'' with semantic segmentation tasks is the lack of ``gold standard'' segmentation on a large scale,
-\footnote{M: For the rest a bit vague... what do we really mean by suffer? Maybe this becomes clear later in the intro...? J: Refrased.}
-The largest segmentation dataset, COCO2014\cite{lin2014microsoft}, contains annotations for only 164,000 training images, smaller by a factor of 10 than the ILSVRC2012 dataset with 1,281,167 labeled training images.
-Millions of images are available through Flikr, ImageNet and many other sources on the Internet but only a few of them \cite{everingham2015pascal,mottaghi2014role,lin2014microsoft} have been well-annotated for semantic segmentation tasks.
-Most state-of-art neural networks for semantic segmentation \cite{long2015fully,zheng2015conditional} assume the existence of perfect segmentations with all instance annotated (exhaustive) and no misannotated instance (precise).
-However, it is natural for human beings to make mistakes due to the lack of expertise, the inherent ambiguity of tasks or unconscious bias.
-Enormous efforts are required to correct the mistakes made, including double-checking the annotations over and over again and ensembling opinions from multiple annotators.
-Otherwise, it may lead to annotations that contain misannotated instances, unannotated instances and misclassification of instances.
-This makes collecting such perfect segmentations manually on a large scale become both expensive and time-consuming. \cite{lin2014microsoft}
-\footnote{M: Do we actually have a reference for that?  Or other proof?\\J: Yep. Microsoft's paper about the Microsoft COCO dataset actually mentioned how many working hours the crowd workers spent, etc.}
-In domains like medical imaging, collecting such annotations can be even more expensive because of the high compensation and workload for the medical experts.
-In addition, there are some freely available labels which may or may not be accurate.
-One exemple for this is the use of digital maps such as OpenStreetMap to annotate aerial images for segmentation, but the such dataset constructed from maps suffer from omission noise and registration problems.\cite{mnih2012learning}
-If the ``gold standard'' annotation assumption can be relaxed somehow, collecting segmentation annotations would be easier to scale by avoiding tedious inspection and correction.
-But that requires methods that can still learn transferable features in the presence of annotation errors.
-\footnote{J: Why would this differ from training deep neural networks in the precence of annotation errors?}
-
-
-% %%%%%%%% TEXT Reasoning problem
-% \noindent
-% \textit{This paragraph should reason the idea obtain pre-trained features by learning ``objectness'' with Positive and Unlabeled examples.}
-%
-% \noindent
-% For CNN based convolutional neural networks, the purpose of a learning objective is not only to train a classifier with minimum errors but also to learn satisfying intermediate convolutional filters.
-% \footnote{M: This is not really clear to me and certainly not to the average reader, I think.  I think this needs clarification : why would one want this?}
-% It is clear that training with the noisy annotations would lead to higher segmenting errors than training with the correct annotations if the validation samples had correct annotations. It is nevertheless unclear how the annotation noises influence the learned image representation.
-%
-% \noindent
-% That leads to our research questions:
-% \begin{enumerate}
-%   \item How to compensate the classification bias introduced by misannotation and inexhaustive annotations with the appropriate prior knowledge.
-%   \footnote{M: I guess the related work section should make clear why semi-supervised learning, learning under label noise, etc. can or cannot be the answer to this question...?}
-%   \item How do the label noises influence the learned representation.
-% \end{enumerate}
-%
-% \noindent
-% We argue that annotation errors do not necessarily lead to a ``bad representation'' though it may affect the pre-training .
-%
-% the number of training samples could compensate the annotation errors.
+The different levels of the hierarchical features in DCNNs are believed to play different roles in extracting information from the images.
+The low-level features process the local information within small neighborhood and the high-level features ensemble information from lower-level features to extract abstract information.
+The high-level features were found significantly dependent on the exact categories compared to the low-level features which show extraordinary category independency.\cite{yosinski2014transferable}
+Previous studies\cite{sukhbaatar2014training,patrini2016making} have shown that training with noisy labels can lead to significant higher classification errors than training with clean labels if the total number of training samples are fixed.
+It is nevertheless unclear how the annotation errors would influence the learned multiple level features.
+We made a hypothesis that annotation errors do not necessarily lead to a ``bad representation'' because the ``generality'' of low-level features may contribute to a robustness to the rrors when we transfer the learned features to a new dataset with new categories.
 % We then explored methods to learn image representation in the presence of annotation noise.
 % \footnote{M: This needs a bit more explaining, I think.  To me this step is absolutely nontrivial.}
-
-%%%%%%%% TEXT Noise model
-\noindent
-\textit{Briefly formulate the problem.}
-
-\noindent
-Semantic Segmentation tasks can be considered as per-pixel classification problem. Each of the pixels is assigned a label of either $0$, indicating a background pixel, or $k \in {1, \ldots, K}$ denoting a foreground pixel corresponding to an instance from one of the $K$ categories.
-The aforementioned errors can be interpreted by the pixel label flipping:
-\textit{misannotation} is label flipped from $0$ to $k$, \textit{inexaustive annotation} flipped from $k$ to $0$, and \textit{misclassification} flipped from $i$ to $j$, where $i, j, k \in {1, \ldots, K}$.
-The misannotated instances are assumed to be visually distinguishable against the background and have natural semantic meaning. All the label flips have one instance as the minimum fliping unit.
-
-\noindent
-\textit{Instance Misannotation and Instance Misclassification}
-\noindent
-One hypothesis made in this work is that the \textit{misannotated and misclassified} instances can still provide information for training multi-scaled features that are \textit{transferable}\cite{yosinski2014transferable} to the other datasets and categories.
-Supposing a dog toy is wrongly annotated as a dog, given that the ``dog'' is one of the target categories while the ``toy'' is not, the error would introduce bias into the last layer but not necessarily into the first convolutional layers.
-The high-level features were found more dependent on a  particular category, i.e. more \textit{specific}, than the low-level features, whereas the low-level features were found less category-dependent, i.e. more \textit{general}. \cite{yosinski2014transferable}
-We wanted to explore whether the ``generality'' of low-level features contributes to the annotation error robustness when we transfer the learned features to a new dataset with new categories.
-That leads us to the following research question:
-\begin{enumerate}
-  \item How do misannotation and misclassification of instances influence the ``transferability'' of the learned features respectively?
-\end{enumerate}
-We experimented, in Section \ref{sec:objectness}, how transferable the learned features are in two special cases for the two types of annotation error:
-\begin{description}
-  \item [instance misannotation] all instances from the non-target categories are misannotated as instance from the target category
-  \item [instance misclassification] the classes for all the instances are completely randomly assigned
-\end{description}
-\footnote{M: So, to what extent is this the actual research question that you would like to answer? J: I think this section answers your question now.}
-The \textit{transferability} of the features can be evaluated by how much they can boost the performance of training a new dataset. \cite{yosinski2014transferable}
-\textit{TODO One sentence summarizes the results.}
-
-\noindent
-\textit{Inexaustive annotating}
-
-\noindent
-The exhaustive annotations can introduce bias to both the decoding layer and the encoding layers because they negatively contribute to the activations in all the layers.
-\footnote{J: This argument need evidence too, or experiment/discussions in details in Section \ref{sec:pulearning}}
-The inexhaustive annotations need to be properly handled given the prior knowledge modeling the missing pattern of the annotations.
-Given that we believe any annotated instance provide information, all the foreground pixels that correspond to the annotated instances become reliable and the background pixels may contain both the true background pixels and object pixels unannotated.
-That satisfies a Positive and Unlabeled learning setup where the training dataset contains only the positive examples and unlabeled examples that are the mixed of the positive samples and negative samples.
-
-
 
 %%%%%%%% TEXT Table of contents
 \noindent
 \textit{Table of contents}
 
 \noindent
-Related works are summarized in the next section.
-In Section \ref{sec:objectness} we judge the possibility of learning convolutional representation with misannotations by learning to predict the pixel objectness.
-Section \ref{sec:pulearning} explored the methods to compensate the inexaustive annotations in a Positive and Unlabeled Learning setup.
-Features learned by predicting the pixel objectness with inexaustive annotations were then validated with experiments described in Section \ref{sec:results}.
+In the next section, we summarized the related works.
+In Section \ref{sec:formulation} we formulate the annotation errors into three categroies: misannotation, misclassification and incomple annotation.
+We tested our hypothesis in Section \ref{sec:objectness}, studying whether the misannotation and misclassification had an impact on learning ``transferable'' features.
+In Section \ref{sec:pulearning} we connected training with inexaustive annotations to Positive and Unlabeled Learning.
+%Features learned by predicting the pixel objectness with inexaustive annotations were then validated with experiments described in Section \ref{sec:results}.
+
 
 % %%%%%%%% TEXT Semantic segmentation is different from classification
 % \textit{This paragraph should explain the difference between classification and semantic segmentation.}

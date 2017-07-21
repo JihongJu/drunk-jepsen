@@ -1,5 +1,5 @@
 \section{Related work}
-\label{related}
+\label{sec:related}
 
 \paragraph{Semantic Image Segmentation with Deep Neural Nets}
 
@@ -10,34 +10,42 @@ S. Zheng et.al.\cite{zheng2015conditional} integrate the CRFs-based probabilisti
 \paragraph{Transfer Learning}
 The first-layer features in the modern CNNs are often observed converging to either Gabor filters or color blobs, regardless the exact learning objectives and the training dataset.
 This pheonomen is called the \textit{generality} of the first-layer features.
-By contrast, the last-layer features depend significantly on the learning objective and dataset and they are called \textit{specific}.\cite{yosinski2014transferable}
+By contrast, the last-layer features depend significantly on the learning objective and dataset and they are called \textit{specific}.
 Yosinski et.al.\cite{yosinski2014transferable} studied the transition from general to specific for the features in the intermediate layers by measuring how much the tranformed  pre-trained features boost the fine-tuning performance on a new dataset, i.e. the ``transferability'' of the features.
 They found features from several bottom layers, not only the first layer, were ``transferable'' to a new dataset, meaning that they were not specific for a particular category but were shared across categories.
 This discovery led to our hypothesis that the general features can be more robust to annotation errors, either object misannotation or instance misclassidication, than the specific features.
 We used the same measure as Yosinki et.al. did to quantitatively measure the ``transferability'' of the features and reported the robustness to instance misannotation and instance misclassification for the learned representation.
 
 \paragraph{Unsupervised and semi-supervised pre-training}
-Apart from supervised pre-training, one can also obtain the pre-trained features with unsupervised or semi-supervised pre-training.
-Vincent et al.\cite{vincent2010stacked} trained multilevel representations robust to corrupted inputs with stacked denoising auto-encoders.
+Apart from supervised pre-training, one can also obtain the pre-trained features in an  unsupervised or a semi-supervised way.
+The most common method is to train a generative model with either \textit{auto-encoder} variants or \textit{deep beilief network}.
+Vincent et al.\cite{vincent2010stacked} trained multiple levels of representation robust to the corrupted inputs with stacked denoising auto-encoders.
 Masci et al.\cite{masci2011stacked} presented a stacked convolutional auto-encoder unsupervised pre-training for hierarchical feature extraction.
-Hinton et al.\cite{hinton2006fast} proposed a greedy learning algorithm to train \textit{deep belief nets} one layer at a time in an unsupervised generative training setup.
-Lee et al.\cite{lee2009convolutional} presented a hierarchical generative model, \textit{convolutional deep belief network}, to learn hierachical representation.
-A couple of works\cite{erhan2009difficulty,erhan2010does,bengio2012deep} highlighted the advantage of unsupervised pre-training compared to the random initialization, connecting unsupervised pre-training to either a norm of regularization or better disentangling the sample variations.
-However, xavier initialization\cite{glorot2010understanding} shorten the gap between the unsupervised pre-trained representations and random initialization.
-Unsupervised deep representation learning is in general not comparable to supervised representation learning given large scale dataset is available.
-\footnote{J: Citation needed.}
-Supervised pre-training even in the presence of annotation errors is expected to outperform unsupervised pre-training because more information is provided.
-\footnote{J: Evidence/Experiment needed!}
+Hinton et al.\cite{hinton2006fast} proposed a greedy learning algorithm to train \textit{deep belief nets} one layer at a time to train hierarchival features.
+Lee et al.\cite{lee2009convolutional} presented a \textit{convolutional deep belief network}, to learn hierachical convolutional representations.
+A few studies\cite{erhan2009difficulty,erhan2010does,bengio2012deep} highlighted the advantage of unsupervised pre-training compared to the random initialization, connecting unsupervised pre-training to a norm of regularization and a method that help disentangle the sample variations.
+However, better random initialization strategies, for example xavier initialization\cite{glorot2010understanding} and its variants, have shorten the gap between unsupervised pre-training and random initialization.
+Using unsupervised pre-training or not now becomes a tradeoff between the time and resources invested and the perfomance gain.
+Unsupervised deep representation learning is in general not comparable to supervised representation learning especially when large scale dataset is available.
+A proper method to learn features in the presence of label noise should outperform  unsupervised pre-training because noisy information is still better than no information.
+\footnote{J: This argument is a bit too strong to me.}
 \textit{TODO Semi-supervised representation learning}
 
 \paragraph{{Deep Learning with Noisy Labels}}
+A few studies\cite{sukhbaatar2014training,patrini2016making} investigated the impact of label noise on classification performance with convolutional neural networks assuming the labels were randomly transited from one to another given the probabilities fall in a trainsition matrix.
+They found a significant decrease of classification performance along with the increase of false label proportion when the total number of examples is fixed.
+They then proposed methods to handle this label noise at random (NAR)\cite{frenay2014classification} situation by either introducing a linear noise layer on top of the output layer\cite{sukhbaatar2014training} or correcting the loss functions with an estimation of the noise transition matrix\cite{patrini2016making}.
+Xiao et al.\cite{xiao2015learning} integrated a probabilitic graphic model to an end-to-end deep learning system to train predicting class labels, either correct or wrong, together with correcting the wrong labels.
+Reed \& Lee\cite{reed2014training} proposed an empricaly way of taking into account the \textit{perceptual consistency} for large-scale object recognition and detection when incomplete and noisy labels exist by introducing a bootstrpping modification to the negative log-likelihood, in either a ``Hard'' or a ``soft'' favor.
+The ``soft'' bootstrapping loss is actually equivalent to a softmax regression with \textit{minimum entropy regularization}\cite{grandvalet2005semi} which was originally proposed for semi-supervised learning.
+Minimum entropy regularization encourages the model to have a high confidence in predicting labels.
+%Pereyra et al.\cite{pereyra2017regularizing} argued that the maximum entropy principle can prevent the model to have high confident predictions and result in better genralization.
 
-\textit{Robustness analysis}
-Deep Learning is Robust to Massive Label Noise \cite{rolnick2017deep}
-
-\textit{Entropy regularization}
-Training deep neural networks on noisy labels with bootstrapping \cite{reed2014training}
-Regularizing Neural Networks by Penalizing Confident Output Distributions \cite{pereyra2017regularizing}
-
+\textit{Noise robustness}
+In contrast to the aforementioned works, Rolnick et al.\cite{rolnick2017deep} argued that deep neural networks can learn robustly from noisy dataset as long as approriate hyperparameters choice are made.
+They studied instead of replacing the correct labels with noisy labels but diluting correct labels with noisy labels to support their argument.
+They then concluded sufficiently large training set is of more importance than lower the level of noise.
+This work is closely related to our work in Section \ref{sec:objectness}, except that we focus on the label noise robustness with respect to the feature ``transferability'' instead of the classification performance.
 
 \paragraph{Positive and Unlabeled Learning}
+Most of the current studies for deep learning with noisy labels focus on classification problems.
