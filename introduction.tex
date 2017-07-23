@@ -26,25 +26,25 @@ This motivates us to explore how to learn from these noisy annotations.
 \textit{Why representation?: This paragraph should discuss the idea of noise-robust representation}
 
 \noindent
-Deep convolutional neural networks (DCNN) based models often contain two principle components: a stack of convolutional layers to extract hierarchical features and a few  task-specific layers to fit the training objectives.
+Deep convolutional neural networks (DCNN) based models often contain two principal components: a stack of convolutional layers to extract hierarchical features and a few task-specific layers to fit the training objectives.
 Both parts are important to achieve good performance because they are trained jointly in an end-to-end manner via back propagation.
 The convolutional features were proved ``transferable'' to a new dataset\cite{yosinski2014transferable} or even to a different task\cite{girshick2014rich}.
-The state-of-art DCNN based semantic image segmentation models relies on transfering the pre-trained convolutional filters as well.\cite{long2015fully}
+The state-of-art DCNN based semantic image segmentation models relies on transferring the pre-trained convolutional filters as well.\cite{long2015fully}
 A typical method to pre-train the convolutional filters is to train a classification model with the large-scale ILSVRC dataset \cite{russakovsky2015imagenet}
 However, this method constrains the semantic image segmentation models to have the same CNN architecture as the image classification models.
 The CNN design for semantic image segmentation does not necessarily follow the design of image classification architectures.
 The segmentation models need both global and local information to predict the category and give a fine segmentation, whereas the classification models care less about local information for object localization.
 For instance, the presence of the max-pooling layers enable the following convolutional filters to have larger receptive fields but, at the same time, reduce the resolution of the features.
-Additional upsampling layers, can recover the shape of the output segmentation but cannot fully recover the information thrown away.
+Additional upsampling layers can recover the shape of the output segmentation but cannot fully recover the information thrown away.
 This first-pooling-and-then-upsampling pipeline can result in coarse segmentation output \cite{chen2016deeplab} with non-shape boundaries and blob-like shapes.
 \footnote{M: Also for this claim, I think we need a reference or something like that. Or other proof indeed...  In addition, I wonder whether we can explain why this may be the case? J: Yes, I can refer to a paragraph in the intro of CRFasRNN and enrich the discussion a bit.}
 %The coarse output can be refined with Conditional Random Field (CRF) inference\cite{zheng2015conditional,chen2016deeplab}.
 \noindent
 Alternatively, one can also extract convolutional features with semantic segmentation tasks.
 But it is more difficult to collect well-annotated dataset for semantic image segmentation than for object recognition.
-A large number of annotated images are of great value to train sufficiently generalised representation and avoid overfitting, given the ``data-hungry'' nature of DCNNs.
+A large number of annotated images are of great value to train sufficiently generalized representation and avoid overfitting, given the ``data-hungry'' nature of DCNNs.
 \footnote{M: For the rest a bit vague... what do we really mean by suffer? Maybe this becomes clear later in the intro...? J: Refrased.}
-Allowing the existence noisy annotations could help signicantly increase the number of annotated images and the number of training samples could compensate the impact of annotation errors.
+Allowing the existence noisy annotations could help significantly increase the number of annotated images and the number of training samples could compensate the impact of annotation errors.
 We will further discuss this in the related works.
 
 % %%%%%%%% TEXT Summarize
@@ -54,10 +54,10 @@ We will further discuss this in the related works.
 \noindent
 The different levels of the hierarchical features in DCNNs are believed to play different roles in extracting information from the images.
 The low-level features process the local information within small neighborhood and the high-level features ensemble information from lower-level features to extract abstract information.
-The high-level features were found significantly dependent on the exact categories compared to the low-level features which show extraordinary category independency.\cite{yosinski2014transferable}
-Previous studies\cite{sukhbaatar2014training,patrini2016making} have shown that training with noisy labels can lead to significant higher classification errors than training with clean labels if the total number of training samples are fixed.
+The high-level features were found significantly dependent on the exact categories compared to the low-level features which show extraordinary category independence.\cite{yosinski2014transferable}
+Previous studies\cite{sukhbaatar2014training,patrini2016making} have shown that training with noisy labels can lead to significantly higher classification errors than training with clean labels if the total number of training samples are fixed.
 It is nevertheless unclear how the annotation errors would influence the learned multiple level features.
-We made a hypothesis that annotation errors do not necessarily lead to a ``bad representation'' because the ``generality'' of low-level features may contribute to a robustness to the rrors when we transfer the learned features to a new dataset with new categories.
+We made a hypothesis that annotation errors do not necessarily lead to a ``bad representation'' because the ``generality'' of low-level features may contribute to a robustness to the errors when we transfer the learned features to a new dataset with new categories.
 % We then explored methods to learn image representation in the presence of annotation noise.
 % \footnote{M: This needs a bit more explaining, I think.  To me this step is absolutely nontrivial.}
 
@@ -66,8 +66,8 @@ We made a hypothesis that annotation errors do not necessarily lead to a ``bad r
 \textit{Table of contents}
 
 \noindent
-In the next section, we summarized the related works.
-In Section \ref{sec:formulation} we formulate the annotation errors into three categroies: misannotation, misclassification and incomple annotation.
+In the next section, we summarized the related works for deep learning with noisy labels.
+In Section \ref{sec:formulation} we formulate the annotation errors into three categroies: misannotation, misclassification and incomplete annotation.
 We tested our hypothesis in Section \ref{sec:objectness}, studying whether the misannotation and misclassification had an impact on learning ``transferable'' features.
 In Section \ref{sec:pulearning} we connected training with inexaustive annotations to Positive and Unlabeled Learning.
 %Features learned by predicting the pixel objectness with inexaustive annotations were then validated with experiments described in Section \ref{sec:results}.
