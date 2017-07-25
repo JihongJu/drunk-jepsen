@@ -6,18 +6,31 @@
 \textit{Briefly formulate the problem.}
 
 \noindent
-Semantic Segmentation tasks can be considered as per-pixel classification problem. Each of the pixels is assigned a label of either $0$, indicating a background pixel, or $k \in {1, \ldots, K}$ denoting a foreground pixel corresponding to an instance from one of the $K$ categories.
-The aforementioned errors can be interpreted by the pixel label flipping:
-\textit{misannotation} is label flipped from $0$ to $k$, \textit{inexaustive annotation} flipped from $k$ to $0$, and \textit{misclassification} flipped from $i$ to $j$, where $i, j, k \in {1, \ldots, K}$.
-The misannotated instances are assumed to be visually distinguishable against the background and have natural semantic meaning. All the label flips have one instance as the minimum fliping unit.
+Semantic segmentation and other dense prediction tasks can be considered as pixel-wise classification problem.
+Supposing there are $K$ pre-defined categories to segment, each of the pixels is assigned a label $k \in [0, K]$, where $k=0$ if the pixel is a pixel for background, or $k \in [1, k]$ if the pixel is correspondent to an object from one of the $K$ categories.
+The three types of annotation errors considered in this work are:
+\begin{description}
+  \item [Misannotation] There are objects, which are semantically meaningful but not not from the pre-defined categories, wrongly segmented as one of the pre-defined categories. The objects have pixel labels flipped from $0$ to $k$.
+  \item [Misclassification] There are objects misclassified from one pre-defined category to another. Labels of the corresponding pixels flipped from $i$ to $j$.
+  \item [Inexaustive annotation] There are objects from the pre-defined categories unsegmentated. Pixels for the unannotated objects have labels flipped from $k$ to $0$.
+\end{description}
+where $i, j, k \in [1, \ldots, K]$.
 
 \noindent
-\textit{Instance Misannotation and Instance Misclassification}
+\textit{Why would low-level features robust to misannotation}
 \noindent
-One hypothesis made in this work is that the \textit{misannotated and misclassified} instances can still provide information for training multi-scaled features that are \textit{transferable}\cite{yosinski2014transferable} to the other datasets and categories.
-Supposing a dog toy is wrongly annotated as a dog, given that the ``dog'' is one of the target categories while the ``toy'' is not, the error would introduce bias into the last layer but not necessarily into the first convolutional layers.
-The high-level features were found more dependent on a particular category, i.e. more \textit{specific}, than the low-level features, whereas the low-level features were found less category-dependent, i.e. more \textit{general}. \cite{yosinski2014transferable}
-We wanted to explore whether the ``generality'' of low-level features contributes to the annotation error robustness when we transfer the learned features to a new dataset with new categories.
+\paragraph{Misannotation}
+Convolutional neural networks on images are believed to extract hierarchical features, among which the low-level features look for specific patterns and the high-level features ensemble information from the low-level features.
+Low-level features were found\cite{yosinski2014transferable} less dependent on a particular category, i.e. more \textit{general}, than the high-level features by showing the transferability from one category to another.
+Supposing a toy dog is wrongly annotated as a dog, given that the ``dog'' is one of the target categories whereas the ``toy'' is not, the error could mislead the model to predict this toy dog as dogs.
+However, a toy dog and a dog still look similiar to each other, especially in terms of the visual details: they are both furry, have similiar shape and appearance for eyes, noses, mouths, etc.
+These similiarities in features between the toy dog and dog can help learn the low-level features when a toy dog was misannotated as a dog.
+If we consider further lower features, for exmaple those for detecting edges and corners, they are commonly transferable to many categories, not necessarily ones that look alike.
+dissimilar categories (man-made classes and natural classes)
+%If we constraint ourselves to perceive only part of the dog and the toy dog, for example the ears, it may become difficult even for us to distinguish the two because given only the local information there is not much difference between them.
+The generality of the low-level features can introduce the robustness to misannotations regarding the transferability when we want to transfer hieraychical features for semantic segmentation in the presence misannotated objects because the low-level features are not dependent on the exact category assigned to the objects.
+This annotation error robustness for the low-level features could result in noise robustness for the multiple level pre-trained weights for semantic segmentation with noisy labels.
+In Section \ref{sec:objectness}, we tested whether object misannotation had an impact on the transfehen we transfer the learned features to a new dataset with new categories.
 That leads us to the following research question:
 \begin{enumerate}
   \item How do misannotation and misclassification of instances influence the ``transferability'' of the learned features respectively?
@@ -30,6 +43,11 @@ We experimented, in Section \ref{sec:objectness}, how transferable the learned f
 \footnote{M: So, to what extent is this the actual research question that you would like to answer? J: I think this section answers your question now.}
 The \textit{transferability} of the features can be evaluated by how much they can boost the performance of training a new dataset. \cite{yosinski2014transferable}
 \textit{TODO One sentence summarizes the results.}
+
+
+\noindent
+\textit{Misclassification}
+Misclassification is similiar to misannotation except
 
 \noindent
 \textit{Inexaustive annotating}
