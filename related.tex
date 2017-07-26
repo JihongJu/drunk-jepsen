@@ -8,13 +8,17 @@
 % S. Zheng et.al.\cite{zheng2015conditional} integrate the CRFs-based probabilistic graphical modeling with CNNs in an end-to-end framework.
 
 \paragraph{Transfer Learning}
-The first-layer features in the modern CNNs are often observed converged to either Gabor filters or color blobs, regardless the exact learning objectives and the training dataset.
-These first-layer features are then often described as \textit{general}.
-By contrast, the last-layer features significantly depend on the learning objective and dataset and they are denoted \textit{specific}.
-Yosinski et.al.\cite{yosinski2014transferable} studied the features in the intermediate layers, transiting from general to specific by measuring how much the tranformed  pre-trained features boost the fine-tuning performance on a new dataset, i.e. the transferability of the features.
-They found features from several bottom layers, not only the first layer, were transferable to a new dataset, meaning that they were not specific for a particular category but were shared across categories.
-This discovery led to our hypothesis that the general features can be more robust to annotation errors, either object misannotation or instance misclassidication, than the specific features.
-We used the same measure as Yosinki et.al. did to quantitatively measure the transferability of the features and reported the robustness to instance misannotation and instance misclassification for the learned representation.
+\textit{transfer learning}
+We sometimes have a learning task in one domain of interest, but we only have sufficient training data in another domain of interest, where the two domain may or may not share the same feature space and have the same data distribution.
+Transfer learning arises in this scenario to transfer knowledge from one domain to anthoer and to improve the performance of learning by avoiding much expensive data-labeling efforts.\cite{pan2010survey}
+Recently, a form of knowledge that shows outstanding transferability is the weights of convolutional neural networks.
+For example, weights trained on ImageNet images to perform image classification were shown successfully transfered to new categories and new learning problems\cite{girshick2014rich,long2015fully,shin2016deep}.
+Convolutional neural networks on images are believed to extract hierarchical features, among which the low-level features look for specific patterns and the high-level features ensemble the information from low-level features.
+Low-level features were found more \textit{general}, i.e., less dependent on a particular category, than the high-level features.
+By training a CNN on a random half of the ImageNet categories and transfer features, varying from the bottom layers to the top layers, to the other half, Yosinski et al. found transferability of features drop due to representation specificity increase as well as optimization difficulties due to co-adaption.\cite{yosinski2014transferable}
+They also found that transferability of features decreases as the distance between the base task and target task increases, the first two layers have features still showing significant transferability to disimilar categories.
+Transferring features even from distant tasks can be better than using random features.
+In Section \ref{sec:objectness}, we wanted to explore whether transferability of features is robust to annotation errors in the pre-training dataset.
 
 \paragraph{Unsupervised pre-training}
 Apart from supervised pre-training, one can also obtain pre-trained features in an unsupervised or a semi-supervised way.

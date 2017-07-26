@@ -1,0 +1,90 @@
+\section{Annotation noise-robustness of representations}
+\label{sec:robustness}
+
+%%%%%%%% TEXT Noise model
+
+\noindent
+\textit{From feature generality to feature robustness}
+\noindent
+The first-layer features of convolutional neural networks for images are often observed converged to either Gabor filters or color blobs even training with different datasets and different objectives\cite{zeiler2014visualizing,lee2009convolutional,krizhevsky2012imagenet,shin2016deep}.
+Because these standard features on the first layer often occur independent of the exact cost function and natural image dataset, we call these first-layer features \textit{general}.
+By contrast, the last-layer features must significantly depend on the given labels otherwise the training errors would be high which is against learning objective.
+These features are then denoted as \textit{specific}.
+As we mentioned in Section \ref{sec:related}, Yosinski et al. \cite{yosinski2014transferable} studied the features in the intermediate layers and found the weights transferability decreases from the first layer to the last layer, alongside the specificity increases from the first layer to the last layer.
+Given the evidence that low-level features can be independent of a particular category, we wonder if the learned features are robustness to label noises regarding their transferability to a new task.
+For instance, if some dogs were incorrectly annotated as cats in the base dataset for pre-training, would these annotation noises influence transferability of the learned features to a new task recognize or detect sheep?
+
+\noindent
+We experimented, in Section \ref{sec:results}, how transferable the learned features are in the presence of three types of annotation noises: \textit{misannotation}, \textit{misclassification} and \textit{inexaustive annotation}.
+
+Transferability of features can be evaluated by how much they can improve the performance of training a new dataset compared to training with random weights initialization. \cite{yosinski2014transferable}
+
+\noindent
+\paragraph{Problem Formulation}
+\noindent
+Semantic segmentation and other dense prediction tasks can be considered as pixel-wise classification problem.
+Given an image $x$, a segmenting model $f: R^{h \times w \times c} \rightarrow R^{h \times w}$ predicts a label for each pixel and output a label map $y$ that has the same size as $x$.
+$h, w$ are image height and weight respectively and $c$ is the number of channels for images.
+Supposing there are $K$ predefined categories, each pixel is assigned a label $y_{ij}=k$, where $ij$ denotes a pixel from a set of all pixels in the image, $P$, and $i \in [1,h], j \in [1,w]$.
+The assigned label $k \in [1, K]$ if the pixel corresponds to an object from one of the $K$ categories; $k=0$ if the pixel is correspondent to the background.
+We can also say pixels with $k=0$ are unannotated as they were not annotated to one of the predefined categories..
+The probability of obsesrving a pixel label $\tilde{y_{ij}}$ depends on inputs $x$, the true label of that pixel $y_{ij}$, and labels of the rest pixels in that image:
+$$p(\tilde{y_{ij}} \vert x, y_{ij\inP}, \{y_{mn}: mn \in P \setminus \{ij\}}\})$$
+where $P$ is the full set of pixels in one image and $i,m \in [1,h], j,n \in [1,w]$.
+
+\noindent
+It is difficult to model the probability conditioning on the distribution of $x$.
+\footnote{J: A bit more explaination needed.}
+
+
+\noindent
+The annotation errors considered in this work all occured to the whole object instead of to individual pixels.
+That means if one pixel for an object has a wrong label, the rest pixels that belongs to this object will also have the same wrong label.
+By doing so, we exlude errors such as inprecise boundaries, oversegmenting or undersegmenting the objects from discussion.
+These types of errors are not the focus of our works and may lead to future studies.
+
+\noindent
+\paragraph{Misannotation}
+Misannotation denotes the errors wrongly segmenting a semantically meaningful but not predefined category object as one of the pre-defined categories.
+These misannotated objects have pixel labels transited from $0$ to $k$ with probability $p(\tilde{y_{ij}}=k\vert x,y, y_{ij}=0)$, where $\tilde{y_{ij}}$ means the observed label and $y_{ij}$ is the true label.
+For this type of error we assume it depends on both inputs $x$ and true labels $y$, meaning that the labels are \textit{noisy not at random (NNAR)}\cite{frenay2014classification}.
+That is natural because it is less likely misannotation would happens to partitions that have no semantically meaning or are not distinguishable against the background.
+The dependence of $x$ results in the difficulty of modeling $p$ by fitting to
+
+
+\noindent
+\paragraph{Misclassification}
+Misclassification means objects misclassified from one pre-defined category to another.
+Labels of the corresponding pixels flipped from $k$ to $l$ with probability $p(\tilde{y_{ij}}=l\vert y(y_{ij}=k))$, where $k,l \in [1, K]$.
+
+We assume noise at random
+
+\noindent
+\paragraph{Inexaustive annotation}
+Inexaustive annotation denotes that there exists objects from the pre-defined categories unsegmentated.
+Pixels for the unannotated objects have labels flipped from $k$ to $0$.
+$p(\tilde{y_{ij}}=0\vert y(y_{ij}=k))$, where $k \in [1,K]$
+
+We assume labels are missing at random
+
+\noindent
+The exhaustive annotations can introduce bias to both the decoding layer and the encoding layers because they negatively contribute to the activations in all the layers.
+\footnote{J: This argument need evidence too, or experiment/discussions in details in Section \ref{sec:pulearning}}
+The inexhaustive annotations need to be properly handled given the prior knowledge modeling the missing pattern of the annotations.
+Given that we believe any annotated instance provide information, all the foreground pixels that correspond to the annotated instances become reliable and the background pixels may contain both the true background pixels and object pixels unannotated.
+That satisfies a Positive and Unlabeled learning setup where the training dataset contains only the positive examples and unlabeled examples that are the mixed of the positive samples and negative samples.
+
+
+% Supposing a dog is wrongly annotated as a cat, the error could mislead the model to predict the dog as cat because the learning objective drives the model to fit the given labels.
+% But dogs and cats have visual features: they are both furry, have similiar shape and appearance, etc.
+% These similiarities in features between dogs and cats may correspond to some interm features when a toy dog was misannotated as a dog.
+% If we consider further lower features, for exmaple those for detecting edges and corners, they are commonly transferable to many categories, not necessarily ones that look alike.
+% dissimilar categories (man-made classes and natural classes)
+%If we constraint ourselves to perceive only part of the dog and the toy dog, for example the ears, it may become difficult even for us to distinguish the two because given only the local information there is not much difference between them.
+% The generality of the low-level features can introduce the robustness to misannotations regarding the transferability when we want to transfer hieraychical features for semantic segmentation in the presence misannotated objects because the low-level features are not dependent on the exact category assigned to the objects.
+% This annotation error robustness for the low-level features could result in noise robustness for the multiple level pre-trained weights for semantic segmentation with noisy labels.
+% In Section \ref{sec:objectness}, we tested whether object misannotation had an impact on the transfehen we transfer the learned features to a new dataset with new categories.
+% That leads us to the following research question:
+% \begin{enumerate}
+%   \item How do misannotation and misclassification of instances influence the ``transferability'' of the learned features respectively?
+% \end{enumerate}
