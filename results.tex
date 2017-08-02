@@ -1,34 +1,7 @@
 \section{Results}
 \label{sec:results}
+\subsection{Impact of label noise on feature transferability}
 
-%%%%%%%% TEXT
-\noindent
-\textit{What Table \ref{tab:objectness} tell us.}
-\noindent
-
-%%%%%%%% Table Learn Pixel Objectness for pre-training
-\begin{table}[t]
-\resizebox{\columnwidth}{!}{
-\centering
-\begin{tabular}{l|llll}
-\makecell{Initial \\Representation}  & \makecell{mean IU \\(aerospace, bicycle, \\bird, boat, \\bottle)} & \makecell{mean IU \\(bus, car, \\cat, chair, \\cow)} & \makecell{mean IU \\ (dining table, \\dog, horse, \\motorbike, person)} & \makecell{mean IU \\(potted plant, \\sheep, sofa, \\train, TV)} \\
-\hline
-ImageNetModel    & \makecell{$0.42\pm0.01$} & \makecell{$0.51\pm0.01$} & \makecell{$0.49\pm0.01$} & \makecell{$0.47\pm0.01$} \\
-SingleCategory   & \makecell{$0.26\pm0.01$} & \makecell{$0.37\pm0.03$} & \makecell{$0.29\pm0.01$} & \makecell{$0.33\pm0.04$} \\
-BinaryLabels     & \makecell{$0.30\pm0.02$} & \makecell{$0.35\pm0.01$} & \makecell{$0.29\pm0.02$} & \makecell{$0.35\pm0.03$} \\
-TrueLabels       & \makecell{$0.29\pm0.01$} & \makecell{$0.36\pm0.01$} & \makecell{$0.29\pm0.01$} & \makecell{$0.37\pm0.01$} \\
-AllRandomLabels  & \makecell{$0.29\pm0.01$} & \makecell{$0.33\pm0.03$} & \makecell{$0.26\pm0.01$} & \makecell{$0.28\pm0.01$} \\
-HalfRandomLabels & \makecell{$0.29\pm0.00$} & \makecell{$0.33\pm0.00$} & \makecell{$0.26\pm0.00$} & \makecell{$0.28\pm0.00$} \\
-IncompleteLabels & \makecell{$0.29\pm0.00$} & \makecell{$0.29\pm0.00$} & \makecell{$0.27\pm0.00$} & \makecell{$0.30\pm0.00$} \\
-RandomWeights    & \makecell{$0.29\pm0.01$} & \makecell{$0.29\pm0.03$} & \makecell{$0.27\pm0.01$} & \makecell{$0.30\pm0.02$} \\
-\end{tabular}
-}
-\caption{Performances of FCN with Alexnet trained to segment 5 categories from the PASCAL VOC2011 dataset with different representation initializations.
-% \textit{ImageNetModel} represents the ImageNet pre-trained model;
-% \textit{FromScratch} indicates that the representation is randomly initialization using Xavier Initialization;
-\textit{CompleteCategory} is the model pre-trained to segment the other 15 categories from the PASCAL VOC2011 dataset; The \textit{PixelObjectness} model was pre-trained to distinguish the instance against the background; The \textit{RandomCategory} model was pre-trained to segment instances with randomly assigned categories from 1 to 15.}
-\label{tab:objectness}
-\end{table}
 
 
 %%%%%%%% FIGURE First-layer feature visualization

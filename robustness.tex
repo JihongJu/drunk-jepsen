@@ -1,80 +1,192 @@
-\section{Annotation noise-robustness of representations}
+\section{Noise robustness of feature transferability}
 \label{sec:robustness}
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%% TEXT Noise model
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\noindent \textit{From feature generality to feature robustness}
 
 \noindent
-\textit{From feature generality to feature robustness}
-\noindent
-The first-layer features of convolutional neural networks for images are often observed converged to either Gabor filters or color blobs even training with different datasets and different objectives\cite{zeiler2014visualizing,lee2009convolutional,krizhevsky2012imagenet,shin2016deep}.
-Because these standard features on the first layer often occur independent of the exact cost function and natural image dataset, we call these first-layer features \textit{general}.
-By contrast, the last-layer features must significantly depend on the given labels otherwise the training errors would be high which is against learning objective.
+The first convolutional features for images are often observed converged to either Gabor filters or color blobs even training with different datasets and different objectives\cite{zeiler2014visualizing,lee2009convolutional,krizhevsky2012imagenet,shin2016deep}.
+These standard features on the first layer are called \textit{general} because they often occur independent of the exact cost function and natural image dataset.
+By contrast, the last-layer features depend significantly on the given labels otherwise the training errors would be high which is against learning objective.
 These features are then denoted as \textit{specific}.
 As we mentioned in Section \ref{sec:related}, Yosinski et al. \cite{yosinski2014transferable} studied the features in the intermediate layers and found the weights transferability decreases from the first layer to the last layer, alongside the specificity increases from the first layer to the last layer.
 Given the evidence that low-level features can be independent of a particular category, we wonder if the learned features are robustness to label noises regarding their transferability to a new task.
 For instance, if some dogs were incorrectly annotated as cats in the base dataset for pre-training, would these annotation noises influence transferability of the learned features to a new task recognize or detect sheep?
 
 \noindent
-We experimented, in Section \ref{sec:results}, how transferable the learned features are in the presence of three types of annotation noises: \textit{misannotation}, \textit{misclassification} and \textit{inexaustive annotation}.
+We experimented, in Section \ref{subsec:robustness}, how transferable the learned features are in the presence of three types of annotation noises: \textit{misannotation}, \textit{misclassification} and \textit{inexaustive annotation}.
+We synthesized these three types of errors with the probabilitic model discussed with a well-annotated dataset and studied how the synthesized errors influence transferability of learned features compared to the noise-free cases.
+Feature transferability can be evaluated by how much transferring the features improves the performance of training a new dataset compared to training with random weights initialization. \cite{yosinski2014transferable}
 
-Transferability of features can be evaluated by how much they can improve the performance of training a new dataset compared to training with random weights initialization. \cite{yosinski2014transferable}
 
+\subsection{Problem Formulation}
+\label{subsec:formulation}
+
+\noindent \textit{Formulation of segmentation}
 \noindent
-\paragraph{Problem Formulation}
-\noindent
-Semantic segmentation and other dense prediction tasks can be considered as pixel-wise classification problem.
+The goal of semantic segmentation tasks is to segment images into semantically meaningful partitions, a.k.a.,\textit{segments}.
+These segments are \textit{target} if they depict instances of pre-defined object categories or \textit{non-target} otherwise.
+A common way of interpreting semantic image segmentation tasks with CNNs is the pixel-wise classification model:
 Given an image $x$, a segmenting model $f: R^{h \times w \times c} \rightarrow R^{h \times w}$ predicts a label for each pixel and output a label map $y$ that has the same size as $x$.
-$h, w$ are image height and weight respectively and $c$ is the number of channels for images.
-Supposing there are $K$ predefined categories, each pixel is assigned a label $y_{ij}=k$, where $ij$ denotes a pixel from a set of all pixels in the image, $P$, and $i \in [1,h], j \in [1,w]$.
-The assigned label $k \in [1, K]$ if the pixel corresponds to an object from one of the $K$ categories; $k=0$ if the pixel is correspondent to the background.
-We can also say pixels with $k=0$ are unannotated as they were not annotated to one of the predefined categories..
-The probability of obsesrving a pixel label $\tilde{y_{ij}}$ depends on inputs $x$, the true label of that pixel $y_{ij}$, and labels of the rest pixels in that image:
-$$p(\tilde{y_{ij}} \vert x, y_{ij\inP}, \{y_{mn}: mn \in P \setminus \{ij\}}\})$$
-where $P$ is the full set of pixels in one image and $i,m \in [1,h], j,n \in [1,w]$.
+$h, w$ are image height and weight respectively, and $c$ is the number of image channels.
+Supposing there are $K$ predefined categories, each pixel in $y$ is assigned a label $y_{ij}=k$, where $ij$ specifies the pixel with $i \in [1,h], j \in [1,w]$.
+The assigned label $k \in [1, K]$ if the pixel corresponds to an instance of one of the $K$ categories; $k=0$ if the pixel is correspondent to a non-target segment.
+We can also name pixels with $k=0$ as \textit{unannotated} since they were not assigned to one of the predefined categories.
 
+\noindent \textit{Noise model}
 \noindent
-It is difficult to model the probability conditioning on the distribution of $x$.
-\footnote{J: A bit more explaination needed.}
+Noisy labels can be considered as true labels corrupted with a noise model.
+The noise model describes the probabilistic distribution of the observed label map conditioning on the the true label map $y$, the image $x$ and label errorness $e$:
+$$p(\tilde{y} \vert x, y, e)$$
+where the occurence of errors $e$ for pixels depends on the inputs $x$ and true labels $y$.
+Such a noise model is called noisy not at random (NNAR) \cite{frenay2014classification} because the noise depends on not only the true label $y$ but also the inputs $x$.
 
-
+\noindent \textit{Clarity for noise considered.}
 \noindent
-The annotation errors considered in this work all occured to the whole object instead of to individual pixels.
-That means if one pixel for an object has a wrong label, the rest pixels that belongs to this object will also have the same wrong label.
-By doing so, we exlude errors such as inprecise boundaries, oversegmenting or undersegmenting the objects from discussion.
+% In the above model, label errorness for pixels is assumed to be independent to each other despite the fact that neighboring pixels are likely to have the same label in practice.
+%Conditional random fields (CRF) were introduced to interpret the neighboring pixel dependence.\cite{chen2016deeplab}
+All the errors considered in this work apply to the whole segment instead of to individual pixels.
+This means if one pixel for an object has a wrong label, the pixels that also belong to this object will have the same wrong label.
+% This can be interpreted as a probablilistic distribution of the observed label for pixel $ij$ conditioned on its true label $y_{ij}$, the image $x$, and observed labels for the other pixels $\{\tilde{y_{kl}}, kl \in P \setminus \{ij\} \}$:
+% $$p(\tilde{y_{ij}} \vert x, y_{ij}, \{\tilde{y_{kl}}, kl \in P \setminus \{ij\} \})$$
+% where $P$ is the set of all pixels in image $x$.
+By doing so, we exlude segmenting errors such as inprecise boundaries, oversegmenting or undersegmenting the objects from discussion.
 These types of errors are not the focus of our works and may lead to future studies.
+
+% \noindent
+% In general, the observed value of a pixel label $\tilde{y_{ij}}$ depends on the joint distribution of its true label $y_{ij}$, the occurence of an error $e_{ij}$, and the input image $x$, and the occurence of an error $e_{ij}$ depends on both $x$ and $y_{ij}$.
+% This model is denoted as \textit{noisy not at ramdom (NNAR)}\cite{frenay2014classification}: $p(\tilde{y_{ij}},x) = p(\tilde{y_{ij}} \vert x, y, e_{ij}) p(e_{ij} \vert x,y)$.
+% However, there are two difficulties estimate $p(\tilde{y})$ with the NNAR model:
+% neighboring pixel dependency
+% x dependency
+%
+% $p(\tilde{y} \vert y,e) p(e \vert y)$
+% It is nevertheless difficult to fit such a NNAR model directly because it is difficult to estimate of $p(e \vert x,y)$ with limited number of samples.
+% An alternatie model is the \textit{noisy at random (NAR)} model in which the occurence of errors $e$ are independent to $x$ only on $y$: $p(\tilde{y} \vert y)p(y \vert x)$
+% Such \textit{Noisy at random (NAR)}
+
+% \noindent
+% The probability of obsesrving a pixel label $\tilde{y_{ij}}$ depends on inputs $x$, the true label of that pixel $y_{ij}$, and labels of the rest pixels in that image:
+% $$p(\tilde{y_{ij}} \vert x, y_{ij \in P}, \{ y_{mn}: mn \in P \setminus \{ij\} \})$$
+
+% \noindent
+% where $P$ is the full set of pixels in one image and $i,m \in [1,h], j,n \in [1,w]$.
+
+
 
 \noindent
 \paragraph{Misannotation}
-Misannotation denotes the errors wrongly segmenting a semantically meaningful but not predefined category object as one of the pre-defined categories.
-These misannotated objects have pixel labels transited from $0$ to $k$ with probability $p(\tilde{y_{ij}}=k\vert x,y, y_{ij}=0)$, where $\tilde{y_{ij}}$ means the observed label and $y_{ij}$ is the true label.
-For this type of error we assume it depends on both inputs $x$ and true labels $y$, meaning that the labels are \textit{noisy not at random (NNAR)}\cite{frenay2014classification}.
-That is natural because it is less likely misannotation would happens to partitions that have no semantically meaning or are not distinguishable against the background.
-The dependence of $x$ results in the difficulty of modeling $p$ by fitting to
+Misannotation denotes the errors wrongly segmenting objects of categories that are semantically meaningful but not predefined as objects of pre-defined categories.
+For example, a toy dog was misannotated as a dog given that ``dog'' was predefined and ``toy dog'' was not.
+These misannotated objects have pixel labels transited from $0$ to $k$ with probability $p(\tilde{y_{ij}}=k \vert x, y_{ij}=0, \{\tilde{y_{kl}}, kl \in P \setminus \{ij\} \})$, where P
+We assumed that misannotation would happen to only semantically meaningful segments in images because it is less likely for partitions which have no semantical meaning to be misannotated.
+Given a perfectly annotated training set, we can synthesize misannotation errors by selecting part of the categories as segmenting target and assigning the target labels to non-target segments.
 
 
 \noindent
 \paragraph{Misclassification}
-Misclassification means objects misclassified from one pre-defined category to another.
-Labels of the corresponding pixels flipped from $k$ to $l$ with probability $p(\tilde{y_{ij}}=l\vert y(y_{ij}=k))$, where $k,l \in [1, K]$.
+Misclassification error means objects misclassified from one pre-defined category to another.
+It is similiar to misannotation error except that both correct and incorrect classes belong to the pre-defined set of categories.
+For example, cats was misclassified as dogs given that both ``cat'' and ``dog'' are target classes.
+The misclassified pixels transit from $k$ to $l$ with probability $p(\tilde{y_{ij}}=l\vert x, y_{ij}=k)$, where $k,l \in [1, K]$.
 
-We assume noise at random
 
 \noindent
 \paragraph{Inexaustive annotation}
-Inexaustive annotation denotes that there exists objects from the pre-defined categories unsegmentated.
+Inexaustive annotation denotes that there exists unsegmented objects for pre-defined categories.
 Pixels for the unannotated objects have labels flipped from $k$ to $0$.
-$p(\tilde{y_{ij}}=0\vert y(y_{ij}=k))$, where $k \in [1,K]$
+$p(\tilde{y_{ij}}=0\vert x, y_{ij}=k)$, where $k \in [1,K]$
 
-We assume labels are missing at random
 
+
+% The inexhaustive annotations need to be properly handled given the prior knowledge modeling the missing pattern of the annotations.
+% Given that we believe any annotated instance provide information, all the foreground pixels that correspond to the annotated instances become reliable and the background pixels may contain both the true background pixels and object pixels unannotated.
+% That satisfies a Positive and Unlabeled learning setup where the training dataset contains only the positive examples and unlabeled examples that are the mixed of the positive samples and negative samples.
+
+
+\subsection{Synthesized dataset}
+\label{subsec:robustness}
+
+%%%%%%%% TEXT
 \noindent
-The exhaustive annotations can introduce bias to both the decoding layer and the encoding layers because they negatively contribute to the activations in all the layers.
-\footnote{J: This argument need evidence too, or experiment/discussions in details in Section \ref{sec:pulearning}}
-The inexhaustive annotations need to be properly handled given the prior knowledge modeling the missing pattern of the annotations.
-Given that we believe any annotated instance provide information, all the foreground pixels that correspond to the annotated instances become reliable and the background pixels may contain both the true background pixels and object pixels unannotated.
-That satisfies a Positive and Unlabeled learning setup where the training dataset contains only the positive examples and unlabeled examples that are the mixed of the positive samples and negative samples.
+\textit{Experiment setup}
+\noindent
+In order to investigate the influence of misannotation, misclassification and inexaustive annotation on feature transferability, we set up experiments with the perfectly annotated dataset, PASCAL VOC2011\cite{everingham2015pascal}.
+The 20 categories of VOC2011 were divided equally into four folds, and the exact partitions are listed in Table \ref{tab:objectness}.
+For each fold, images were split into two set: \textit{pre-training set} consists of images with segments of the 5 target classes and \textit{fine-tuning set}  images contained only objects of the other 15 classes.
+Pre-training set was used to pre-train weights and fine-tuning set was used to fine-tune the pre-trained weights.
+Misannotation, misclassification and inexaustive annotation were synthesized by polluting well-annotated pre-training dataset in different manners.
+Pre-trained weights learned in the presence of synthesized noises were compared against those trained with the corresponding noise-free annotations.
+The transferability of learned weights were evaluated by performance achieved with the fine-tuning test set.
+We used the mean intersection over union (mean IU) metric to evaluate the segmentation performance, following the VOC segmentation challenge.
+
+\noindent \textit{Experiment details}
+\noindent
+To keep the segmenting task simple, we used images containing only a single object and excluded those that have multiple objects from both the pre-training set and the fine-tuning set.
+The training dataset was enriched with the SBDD annotations due to the limited number of available segmentations from the official PASCAL VOC2011 dataset, resulting in 4000 training images of 20 categories in total.
+In order to accelerate the training process, we subsampled the original images by four times.
+Fully Convolutional Networks with AlexNet was used for experiments because its simplicity and relatively short training time and the existence of an ImageNet model for AlexNet.
+Only weights of convolutional filters in AlexNet were transfered from the pre-training phase to fine-tuning phase and the other layers were random initialized, with Xavier Initialization.
+By doing this, the ImageNet model and completely random weight initialization become the upper bound and lower bound respectively for various pre-trained weights summarized in Table \ref{tab:objectness}.
+The default hyperparameters of FCN-AlexNet\cite{long2015fully} were kept unchanged.
+Training run 240,000 iterations for pre-training phase, and 12,000 iterations for fine-tuning phase.
 
 
+\noindent \textit{What Table \ref{tab:objectness} tell us.}
+\noindent
+Feature transferability in the presence of synthesized misannotation, misclassification and inexaustive annotation were studied seperately.
+
+\noindent \textit{
+How misannotation is synthesized;
+How synthesization different from reality;
+What are the result;
+}
+\noindent
+As discussed in Section \ref{subsec:formulation}, we synthesized misannotation errors by selecting one category as target and assigning instances of the other 14 categories target labels.
+The corresponding noise-free case is datasets with only the selected target category annotated and the other 14 categories unannotated.
+These two cases were denoted as BinaryCategory and SingleCategory seperately in Table \ref{tab:objectness}.
+
+
+Misclassification: TrueLabels vs. RandomLabels
+Misclassification
+
+Inexaustive annotation: TrueLabels vs. InexaustiveLabels
+
+%%%%%%%% Table Learn Pixel Objectness for pre-training
+\begin{table}[t]
+\resizebox{\columnwidth}{!}{
+\centering
+\begin{tabular}{l|llll}
+\makecell{Initial \\Representation}  & \makecell{mean IU \\(aerospace, bicycle, \\bird, boat, \\bottle)} & \makecell{mean IU \\(bus, car, \\cat, chair, \\cow)} & \makecell{mean IU \\ (dining table, \\dog, horse, \\motorbike, person)} & \makecell{mean IU \\(potted plant, \\sheep, sofa, \\train, TV)} \\
+\hline
+ImageNetModel    & \makecell{$0.42\pm0.01$} & \makecell{$0.51\pm0.01$} & \makecell{$0.49\pm0.01$} & \makecell{$0.47\pm0.01$} \\
+RandomWeights    & \makecell{$0.29\pm0.01$} & \makecell{$0.29\pm0.03$} & \makecell{$0.27\pm0.01$} & \makecell{$0.30\pm0.02$} \\
+\hline
+SingleCategory   & \makecell{$0.26\pm0.01$} & \makecell{$0.37\pm0.03$} & \makecell{$0.27\pm0.01$} & \makecell{$0.33\pm0.04$} \\
+BinaryLabels     & \makecell{$0.30\pm0.02$} & \makecell{$0.35\pm0.01$} & \makecell{$0.29\pm0.02$} & \makecell{$0.35\pm0.03$} \\
+\hline
+TrueLabels       & \makecell{$0.29\pm0.01$} & \makecell{$0.36\pm0.01$} & \makecell{$0.29\pm0.01$} & \makecell{$0.37\pm0.01$} \\
+AllRandomLabels  & \makecell{$0.29\pm0.01$} & \makecell{$0.33\pm0.03$} & \makecell{$0.26\pm0.01$} & \makecell{$0.28\pm0.01$} \\
+HalfRandomLabels & \makecell{$0.29\pm0.00$} & \makecell{$0.33\pm0.00$} & \makecell{$0.26\pm0.00$} & \makecell{$0.28\pm0.00$} \\
+InexaustiveLabels& \makecell{$0.27\pm0.00$} & \makecell{$0.32\pm0.00$} & \makecell{$0.26\pm0.00$} & \makecell{$0.34\pm0.00$} \\
+\end{tabular}
+}
+\caption{Performances of FCN with Alexnet trained with different representation initializations to segment five categories from the PASCAL VOC2011 dataset.
+\textit{ImageNetModel} represents the pre-trained ImageNet model;
+\textit{RandomWeights} indicates that the weights were randomly initialized with Xavier Initialization;
+All the other weights were pre-trained with images of the complementary fifteen categories for the five fine-tuning target categories.
+\textit{SingleCategory} was pre-trained on only one annotated category, either ``dog'' or ``cat'' depending on the fold, and the other categories were left unannotated;
+\textit{BinaryLabels} was pre-trained with binary labels that any objects of the fifteen categories were annotated as one single category, namely ``dog'' or ``cat'' depending on fold;
+\textit{TrueLabels} was pre-trained with all objects segmented and assigned to 15 categories correctly;
+\textit{AllRandomLabels} was pre-trained with all objects correctly segmented but assigned random labels;
+\textit{HalfRandomLabels} was pre-trained with all objects correctly segmented and half of them randomly assigned labels;
+\textit{IncompleteLabels} was trained with datasets that objects were annotated correctly with a probability of 0.5;
+}
+\label{tab:objectness}
+\end{table}
 % Supposing a dog is wrongly annotated as a cat, the error could mislead the model to predict the dog as cat because the learning objective drives the model to fit the given labels.
 % But dogs and cats have visual features: they are both furry, have similiar shape and appearance, etc.
 % These similiarities in features between dogs and cats may correspond to some interm features when a toy dog was misannotated as a dog.

@@ -1,19 +1,33 @@
 \section{Positive and Unlabeled Learning}
 \label{sec:pulearning}
 
-\textit{One sentence summary of Positive and Unlabeled Learning}
+\noindent \textit{This part should explain the necessarity of Positive and Unlabeled Learning setup, including the importance to make a difference between inexaustive annot. and misclassification.}
+
+\noindent
+We discussed in Section \ref{sec:robustness} that misclassification and inexaustive annotation can have negative influence on feature transferability, which is undesirable when we train transferable weights with noisy data.
+Therefore, methods to compensate these errors are discussed in this section.
+In practice, misclassification error is less likely to \textit{dorminate} and dorminate means the misclassified rate outperforms the correct rate.
+However, unannotated objects can be dorminant for a large dataset.
+Besides,
+the most studied \cite{reed2014training,sukhbaatar2014training,patrini2016making,jindal2016learning}
+Therefore, we focus on inexaustive annotation.
 
 %%%%%%%% TEXT PU Learning setup
-
 \paragraph{Formulation}
+\noindent \textit{This part should formulate the problem with a probability model and make clear statement that model here is different from previous section: model to corrupt and model to recover.}
 \noindent
-\textit{This part should explain the Positive and Unlabeled Learning setup with mathematical representation when necessary.}
+When we synthesized errors in Section \ref{sec:robustness}, we assumed that the observed labels depend on
+$p(\tilde{y} \vert x, y)$.
+
+$p(\tilde{y_{ij}} \vert y_{ij})$.
+This model is easy to apply when we have the perfect annotations and want to generate noisy labels, but it is not as easy when we observe noisy labels and want to recover the correct ones.
+
+$p(\tilde{y_{ij}} \vert y_{ij})$
 
 
 %%%%%%%% TEXT Modeling
 \paragraph{Weighted Logistic Regression}
-\noindent
-\textit{This part should discuss the linear model for observing positive conditioning on true positive and its relationship to changing the class weight.}
+\noindent \textit{This part should discuss the linear model for observing positive conditioning on true positive and its relationship to changing the class weight.}
 
 
 %%%%%%%% TEXT Exponential loss
@@ -24,9 +38,11 @@ The ``soft'' bootstrapping loss in \cite{reed2014training} is actually equivalen
 Minimum entropy regularization encourages the model to have a high confidence in predicting labels.
 
 %%%%%%%% TEXT Expontial loss FADE IN
-\noindent
-\textit{This paragraph should explain why fade-in was introduced to avoid all-positive inital prediction}
 
+\paragraph{Implementation details}
+\noindent \textit{This paragraph should explain fade-in was introduced to avoid all-positive inital prediction;}
+
+\noindent
 
 %%%%%%%% TEXT Imbalanced
 \noindent

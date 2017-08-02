@@ -14,11 +14,12 @@ Transfer learning arises in this scenario to transfer knowledge from one domain 
 Recently, a form of knowledge that shows outstanding transferability is the weights of convolutional neural networks.
 For example, weights trained on ImageNet images to perform image classification were shown successfully transfered to new categories and new learning problems\cite{girshick2014rich,long2015fully,shin2016deep}.
 Convolutional neural networks on images are believed to extract hierarchical features, among which the low-level features look for specific patterns and the high-level features ensemble the information from low-level features.
-Low-level features were found more \textit{general}, i.e., less dependent on a particular category, than the high-level features.
-By training a CNN on a random half of the ImageNet categories and transfer features, varying from the bottom layers to the top layers, to the other half, Yosinski et al. found transferability of features drop due to representation specificity increase as well as optimization difficulties due to co-adaption.\cite{yosinski2014transferable}
-They also found that transferability of features decreases as the distance between the base task and target task increases, the first two layers have features still showing significant transferability to disimilar categories.
-Transferring features even from distant tasks can be better than using random features.
-In Section \ref{sec:objectness}, we wanted to explore whether transferability of features is robust to annotation errors in the pre-training dataset.
+Low-level features were found more \textit{general}, i.e., less dependent on a particular category, than the high-level features.\cite{yosinski2014transferable}
+By training a CNN on a random half of the ImageNet categories and transfer features, varying from the bottom layers to the top layers, to the other half, Yosinski et al. found transferability of features drop due to representation specificity increase.\cite{yosinski2014transferable}
+They also found low-level features, especially those of first two layers, presented magnificent transferability to even disimilar categories, even though feature transferability decreased as the distance between the base task and target task increased in general.
+% Given the superiority of transferring pre-trained weights and the availability of larger but noisier dataset, we learn transferable features with the noisy dataset and fine-tune the model with small dataset.
+% In Section \ref{sec:robustness}, we explored whether transferability of features is robust to annotation errors in the pre-training dataset.
+{TODO} Relations to our work.
 
 \paragraph{Unsupervised pre-training}
 Apart from supervised pre-training, one can also obtain pre-trained features in an unsupervised or a semi-supervised way.
@@ -45,7 +46,7 @@ Reed \& Lee\cite{reed2014training} proposed an empirical way of taking into acco
 In contrast to the works above, Rolnick et al.\cite{rolnick2017deep} argued that deep neural networks can learn robustly from the noisy dataset as long as an appropriate hyper parameters choice was made.
 They studied instead of replacing the correct labels with noisy labels but diluting correct labels with noisy labels to support their argument.
 They then concluded sufficiently large training set is of more importance than lower the level of noise.
-This work is closely related to our work in Section \ref{sec:objectness}, except that we focus on the label noise robustness regarding the feature transferability instead of the classification performance.
+This work is closely related to our work in Section \ref{sec:robustness}, except that we focus on the label noise robustness regarding the feature transferability instead of the classification performance.
 Additionally, most of these studies focus on the classification problems, whereas our work inclined more to the semantic segmentation problem.
 
 \paragraph{Positive and Unlabeled Learning}

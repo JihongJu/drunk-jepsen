@@ -1,79 +1,85 @@
 \section{Introduction}
 \label{introduction}
 
-%%%%%%%% TEXT Lack of perfect annotations
-\noindent
-\textit{Why noisy labels?:This paragraph should discuss the difficulties for collecting perfect segmentation annotations on a large scale}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%% TEXT Why noise labels?
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \noindent
-The recent success of deep neural networks benefits from the availability of large-scale supervised datasets such as ILSVRC\cite{russakovsky2015imagenet}.
-However, collecting a dataset for semantic image segmentation on a large scale can be expensive and time-consuming, especially when error-free labels are required.
-Enormous efforts have been made to create ``gold standard'' annotations for the current benchmark segmentation datasets\cite{everingham2015pascal,mottaghi2014role,lin2014microsoft}.
-\footnote{M: Do we actually have a reference for that?  Or other proof?\\J: I think the preparation methods described in these papers can be supportive. Microsoft COCO even mentioned the total working hours in the paper.}
-%Millions of images are available through Flikr, ImageNet and many other sources on the Internet but only a few of them \cite{everingham2015pascal,mottaghi2014role,lin2014microsoft} have been well-annotated for semantic segmentation tasks.
-%The largest segmentation dataset, COCO2014\cite{lin2014microsoft}, contains annotations for only 164,000 training images, smaller by a factor of 10 than the ILSVRC2012 dataset with 1,281,167 labeled training images.
-These datasets allow deep neural network models for semantic segmentation \cite{long2015fully,zheng2015conditional} to develop assuming the perfect segmentation ground truth exists, where perfect means that all the instances were annotated, no non-target object was misannotated, and no instance was misclassified.
-However, it is natural for human beings to make mistakes due to the lack of expertise, the inherent ambiguity of tasks or unconscious bias.
-Strong supervision is required to correct the mistakes, including double-checking the annotations over and over again and ensembling opinions from multiple annotators.
-%Otherwise, it may lead to annotations that contain misannotated objects, unannotated instances and misclassified instances.
-In some cases, for example in the medical imaging, the ``gold standard'' itself can be ambiguous and cause disagreement among different annotators.
-\footnote{M: But that's OK or not?  This is what probabilities solve...}
-Also, there are some freely available labels, which may or may not be accurate, for specific problems.
-For example, one can use digital maps, like OpenStreetMap, to annotate aerial images, but such segmentation annotations constructed from maps suffer from the incomplete annotation as well as registration problems.\cite{mnih2012learning}
-%There are also crowdsourcing platforms like Pl\@ntNet can provide noisy labels on a large scale.
-This motivates us to explore how to learn from these noisy annotations.
+\textit{Why noisy labels?
+This paragraph should discuss the ubiquity of label noise and difficulties of collecting perfect annotations.}
 
 \noindent
-\textit{Why representation?: This paragraph should discuss the idea of noise-robust representation}
+The recent success of deep neural networks benefits from the availability of large-scale supervised datasets such as \cite{russakovsky2015imagenet,everingham2015pascal,mottaghi2014role,lin2014microsoft}.
+These datasets allow researchers to develop deep neural network models for object recognition\cite{simonyan2014very}, object detection\cite{girshick2014rich}, semantic image segmentation\cite{long2015fully,zheng2015conditional} and other applications assuming the existence of perfect ground-truth segmentation.
+However, collecting well-annotated datasets on a large scale can be tremendously expensive and time-consuming in general.
+% For example, it took over 70,000 worker hours to create Microsoft COCO dataset which contains 2.5 million labeled objects in 328k images\cite{lin2014microsoft}.
+% A significant percentage of these hours were contributed to judge the correctness of annotations.
+When annotators work on their tasks, it is natural for them to make mistakes as a result of lack of expertise, inherent ambiguity of tasks or unconscious bias.
+Enormous efforts were made in various manners to ensure the correctness of annotations according to reports in \cite{russakovsky2015imagenet,lin2014microsoft}.
+Saving efforts made for correctness will result in a noisy dataset but also potentially more annotated images.
+Trade-offs need to be made between the impact of by label noise and the gain of a larger dataset.
+% In addition, a slight decrease in annotation errors may require extraordinary additional efforts due to the difficulty of identifying errors from a large-scale dataset.
+% In some cases, for example in the medical imaging, the ``gold standard'' itself can be ambiguous and cause disagreement among different annotators.
+% \footnote{M: But that's OK or not?  This is what probabilities solve...}
+For particular tasks, there exist freely available labels as alternatives to manual annotations.
+But these labels are often noisy owing to the way they were created.
+For example, one can use digital maps, like OpenStreetMap, to segment aerial images.
+These segmentations constructed from maps suffer from the incomplete annotation as well as registration problems.\cite{mnih2012learning}
+Besides, Pl@ntNet\footnote{https://identify.plantnet-project.org/}, a crowdsourcing platform, provide millions of images of plants and corresponding labels which may or may not be correct.
+Strong supervision is therefore required to correct the mistakes, for example double-checking the annotations over and over again and ensembling opinions from multiple annotators.
+It is therefore sometimes inevitable for deep neural network models to accept the existence of noisy annotations.
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%% TEXT Why feature's noise robustness?
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \noindent
-Deep convolutional neural networks (DCNN) based models often contain two principal components: a stack of convolutional layers to extract hierarchical features and a few task-specific layers to fit the training objectives.
-Both parts are trained jointly in an end-to-end manner via back propagation and are both important to achieve good performance for a particular task.
-\footnote{M: As a non-expert it is rather unclear to me how to identify or design generic layers and task-specific ones, or what it actually means or why it is important to make this distinction.  In addition, I wonder to what extent end-to-end training actually turns generic layers into task-specific ones.} The convolutional features were proved ``transferable'' to a new dataset\cite{yosinski2014transferable} or even to a different task\cite{girshick2014rich}.
-The state-of-art DCNN based semantic image segmentation models relies on transferring the pre-trained convolutional filters as well.\cite{long2015fully}
-A typical method to pre-train the convolutional filters is to train a classification model with the large-scale ILSVRC dataset \cite{russakovsky2015imagenet}
-However, this method constrains the semantic image segmentation models to have the same CNN architecture as the image classification models.
-The CNN design for semantic image segmentation does not necessarily follow the design of image classification architectures.
-The segmentation models need both global and local information to predict the category and give a fine segmentation, whereas the classification models care less about local information for object localization.
-For instance, the presence of the max-pooling layers enable the following convolutional filters to have larger receptive fields but, at the same time, reduce the resolution of the features.
-\footnote{M: Is it the presence of max-pooling or the presence of subsampling that enables larger receptive fields?  And what do you mean by resolution?  Should low resolution always mean reduced / ``thrown away'' information? J: Max-pooling is a particular type of subsumpling. Actually both the conv layers and the pooling layers lead to gradually larger receptive field.}
-Additional upsampling layers can recover the shape of the output segmentation but cannot fully recover the information dropped by subsampling.
-This first-pooling-and-then-upsampling pipeline can result in coarse segmentation output \cite{chen2016deeplab} with non-shape boundaries and blob-like shapes.
-\footnote{M: Also for this claim, I think we need a reference or something like that. Or other proof indeed...  In addition, I wonder whether we can explain why this may be the case? J: Yes, I can refer to a paragraph in the intro of CRFasRNN and enrich the discussion a bit.}
-%The coarse output can be refined with Conditional Random Field (CRF) inference\cite{zheng2015conditional,chen2016deeplab}.
-\noindent
-Alternatively, one can also extract convolutional features with semantic segmentation tasks.
-But it is more difficult to collect well-annotated dataset for semantic image segmentation than for object recognition.
-A large number of annotated images are of great value to train sufficiently generalized representation and avoid overfitting, given the ``data-hungry'' nature of DCNNs.
-\footnote{M: For the rest a bit vague... what do we really mean by suffer? Maybe this becomes clear later in the intro...? J: Refrased. M: This is still quite unclear to me.  I would interpret ``data-hungry'' as an NN that overtrains even with large amount of data, but one would typically try to fix this by introducing some form of regularization or just using smaller networks.  All in all [as a maybe-too-stubborn non-deep learner  ;-)  ] I could still wonder what is really the problem...}
-Allowing noisy annotations to exist could help significantly increase the number of annotated images and the number of training samples could compensate the impact of annotation errors.
-We will further discuss this in the related works.
-
-% %%%%%%%% TEXT Summarize
-\noindent
-\textit{This paragraph should summarize the main ideas.}
+\textit{Why feature's noise robustness?
+This paragraph should discuss
+1. CNNs arch: hierarchical feature extraction and task-specific layers
+2. CNNs based models benefit from transferability of hierarchical feature}
 
 \noindent
-The different levels of the hierarchical features in DCNNs are believed to play different roles in extracting information from the images.
-The low-level features process the local information within small neighborhood and the high-level features ensemble information from lower-level features to extract abstract information.
-The high-level features were found to significantly dependent on the exact categories compared to the low-level features which show extraordinary category independence.\cite{yosinski2014transferable}
-Previous studies\cite{sukhbaatar2014training,patrini2016making} have shown that training with noisy labels can lead to significantly higher classification errors than training with clean labels if the total number of training samples are fixed.
-It is nevertheless unclear how the annotation errors would influence the learned multiple level features.
-We made a hypothesis that annotation errors do not necessarily lead to a ``bad representation'' because the ``generality'' of low-level features may contribute to a robustness to the errors when we transfer the learned features to a new dataset with new categories.
-\footnote{M: We hypothesize?
-For the rest I find the actual hypothesis pretty vague.  Firstly, you use quotation marks quite often, which doesn't make ``things'' clearer.  Either don't use that and make sure that the words you use are indeed the words you like to say or expand the part between ``''s and use some more sentences to really explain what you have in  mind.  Secondly, for me the part ``contribute to a robustness to the errors'' needs further explaining.  You might not have to get mathematically precise here, but I don't understand what you want to say here...}
-% We then explored methods to learn image representation in the presence of annotation noise.
-% \footnote{M: This needs a bit more explaining, I think.  To me this step is absolutely nontrivial.}
+Convolutional neural networks (CNNs) based models often contain two principal components: a stack of convolutional layers to extract hierarchical features and a few task-specific layers to fit the specific learning objectives.
+%Both parts are trained jointly in an end-to-end manner via back propagation and are important to achieve good performance for a particular task.
+\footnote{M: As a non-expert it is rather unclear to me how to identify or design generic layers and task-specific ones, or what it actually means or why it is important to make this distinction.  In addition, I wonder to what extent end-to-end training actually turns generic layers into task-specific ones. J: I think the idea to make this distinction here is to highlight that hierarchical features are reusable for many different applications and tasks but task-specific ones are not as they may have different number of neurons due to the different number of classes, or have even completely different architectures because the learning objectives are different for different app/tasks.}
+The convolutional layers were proved ``transferable'' not only to another dataset\cite{yosinski2014transferable} but also to another application\cite{girshick2014rich,long2015fully}.
+This feature transferability allows reusing the convolutional features for tasks and applications different from which they were originally trained with in a transfer learning scenario, and it helps to achieve better performance when there are only limited number of training samples\cite{long2015fully}.
 
+\noindent \textit{This paragraph should introduce the idea of studying the impact of annotation noise on feature transferability.}
+\noindent
+In cases where only a clean but small dataset is available, an extra noisy but large dataset in a similar domain might be helpful as it can be used to pre-train the convolutional features of the CNNs model.
+Previous studies\cite{sukhbaatar2014training,patrini2016making} have reported a negative impact of label noises on classification performance, but not yet on convolutional feature transferability.
+In general, optimal classification performance on test set often indicates that the extracted features are also optimal, whereas suboptimal classification performance does not necessarily reflect the convolutional features are also suboptimal, especially concerning feature transferability.
+Feature transferability describes the \textit{generality of features}, i.e., the category-independence of features.
+Low-level features were proved to be less dependent to categories and thus more transferable to new tasks than high-level features. \cite{yosinski2014transferable}
+We experimented in Section \ref{sec:robustness} that how much label noises interfere the transferability of convolutional features.
+
+\noindent \textit{Narrow the problem of discussion down to Segmentation}
+\noindent
+In this paper, we considered three types noises that happen to semantic image segmentation.
+These segmentation noises are summarized in Section \ref{subsec:formulation}.
+We chose to study segmentation errors because
+\begin{enumerate}
+  \item It is more difficult to correct noisy segmentation than to correct classification noises for object recognition;
+  \item Semantic segmentation can be treated as pixel-wise classification so that existing methods to compensate label noise can be applied with correpsonding assumptions when necessary.
+\end{enumerate}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%% TEXT Table of contents
-\noindent
-\textit{Table of contents}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\noindent \textit{Table of contents}
 
 \noindent
-In the next section, we summarized the related works for deep learning with noisy labels.
-In Section \ref{sec:robustness} we formulate the annotation errors into three categroies: misannotation, misclassification and incomplete annotation.
-We tested our hypothesis in Section \ref{sec:objectness}, studying whether the misannotation and misclassification had an impact on learning ``transferable'' features.
-In Section \ref{sec:pulearning} we connected training with inexaustive annotations to Positive and Unlabeled Learning.
+In the next section, we summarized related works in areas of transfer learning and learning with noisy labels for deep learning.
+In Section \ref{sec:robustness} we formulated the segmentation errors into three categories, misannotation, misclassification and incomplete annotation, and tested feature transferability against them separately.
+In Section \ref{sec:pulearning} we connected training with inexhaustive annotations to Positive and Unlabeled Learning.
+We tested our hypothesis in Section \ref{sec:results}, studying whether the misannotation and misclassification had an impact on learning ``transferable'' features.
+
+
 %Features learned by predicting the pixel objectness with inexaustive annotations were then validated with experiments described in Section \ref{sec:results}.
 
 
@@ -83,3 +89,6 @@ In Section \ref{sec:pulearning} we connected training with inexaustive annotatio
 % %%%%%%%% TEXT Missing positive label is different
 % \textit{This paragraph should explain the difference between inexaustive/imprecise and misclassification.}
 % Classification with label noise
+
+%Millions of images are available through Flikr, ImageNet and many other sources on the Internet but only a few of them \cite{everingham2015pascal,mottaghi2014role,lin2014microsoft} have been well-annotated for semantic segmentation tasks.
+%The largest segmentation dataset, COCO2014\cite{lin2014microsoft}, contains annotations for only 164,000 training images, smaller by a factor of 10 than the ILSVRC2012 dataset with 1,281,167 labeled training images.
