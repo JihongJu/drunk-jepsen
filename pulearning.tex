@@ -4,24 +4,38 @@
 \noindent \textit{This part should explain the necessarity of Positive and Unlabeled Learning setup, including the importance to make a difference between inexaustive annot. and misclassification.}
 
 \noindent
-We discussed in Section \ref{sec:robustness} that misclassification and inexaustive annotation can have negative influence on feature transferability, which is undesirable when we train transferable weights with noisy data.
-Therefore, methods to compensate these errors are discussed in this section.
-In practice, misclassification error is less likely to \textit{dorminate} and dorminate means the misclassified rate outperforms the correct rate.
-However, unannotated objects can be dorminant for a large dataset.
-Besides,
-the most studied \cite{reed2014training,sukhbaatar2014training,patrini2016making,jindal2016learning}
-Therefore, we focus on inexaustive annotation.
+We discussed in Section \ref{sec:robustness} that misclassification and inexhaustive annotation can have negative influences on feature transferability, which is undesirable when we pre-train weights with noisy data.
+Methods to compensate these errors are therefore necessary to train better representation with a certain number of annotated images.
+In practice, misclassification error is less likely to \textit{dorminate}, meaning that the misclassified rate is often not larger than the correct rate.
+By contrast, unannotated instances can be dominant for a large-scale dataset, especially when misannotated objects are included for training.
+For example, the existence of one misannotated toy dog does not mean that all toy dogs are annotated as dogs.
+If misannotated objects are treated the same as correctly annotated ones as proposed in Section \ref{sec:robustness}, the unannotated ``toy dogs'' may cause the problem of inexhaustive annotations and lead to worse fine-tuning performance.
+\footnote{J: Extra experiment to support this: 50\% misannotated + 50\% unannotated.}
+Therefore, we explored methods to compensate inexhaustive annotations for segmentation in this section.
+
+% \cite{reed2014training,sukhbaatar2014training,patrini2016making,jindal2016learning}
 
 %%%%%%%% TEXT PU Learning setup
 \paragraph{Formulation}
-\noindent \textit{This part should formulate the problem with a probability model and make clear statement that model here is different from previous section: model to corrupt and model to recover.}
+\noindent \textit{This part should formulate the problem with a probability model and make clear difference between model for synthesizating and model to fit.}
 \noindent
-When we synthesized errors in Section \ref{sec:robustness}, we assumed that the observed labels depend on
-$p(\tilde{y} \vert x, y)$.
+When we synthesized errors in Section \ref{sec:robustness}, we assumed that  all label errors occurred to each segment instead of each pixel.
+This is helpful when we already know the
+However, which pixels belong to the same segment is unknown when a model is trained with noisy labels only.
+prediction for each pixel is made independently though the corresponding receptive fields is overlaped.
+Therefore, we instead assume label errors all occured independently
+Reasons:
 
-$p(\tilde{y_{ij}} \vert y_{ij})$.
+$p(\tilde{y_{ij}} \vert x, y_{ij})$.
+
+This is a strong assumption for practical problems
+,and may lead to future works
+
 This model is easy to apply when we have the perfect annotations and want to generate noisy labels, but it is not as easy when we observe noisy labels and want to recover the correct ones.
 
+% It is nevertheless difficult to fit such a NNAR model directly because it is difficult to estimate of $p(e \vert x,y)$ with limited number of samples.
+% An alternatie model is the \textit{noisy at random (NAR)} model in which the occurence of errors $e$ are independent to $x$ only on $y$: $p(\tilde{y} \vert y)p(y \vert x)$
+% Such \textit{Noisy at random (NAR)}
 $p(\tilde{y_{ij}} \vert y_{ij})$
 
 
@@ -65,7 +79,7 @@ Minimum entropy regularization encourages the model to have a high confidence in
 \begin{figure}[t]
 \centering
 % \fbox{\rule{0pt}{2in} \rule{0.9\linewidth}{0pt}}
-   \includegraphics[width=0.95\linewidth]{img/losses.png}
+   \includegraphics[width=1.05\linewidth]{img/losses}
 \caption{The Logistic Loss, Weighted Logistic Loss, Exponential Loss and their dirivatives with respect to the model output.}
 \label{fig:losses}
 \end{figure}
@@ -74,8 +88,7 @@ Minimum entropy regularization encourages the model to have a high confidence in
 %%%%%%%% FIGURE Varying positive annotating percetage
 \begin{figure}[t]
 \centering
-\fbox{\rule{0pt}{2in} \rule{0.9\linewidth}{0pt}}
-  %  \includegraphics[width=0.95\linewidth]{img/}
+   \includegraphics[width=\linewidth]{img/pu_vs_pn}
 \caption{Varying percentage of annotated positives 10\%, 20\%, 50\%, 80\% and 100\% with images from CIFAR10 as the positives and images from CIFAR110 as the negatives.}
 \label{fig:pct_annotating}
 \end{figure}
@@ -93,7 +106,6 @@ Complete    & CrossEntropyU.   & $0.87\pm0.01$ & $0.88\pm0.01$ & $0.82\pm0.01$ &
 50\%P+U     & WeightedU.       & $0.78\pm0.01$ & $0.75\pm0.01$ & $0.75\pm0.01$ & $0.76\pm0.01$ \\
 50\%P+U     & ExponentialU.    & $0.82\pm0.01$ & $0.86\pm0.01$ & $0.73\pm0.01$ & $0.78\pm0.01$ \\
 50\%P+U     & BootstrapHard    & $0.74$ & $0.81$ & $0.60$ & $0.67$ \\
-50\%P+U     & DropoutReg.      & & & & \\
 \end{tabular}
 }
 \caption{Image classification with positive examples partially annotated. The complete dataset contains images from CIFAR10 as the \textbf{positive} (P) set and images from CIFAR110 as the \textbf{negative} (N) set. The unannotated positive examples from P set construct the \textbf{unlabeled} (U) set together with the N set.}

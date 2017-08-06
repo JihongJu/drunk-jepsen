@@ -3,21 +3,22 @@
 \subsection{Impact of label noise on feature transferability}
 
 
-
-%%%%%%%% FIGURE First-layer feature visualization
+%%%%%%%% FIGURE Number of training categories
 \begin{figure}[t]
 \centering
-\fbox{\rule{0pt}{2in} \rule{0.9\linewidth}{0pt}}
-  %  \includegraphics[width=0.95\linewidth]{img/}
-\caption{Visualization of first-layer features from different pre-trained models.}
-\label{fig:features}
-\end{figure}
-
-%%%%%%%% FIGURE Varying positive annotating percetage
-\begin{figure}[t]
-\centering
-\fbox{\rule{0pt}{2in} \rule{0.9\linewidth}{0pt}}
-  %  \includegraphics[width=0.95\linewidth]{img/}
-\caption{Varying the number of categories while pre-training the representation and the pre-trained weights were fine-tuned to segment 5 categories from the PASCAL VOC2011 dataset.}
+   \includegraphics[width=1.\linewidth]{img/num_classes.eps}
+\caption{
+The influence of number of categories in the pre-training dataset on performance of fine-tuned models.
+Varying the number of categories while pre-training the representation and the pre-trained weights were fine-tuned to segment 5 categories from the PASCAL VOC2011 dataset
+}
 \label{fig:categories}
 \end{figure}
+
+% %%%%%%%% FIGURE First-layer feature visualization
+% \begin{figure}[t]
+% \centering
+% \fbox{\rule{0pt}{2in} \rule{0.9\linewidth}{0pt}}
+%   %  \includegraphics[width=0.95\linewidth]{img/}
+% \caption{Visualization of first-layer features from different pre-trained models.}
+% \label{fig:features}
+% \end{figure}

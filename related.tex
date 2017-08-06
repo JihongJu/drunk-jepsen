@@ -8,18 +8,20 @@
 % S. Zheng et.al.\cite{zheng2015conditional} integrate the CRFs-based probabilistic graphical modeling with CNNs in an end-to-end framework.
 
 \paragraph{Transfer Learning}
-\textit{transfer learning}
-We sometimes have a learning task in one domain of interest, but we only have sufficient training data in another domain of interest, where the two domain may or may not share the same feature space and have the same data distribution.
+\noindent \textit{transfer learning}
+\noindent
+We sometimes have a learning task in one domain of interest, but we only have sufficient training data in another domain which does not share a feature space with the domain of interest.
 Transfer learning arises in this scenario to transfer knowledge from one domain to anthoer and to improve the performance of learning by avoiding much expensive data-labeling efforts.\cite{pan2010survey}
-Recently, a form of knowledge that shows outstanding transferability is the weights of convolutional neural networks.
+Weights of convolutional neural networks (CNNs) show outstanding transferability to another task.
 For example, weights trained on ImageNet images to perform image classification were shown successfully transfered to new categories and new learning problems\cite{girshick2014rich,long2015fully,shin2016deep}.
-Convolutional neural networks on images are believed to extract hierarchical features, among which the low-level features look for specific patterns and the high-level features ensemble the information from low-level features.
-Low-level features were found more \textit{general}, i.e., less dependent on a particular category, than the high-level features.\cite{yosinski2014transferable}
-By training a CNN on a random half of the ImageNet categories and transfer features, varying from the bottom layers to the top layers, to the other half, Yosinski et al. found transferability of features drop due to representation specificity increase.\cite{yosinski2014transferable}
-They also found low-level features, especially those of first two layers, presented magnificent transferability to even disimilar categories, even though feature transferability decreased as the distance between the base task and target task increased in general.
+Better performance were achieved for these tasks by using ImageNet pre-trained CNNs as initialization than training full model from scratch.
+%% Why feature transferable?
+Yosinski et al. discovered that feature transferability is negatively affected by the specialization of higher layer neurons and optimization difficulties caused by breaking co-adapted neurons.
+Their experiments showed that low-level features, which are less dependent to particular categories, are more transferable than high-level features.
 % Given the superiority of transferring pre-trained weights and the availability of larger but noisier dataset, we learn transferable features with the noisy dataset and fine-tune the model with small dataset.
 % In Section \ref{sec:robustness}, we explored whether transferability of features is robust to annotation errors in the pre-training dataset.
-{TODO} Relations to our work.
+{TODO:R} Relations to our work.
+We studied if feature transferability is negatively affected by the presence of label noises.
 
 \paragraph{Unsupervised pre-training}
 Apart from supervised pre-training, one can also obtain pre-trained features in an unsupervised or a semi-supervised way.
@@ -32,7 +34,7 @@ A few studies\cite{erhan2009difficulty,erhan2010does,bengio2012deep} highlighted
 However, better random initialization strategies, for example, xavier initialization\cite{glorot2010understanding} and its variants, have shortened the gap between unsupervised pre-training and random initialization.
 Using unsupervised pre-training or not now becomes a tradeoff between the time and resources invested and the performance gain.
 Unsupervised deep representation learning is in general not comparable to supervised representation learning especially when large scale dataset is available.
-A proper method to learn features in the presence of label noise should at least outperform  unsupervised pre-training because noisy information is still better than no information.
+A proper method to learn features in the presence of label noise should at least outperform unsupervised pre-training because noisy information is still better than no information.
 
 \paragraph{{Deep Learning with Noisy Labels}}
 A few studies\cite{sukhbaatar2014training,patrini2016making} investigated the impact of label noise on classification performance with convolutional neural networks assuming the labels were randomly transited from one to another given the probabilities fall in a transition matrix.
