@@ -4,29 +4,140 @@
 \noindent \textit{This part should explain the necessarity of Positive and Unlabeled Learning setup, including the importance to make a difference between inexaustive annot. and misclassification.}
 
 \noindent
-We discussed in Section \ref{sec:robustness} that misclassification and inexhaustive annotation can have negative influences on feature transferability, which is undesirable when we pre-train weights with noisy data.
+We found in Section \ref{subsec:robustness} that misclassification and inexhaustive annotation can have negative influences on feature transferability, which is undesirable when we pre-train weights with noisy data.
 Methods to compensate these errors are therefore necessary to train better representation with a certain number of annotated images.
 In practice, misclassification error is less likely to \textit{dorminate}, meaning that the misclassified rate is often not larger than the correct rate.
-By contrast, unannotated instances can be dominant for a large-scale dataset, especially when misannotated objects are included for training.
+By contrast, unannotated instances can be dominant for a large-scale dataset, especially when misannotated objects are also included for training.
 For example, the existence of one misannotated toy dog does not mean that all toy dogs are annotated as dogs.
-If misannotated objects are treated the same as correctly annotated ones as proposed in Section \ref{sec:robustness}, the unannotated ``toy dogs'' may cause the problem of inexhaustive annotations and lead to worse fine-tuning performance.
-\footnote{J: Extra experiment to support this: 50\% misannotated + 50\% unannotated.}
-Therefore, we explored methods to compensate inexhaustive annotations for segmentation in this section.
-
-% \cite{reed2014training,sukhbaatar2014training,patrini2016making,jindal2016learning}
+In that case, the unannotated ``toy dogs'' may cause the problem of inexhaustive annotations and lead to worse fine-tuning performance as discussed in Section \ref{sec:experiments}.
+Therefore, we focus ourselves to compensate the inexhaustive annotations for segmentation in this section.
 
 %%%%%%%% TEXT PU Learning setup
-\paragraph{Formulation}
-\noindent \textit{This part should formulate the problem with a probability model and make clear difference between model for synthesizating and model to fit.}
-\noindent
-When we synthesized errors in Section \ref{sec:robustness}, we assumed that  all label errors occurred to each segment instead of each pixel.
-This is helpful when we already know the
-However, which pixels belong to the same segment is unknown when a model is trained with noisy labels only.
-prediction for each pixel is made independently though the corresponding receptive fields is overlaped.
-Therefore, we instead assume label errors all occured independently
-Reasons:
+\paragraph{Learning with inexhaustive segmentation fits a PU learning setup}
+\noindent \textit{This part should formulate the PU learning probleml and discuss why PU Learning instead of semi-supervised learning is the way to go.}
 
-$p(\tilde{y_{ij}} \vert x, y_{ij})$.
+\noindent
+To simiplify the demonstration, let us consider a binary segmentation problem where we have \textit{positive} and \textit{negative} pixels denoting pixels corresponding to target and non-target segments.
+The goal of compensating incompleteness is to learn a model that predicts as many positive pixels as possible while keeping the false positive rate low.
+Pixel with negative labels can be either truly negative pixels or wrongly unsegmented positive pixels.
+% It will require extra manual works to distinguish the two cases explicitly.
+In other words, there is no exility labeled negative examples in the train ing set.
+This naturally fit in a Positive and Unlabeled Learning (PU Learning) setup where the training dataset consists of only a set positive examples (P set) and a set of unlabeled examples (U set), meaning that there are no reliable negative examples available.
+The traditional semi-supervised learning techniques are not applicable for this problem due to the absence of negative training samples.
+
+%%%%%%%% TEXT Weighted loss for negatives
+\paragraph{Class-weighted Logistic Loss}
+\noindent \textit{This part should discuss the linear model for observing positive conditioning on true positive and its relationship to changing the class weight and make clear difference between model for synthesizating and model to fit.}
+Traditional PU learning methods often follow a two-step strategy: first identifying a set of reliable negative samples (RN set) from U set and then iteratively build classifiers with RN and P sets and update the RN set with expectation-maximization (EM) algorithm.
+However, this strategy requires training multiple classification models, which is unrealistic for deep learning models because it would take significantly longer time to train neural networks than to train a naïve Bayesian (NB) model or supported vector machine (SVM).
+
+\noindent
+Our original goal was to achieve high precision as well as high recall regardless the existence of false negatives in annotations.
+A straightforward way to achieve this goal is to simply reweigh the positive and negative examples, namely let the positive and negative examples have different rates of contribution to the total loss.
+Suppose logistic loss is used, the corresponding losses for positive and negative samples are:
+\begin{equation*}
+  \begin{aligned}
+    & l_{\tilde{y_i}=+1} = - \log p(y_i=+1|x_i) \\
+    & l_{\tilde{y_i}=-1} = - q \log p(y_i=-1 \vert x_i), 0<q<1
+  \end{aligned}
+\end{equation*}
+where $p(y_i \vert x_i)=\sigma(f(x))$ denotes the probablistic output of the model $f(\cdot)$ for the i-th example. Emprically, the choice of $q$ can be made based on the most highest precision and recall achieved on validation set.
+Alternatively, one can also roughly assign $q=p(y=-1 \vert \tilde{y}=-1)$.
+This turns out to be part of the backward corrected loss proposed in \cite{patrini2016making}:
+\begin{equation*}
+  \begin{aligned}
+    l_{\tilde{y_i}=-1} = - p(y_i=-1 \vert \tilde{y_i}=-1) \log p(y_i=-1 \vert x_i) \\ - p(y_i=+1 \vert \tilde{y_i}=-1) \log p(y_i=+1 \vert x_i)
+  \end{aligned}
+\end{equation*}
+% $$p( \tilde{y} \vert x, y) = \sum_{y}p(\tilde{y} \vert y)p(y \vert x)$$
+% $$p(y=+1 \vert \tilde{y}=+1) = 1 $$
+% $$p(y=-1 \vert \tilde{y}=+1) = 0 $$
+with $p(y_i=-1 \vert \tilde{y_i}=-1) = q$ and $p(y_i=+1 \vert \tilde{y_i}=-1) = 1-q$.
+
+
+%%%%%%%% TEXT Encouraging confident predictions
+\paragraph{Confidence of contrary prediction and probability of false negative label}
+\noindent
+\noindent \textit{The idea of alleviating punishment for confident predictions.}
+Losses above assume that the true label of an observed negative label is independent of the inputs $x$.
+However, the true label $y$ is often dependent on both $x$ and $\tilde{y}$ in practice.
+For instance, in segmentation problems, whether a pixel is left unsegmented correctly or not can be determined by the semantical meaning of this pixel and pixels around.
+It is nevertheless difficult to estimate $p(y \vert x, \tilde{y})$ directly due to the difficulty of exploring the joint distribution of $x$ and $\tilde{y}$.
+Alternatively, one can use the probability $p(y \vert x)$ given by the classification model to provide extra information about the inputs.
+The probabilities indicate how confident the current model is for the predictions made.
+Given a good enough model, the more confident positive predictions for negatively labeled examples can have a higher probability of being wrongly annotated than the less confident ones.
+With a random model by which predictions are made randomly, the high and low confidences do not convey any information about the underlying inputs distribution.
+However, confident predictions made by a trained model indicate that the corresponding samples are possibly close to some previous training samples with positive labels in the feature space.
+The natural trend that similar examples are likely to have the same labels supports a higher probability of being annotated wrongly for confident predictions which have opposite labels.
+This thought leads to the idea of not punishing confident contrary predictions more than unconfident ones as the traditional logistic/softmax loss will do.
+
+%%%%%%%% TEXT Exponential loss
+\paragraph{Exponential Loss for unlabeled examples}
+\noindent
+\noindent \textit{This section should mention the class dependent losses and introduce ExponentialUnlabeledLoss}
+In a PU learning setup, the positive (P) set has only clean positive labels, whereas the unlabeled (U) set can be considered as presented with noisy negative labels.
+In such cases, we designed a class dependent loss to compensate the noisy negative labels while still making full use of the clean positive labels.
+We proposed to use the logistic loss for examples with positive labels and an exponential loss \cite{tax2016class} for negatively labeled examples:
+\begin{equation*}
+  \begin{aligned}
+    & l_{\tilde{y_i}=+1} = - \log p(y_i=+1 \vert x_i) \\
+    & l_{\tilde{y_i}=-1} = 1 - p(y_i=-1|x_i)
+  \end{aligned}
+\end{equation*}
+Figure \ref{fig:losses} shows the weighted logistic loss with $q=0.5$ and the exponential unlabeled loss respectively and their derivatives with respect to logits.
+The main feature of exponential loss is its relatively low loss for negative samples given very positive predictions, compared to the logistic loss and class weighted logistic loss.
+As a consequence of this, the corresponding derivative is small and decreases to zero as the prediction increases in the positive direction.
+This effect of exponential loss interprets the idea of not punishing positive prediction with confidence for negatively labeled samples.
+
+
+\noindent \textit{This section discuss the loss and derivative difference between the losses.}
+\noindent
+Figure \ref{fig:moons} shows the loss and derivate difference between logistic loss, class-weighted logistics loss and exponential negative (unlabeled) loss with a two-dimensional example.
+It demonstrates that, for exponential unlabeled loss, unlabeled positive examples farther from the decision boundary do not have larger loss contributions as ones closer to but still distant from the decision boundary.
+Confident positive predictions, shown as examples located on the positive side of the decision boundary and far from it, has little effect for updating model weights.
+
+
+%%%%%%%% TEXT Bootstrapping
+\paragraph{Minimum entropy regularization and bootstrapping objective}
+\noindent
+An alternative way of encouraging confident positive predictions is to introduce minimum entropy regularization\cite{grandvalet2005semi}.
+Reed et al.\cite{reed2014training} proposed an emprical modification to softmax loss, a.k.a. the \textit{bootstrapping loss}, which can be used to learn with unlabeled examples:
+% $$l_- = - \beta \log p(y=-1 \vert x) - (1-\beta) \sum_{j\in \{-1, +1\}} p(y=j \vert x) \log p(y=j \vert x)$$
+\begin{equation*}
+\resizebox{\columnwidth}{!}{
+  $l_{\tilde{y_i}=-1} = - \beta \log p(y_i=-1 \vert x_i) - (1-\beta) \log p(y_i=\hat{y_i} \vert x_i)$
+}
+\end{equation*}
+where $\hat{y} = argmax_{j\in\{-1,+1\}}p(y_i=j \vert x_i)$ is the model prediction and $0<\beta<1$.
+The first term of the objective is a weighted logistic loss and the second term can be considered as a variation of minimum entropy regularization:
+\begin{equation*}
+  \begin{aligned}
+    H = - \sum_{j\in\{-1,+1\}} p(y_i=j \vert x_i) \log p(y_i=j \vert x_i) \\
+    \sim - \sum_{j\in\{-1,+1\}} \delta(y_i - \hat{y_i}) \log p(y_i=j \vert x_i)
+  \end{aligned}
+\end{equation*}
+which intuitively encourages the model to make confident predictions\cite{grandvalet2005semi}.
+
+%%%%%%%% TEXT Multiple classes
+\paragraph{Multiclass}
+So far, we have been discussing modifications to the logistic loss for binary classification and segmentation.
+Similiar modifications can be applied to softmax loss as well.
+In a multi-class positive and unlabeled learning setup, $K>1$ positive classes are supposed to be distinguished from one negative class, whereas only part of the positive examples are labeled, and the others are not.
+Softmax loss can be still used for positive classes because positive labels are reliable as long as they are given.
+By contrast, the negatively labeled samples are a mix of samples assigned with true negative labels and false positive labels.
+The weighted unlabeled logistic, exponential unlabeled loss and bootstrapping can be used for negative by simply replacing the logistic function by softmax function as the output activation.
+
+
+
+%%%%%%%% TEXT Segmentation
+\paragraph{Segmentation}
+When we synthesized errors in Section \ref{sec:robustness}, we assumed that all label errors occurred to the whole segment instead of individual pixels, meaning that the label transition probability of a pixel is dependent of pixels which belong to the same segment.
+However, which pixels belong to the same segment is unknown when only noisy labels are available, especially in cases of inexhaustive annotation where
+pixels that were supposed to segmented out were mixed with the non-target pixels.
+Therefore, we assume label errors all occured independently
+Reasons:
+In addition, predictions for each pixel are made independently by most of the CNN based segmentation models though the corresponding receptive fields to extract features are overlapped.
+A pixel independent noise model would easily fit with it.
 
 This is a strong assumption for practical problems
 ,and may lead to future works
@@ -36,23 +147,8 @@ This model is easy to apply when we have the perfect annotations and want to gen
 % It is nevertheless difficult to fit such a NNAR model directly because it is difficult to estimate of $p(e \vert x,y)$ with limited number of samples.
 % An alternatie model is the \textit{noisy at random (NAR)} model in which the occurence of errors $e$ are independent to $x$ only on $y$: $p(\tilde{y} \vert y)p(y \vert x)$
 % Such \textit{Noisy at random (NAR)}
-$p(\tilde{y_{ij}} \vert y_{ij})$
-
-
-%%%%%%%% TEXT Modeling
-\paragraph{Weighted Logistic Regression}
-\noindent \textit{This part should discuss the linear model for observing positive conditioning on true positive and its relationship to changing the class weight.}
-
-
-%%%%%%%% TEXT Exponential loss
-\paragraph{Exponential Loss for unlabeled examples}
-\noindent
-\textit{This part should explain why the exponential loss could perform better than the cross-entropy loss, potentially with a figure of 2D Gaussians.}
-The ``soft'' bootstrapping loss in \cite{reed2014training} is actually equivalent to a softmax regression with \textit{minimum entropy regularization}\cite{grandvalet2005semi} which was originally proposed for semi-supervised learning.
-Minimum entropy regularization encourages the model to have a high confidence in predicting labels.
 
 %%%%%%%% TEXT Expontial loss FADE IN
-
 \paragraph{Implementation details}
 \noindent \textit{This paragraph should explain fade-in was introduced to avoid all-positive inital prediction;}
 
@@ -62,7 +158,14 @@ Minimum entropy regularization encourages the model to have a high confidence in
 \noindent
 \textit{This part should explain the influence of the imbalanced problem and how to overcome.}
 
-
+%%%%%%%% FIGURE Losses
+\begin{figure}[t]
+\centering
+% \fbox{\rule{0pt}{2in} \rule{0.9\linewidth}{0pt}}
+   \includegraphics[width=1.05\linewidth]{img/losses}
+\caption{The Logistic Loss, Weighted Logistic Loss, Exponential Loss and their derivatives with respect to logits.}
+\label{fig:losses}
+\end{figure}
 
 %%%%%%%% FIGURE MOONS
 \begin{figure*}
@@ -73,60 +176,3 @@ Minimum entropy regularization encourages the model to have a high confidence in
    \caption{2D moons dataset with non-linear separable decision boudary. Four hundreds samples per class were drawn randomly from two interleaving half circles with noises added with a minor standard deviation. A \textbf{red circle} indicates an example labelled as positive whilst a \textbf{blue square} indicates the example has a negative label. The \textbf{leftmost} figures have complete positive labels, meaning the positive and negative labels are all correct, whereas, in \textbf{the other figures} only half of the positives were correctly labelled and the rest were mixed with the negative samples. The \textbf{background colors} represent the probability for the area to be positive given by the classifier trained with the given samples and labels: \textbf{red} for high probability areas, \textbf{blue} for low probability areas and \textbf{white} for the class transition areas, i.e.decision boundaries. The \textbf{size of the markers} in the top row denotes the per-class normalized training losses and the \textbf{size of the markers} in the bottom row the per-class normalized derivatives w.r.t the output of the last layer for the trained Multilayer Perceptron (MLP) with the different losses.}
 \label{fig:moons}
 \end{figure*}
-
-
-%%%%%%%% FIGURE Losses
-\begin{figure}[t]
-\centering
-% \fbox{\rule{0pt}{2in} \rule{0.9\linewidth}{0pt}}
-   \includegraphics[width=1.05\linewidth]{img/losses}
-\caption{The Logistic Loss, Weighted Logistic Loss, Exponential Loss and their dirivatives with respect to the model output.}
-\label{fig:losses}
-\end{figure}
-
-
-%%%%%%%% FIGURE Varying positive annotating percetage
-\begin{figure}[t]
-\centering
-   \includegraphics[width=\linewidth]{img/pu_vs_pn}
-\caption{Varying percentage of annotated positives 10\%, 20\%, 50\%, 80\% and 100\% with images from CIFAR10 as the positives and images from CIFAR110 as the negatives.}
-\label{fig:pct_annotating}
-\end{figure}
-
-%%%%%%%% TABLE CIFAR10
-\begin{table}[t]
-\resizebox{\columnwidth}{!}{
-\centering
-\begin{tabular}{ll|llll}
-Annotation  & Loss & acc. & prec. & rec. & $F_1$ \\
-\hline
-Complete    & CrossEntropyU.   & $0.87\pm0.01$ & $0.88\pm0.01$ & $0.82\pm0.01$ & $0.85\pm0.01$ \\
-50\%(P+N)   & CrossEntropyU.   & $0.83\pm0.01$ & $0.84\pm0.01$ & $0.78\pm0.01$ & $0.80\pm0.01$ \\
-50\%P+U     & CrossEntropyU.   & $0.64\pm0.04$ & $0.93\pm0.08$ & $0.34\pm0.02$ & $0.44\pm0.06$ \\
-50\%P+U     & WeightedU.       & $0.78\pm0.01$ & $0.75\pm0.01$ & $0.75\pm0.01$ & $0.76\pm0.01$ \\
-50\%P+U     & ExponentialU.    & $0.82\pm0.01$ & $0.86\pm0.01$ & $0.73\pm0.01$ & $0.78\pm0.01$ \\
-50\%P+U     & BootstrapHard    & $0.74$ & $0.81$ & $0.60$ & $0.67$ \\
-\end{tabular}
-}
-\caption{Image classification with positive examples partially annotated. The complete dataset contains images from CIFAR10 as the \textbf{positive} (P) set and images from CIFAR110 as the \textbf{negative} (N) set. The unannotated positive examples from P set construct the \textbf{unlabeled} (U) set together with the N set.}
-\end{table}
-
-
-%%%%%%%% TABLE
-\begin{table}[t]
-\resizebox{\columnwidth}{!}{
-\centering
-\begin{tabular}{ll|llll}
-Annotation  & Loss & pixel acc. & mean acc. & mean IU & f.w. IU \\
-\hline
-Complete    & CrossEnt.U    &  &  & & \\
-50\%(P+N)   & CrossEnt.U    & & & & \\
-50\%P+U     & CrossEnt.U    & & & & \\
-50\%P+U     & WeightedU        &  &  & & \\
-50\%P+U     & ExponentialU     &  &  & & \\
-50\%P+U     & BootstrapHard    &  &  & & \\
-50\%P+U     & DropoutReg. & & & & \\
-\end{tabular}
-}
-\caption{Image semantic segmentation with images contain single instance only from the PASCAL VOC2011 segmentation dataset. The complete \textbf{positive} (P) set denotes the foreground instances and the \textbf{negative} (N) set consists of the background. The unannotated instances from P set construct the \textbf{unlabeled} (U) set together with the N set.}
-\end{table}
