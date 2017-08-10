@@ -96,6 +96,25 @@ Figure \ref{fig:moons} shows the loss and derivate difference between logistic l
 It demonstrates that, for exponential unlabeled loss, unlabeled positive examples farther from the decision boundary do not have larger loss contributions as ones closer to but still distant from the decision boundary.
 Confident positive predictions, shown as examples located on the positive side of the decision boundary and far from it, has little effect for updating model weights.
 
+%%%%%%%% FIGURE Losses
+\begin{figure}[t]
+\centering
+% \fbox{\rule{0pt}{2in} \rule{0.9\linewidth}{0pt}}
+   \includegraphics[width=1.05\linewidth]{img/losses}
+\caption{The Logistic Loss, Weighted Logistic Loss, Exponential Loss and their derivatives with respect to logits.}
+\label{fig:losses}
+\end{figure}
+
+%%%%%%%% FIGURE MOONS
+\begin{figure*}
+\begin{center}
+% \fbox{\rule{0pt}{2in} \rule{.9\linewidth}{0pt}}
+   \includegraphics[width=0.95\linewidth]{img/moons.png}
+\end{center}
+   \caption{2D moons dataset with non-linear separable decision boudary. Four hundreds samples per class were drawn randomly from two interleaving half circles with noises added with a minor standard deviation. A \textbf{red circle} indicates an example labelled as positive whilst a \textbf{blue square} indicates the example has a negative label. The \textbf{leftmost} figures have complete positive labels, meaning the positive and negative labels are all correct, whereas, in \textbf{the other figures} only half of the positives were correctly labelled and the rest were mixed with the negative samples. The \textbf{background colors} represent the probability for the area to be positive given by the classifier trained with the given samples and labels: \textbf{red} for high probability areas, \textbf{blue} for low probability areas and \textbf{white} for the class transition areas, i.e.decision boundaries. The \textbf{size of the markers} in the top row denotes the per-class normalized training losses and the \textbf{size of the markers} in the bottom row the per-class normalized derivatives w.r.t the output of the last layer for the trained Multilayer Perceptron (MLP) with the different losses.}
+\label{fig:moons}
+\end{figure*}
+
 
 %%%%%%%% TEXT Bootstrapping
 \paragraph{Minimum entropy regularization and bootstrapping objective}
@@ -119,30 +138,24 @@ The first term of the objective is a weighted logistic loss and the second term 
 which intuitively encourages the model to make confident predictions\cite{grandvalet2005semi}.
 
 %%%%%%%% TEXT Multiple classes
-\paragraph{Multiclass}
+\paragraph{Multiclass PU learning}
 So far, we have been discussing modifications to the logistic loss for binary classification and segmentation.
 Similiar modifications can be applied to softmax loss as well.
 In a multi-class positive and unlabeled learning setup, $K>1$ positive classes are supposed to be distinguished from one negative class, whereas only part of the positive examples are labeled, and the others are not.
 Softmax loss can be still used for positive classes because positive labels are reliable as long as they are given.
 By contrast, the negatively labeled samples are a mix of samples assigned with true negative labels and false positive labels.
-The weighted unlabeled logistic, exponential unlabeled loss and bootstrapping can be used for negative by simply replacing the logistic function by softmax function as the output activation.
-
+The weighted unlabeled logistic, exponential unlabeled loss and bootstrapping can be used for negative by simply replacing logistic function with softmax function as the activation function for logits.
 
 
 %%%%%%%% TEXT Segmentation
-\paragraph{Segmentation}
-When we synthesized errors in Section \ref{sec:robustness}, we assumed that all label errors occurred to the whole segment instead of individual pixels, meaning that the label transition probability of a pixel is dependent of pixels which belong to the same segment.
-However, which pixels belong to the same segment is unknown when only noisy labels are available, especially in cases of inexhaustive annotation where
-pixels that were supposed to segmented out were mixed with the non-target pixels.
-Therefore, we assume label errors all occured independently
-Reasons:
-In addition, predictions for each pixel are made independently by most of the CNN based segmentation models though the corresponding receptive fields to extract features are overlapped.
-A pixel independent noise model would easily fit with it.
-
-This is a strong assumption for practical problems
-,and may lead to future works
-
-This model is easy to apply when we have the perfect annotations and want to generate noisy labels, but it is not as easy when we observe noisy labels and want to recover the correct ones.
+\paragraph{From classification to segmentation}
+Classification for each pixel is made independently when segmentation task is treated as per-pixel classification.
+The modification of objectives for compensating unlabeled positive samples can be also applied for each pixel.
+This choice of design can be made by assuming the probability of missing positive label for a pixel is independent of its neighbor pixels, which may not hold in practice.
+For synthesized incomplete segmentation errors in Section \ref{sec:robustness}, we stochastically flipped pixel labels for the whole segment, instead of individual pixel label, to 0.
+Even in cases where objects are under-segmented, the probability for a pixel to be unsegmented depends on its neighbor pixels.
+We made a strong assumption for label noise independence for pixels to keep the problem simple.
+Future works are needed to relax this assumption and make use of the spatial dependence of label noises.
 
 % It is nevertheless difficult to fit such a NNAR model directly because it is difficult to estimate of $p(e \vert x,y)$ with limited number of samples.
 % An alternatie model is the \textit{noisy at random (NAR)} model in which the occurence of errors $e$ are independent to $x$ only on $y$: $p(\tilde{y} \vert y)p(y \vert x)$
@@ -151,28 +164,19 @@ This model is easy to apply when we have the perfect annotations and want to gen
 %%%%%%%% TEXT Expontial loss FADE IN
 \paragraph{Implementation details}
 \noindent \textit{This paragraph should explain fade-in was introduced to avoid all-positive inital prediction;}
-
 \noindent
+The exponential loss for negative (unlabeled) examples saturates for very positive outputs, meaning that the confident positive prediction has little contribution to the total loss.
+This can introduce problems at the beginning of the training procedure when the confident predictions are likely to be made at random.
+Additionally, optimization would be stuck if the model predicts all examples to be positive with high confidence.
+Therefore, we introduce the exponential loss after training with the class weighted loss for a few epochs.
+We did similar ``fade-in'' mechanism for the bootstrapping method as well because it also requires the model to be non-random to give sufficiently trustworthy prediction $\hat{y}$.
+
 
 %%%%%%%% TEXT Imbalanced
 \noindent
 \textit{This part should explain the influence of the imbalanced problem and how to overcome.}
-
-%%%%%%%% FIGURE Losses
-\begin{figure}[t]
-\centering
-% \fbox{\rule{0pt}{2in} \rule{0.9\linewidth}{0pt}}
-   \includegraphics[width=1.05\linewidth]{img/losses}
-\caption{The Logistic Loss, Weighted Logistic Loss, Exponential Loss and their derivatives with respect to logits.}
-\label{fig:losses}
-\end{figure}
-
-%%%%%%%% FIGURE MOONS
-\begin{figure*}
-\begin{center}
-% \fbox{\rule{0pt}{2in} \rule{.9\linewidth}{0pt}}
-   \includegraphics[width=0.95\linewidth]{img/moons.png}
-\end{center}
-   \caption{2D moons dataset with non-linear separable decision boudary. Four hundreds samples per class were drawn randomly from two interleaving half circles with noises added with a minor standard deviation. A \textbf{red circle} indicates an example labelled as positive whilst a \textbf{blue square} indicates the example has a negative label. The \textbf{leftmost} figures have complete positive labels, meaning the positive and negative labels are all correct, whereas, in \textbf{the other figures} only half of the positives were correctly labelled and the rest were mixed with the negative samples. The \textbf{background colors} represent the probability for the area to be positive given by the classifier trained with the given samples and labels: \textbf{red} for high probability areas, \textbf{blue} for low probability areas and \textbf{white} for the class transition areas, i.e.decision boundaries. The \textbf{size of the markers} in the top row denotes the per-class normalized training losses and the \textbf{size of the markers} in the bottom row the per-class normalized derivatives w.r.t the output of the last layer for the trained Multilayer Perceptron (MLP) with the different losses.}
-\label{fig:moons}
-\end{figure*}
+\noindent
+Another problem encountered in the PU learning setup is the class imbalance introduced by negatively labeled positive samples.
+Even a balanced dataset can become imbalanced in the presence of false negative labels, especially if only a small portion of positive samples are correctly labeled.
+We reweighed positive and negative samples based on their occurrences of the observed labels to alleviate the influence of imbalance for training.
+Note that the class-weighted logistic loss reweighed the classes further on top of this class weight.
