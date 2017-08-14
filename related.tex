@@ -34,7 +34,7 @@ A few studies\cite{erhan2009difficulty,erhan2010does,bengio2012deep} highlighted
 However, better random initialization strategies, for example, xavier initialization\cite{glorot2010understanding} and its variants, have shortened the gap between unsupervised pre-training and random initialization.
 Using unsupervised pre-training or not now becomes a tradeoff between the time and resources invested and the performance gain.
 Unsupervised deep representation learning is in general not comparable to supervised representation learning especially when large scale dataset is available.
-A proper method to learn features in the presence of label noise should at least outperform unsupervised pre-training because noisy information is still better than no information.
+% A proper method to learn features in the presence of label noise should at least outperform unsupervised pre-training because noisy information is still better than no information.
 
 \paragraph{{Deep Learning with Noisy Labels}}
 A few studies\cite{sukhbaatar2014training,patrini2016making} investigated the impact of label noise on classification performance with convolutional neural networks assuming the labels were randomly transited from one to another given the probabilities fall in a transition matrix.
@@ -52,7 +52,4 @@ This work is closely related to our work in Section \ref{sec:robustness}, except
 Additionally, most of these studies focus on the classification problems, whereas our work inclined more to the semantic segmentation problem.
 
 \paragraph{Positive and Unlabeled Learning}
-If we consider the in-exhaustive annotation issue only, i.e., only a proportion of the target instances were annotated, the problem becomes similar to a so-called \textit{positive and unlabelled learning} (PU learning) setup\cite{li2005learning}.
-In the positive and unlabeled learning setup, the training dataset has two sets of examples: the \textit{positive (P) set}, contained only positive examples, and the \textit{unlabeled (U) set}, contained a mix of positive or negative examples.
-If we categorize the pixels into either \textit{foreground pixels} or \textit{background pixels}, the correctly annotated instances form the positive set, and the unannotated instances are mixed with the background pixels, forming an unlabeled set.
 The previous studies about PU learning mainly focus on the binary classification for linear-separable problems\cite{elkan2008learning,lee2003learning}, whereas we showed in Section \ref{sec:pulearning} that it is possible to train deep neural networks for multiple classes with only ``positive'' and unlabeled examples.

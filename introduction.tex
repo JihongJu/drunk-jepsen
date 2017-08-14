@@ -15,8 +15,8 @@ These datasets allow researchers to develop deep neural network models for objec
 However, collecting well-annotated datasets on a large scale can be tremendously expensive and time-consuming in general.
 % For example, it took over 70,000 worker hours to create Microsoft COCO dataset which contains 2.5 million labeled objects in 328k images\cite{lin2014microsoft}.
 % A significant percentage of these hours were contributed to judge the correctness of annotations.
-When annotators work on their tasks, it is natural for them to make mistakes as a result of lack of expertise, inherent ambiguity of tasks or unconscious bias.
-Enormous efforts were made in various manners to ensure the correctness of annotations according to reports in \cite{russakovsky2015imagenet,lin2014microsoft}.
+When annotators work on the tasks, it is natural for them to make mistakes as a result of lack of expertise, inherent ambiguity of tasks or unconscious bias.
+Enormous efforts were made in various manners to ensure the correctness of annotations as reported in, for example, \cite{russakovsky2015imagenet,lin2014microsoft}.
 Saving efforts made for correctness will result in a noisy dataset but also potentially more annotated images.
 Trade-offs need to be made between the impact of by label noise and the gain of a larger dataset.
 % In addition, a slight decrease in annotation errors may require extraordinary additional efforts due to the difficulty of identifying errors from a large-scale dataset.
@@ -29,7 +29,6 @@ These segmentations constructed from maps suffer from the incomplete annotation 
 Besides, Pl@ntNet\footnote{https://identify.plantnet-project.org/}, a crowdsourcing platform, provide millions of images of plants and corresponding labels which may or may not be correct.
 Strong supervision is therefore required to correct the mistakes, for example double-checking the annotations over and over again and ensembling opinions from multiple annotators.
 It is therefore sometimes inevitable for deep neural network models to accept the existence of noisy annotations.
-
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%% TEXT Why feature's noise robustness?
@@ -59,13 +58,20 @@ We experimented in Section \ref{sec:robustness} that how much label noises inter
 
 \noindent \textit{Narrow the problem of discussion down to Segmentation}
 \noindent
-In this paper, we considered three types noises that happen to semantic image segmentation.
-These segmentation noises are summarized in Section \ref{subsec:formulation}.
-We chose to study segmentation errors because
+In this paper, we considered three types noises that happen to semantic image segmentation: mis-segmentation, misclassification and inexhaustive segmentation, as described in details in Section \ref{subsec:formulation}.
+We chose to study segmentation errors because:
 \begin{enumerate}
   \item It is more difficult to correct noisy segmentation than to correct classification noises for object recognition;
-  \item Semantic segmentation can be treated as pixel-wise classification so that existing methods to compensate label noise can be applied with correpsonding assumptions when necessary.
+  \item Semantic segmentation can be treated as pixel-wise classification so that the existing noise-robust methods can be applied by assuming classifications for each pixels are made independently.
 \end{enumerate}
+
+
+\noindent \textit{Explain why PU learning is relevant}
+\noindent
+If we consider the inexhaustive segmenation issue only, i.e., the segmentation contains only a proportion of the target instances while leaving the rest unsegmented, the problem becomes similar to a so-called \textit{positive and unlabelled learning} (PU learning) setup\cite{li2005learning}.
+In the positive and unlabeled learning setup, the training dataset has two sets of examples: the \textit{positive (P) set}, containing only positive examples, and the \textit{unlabeled (U) set}, containing a mix of positive or negative examples.
+The segmented pixels in the presence of inexhaustive segmentation then form the P set and the unsegmented images construct the U set.
+Methods to learn with only positive examples and unlabeled examples become relevant because of the difficulty of distinguish object pixels and background pixels in the U set.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%% TEXT Table of contents
@@ -74,10 +80,12 @@ We chose to study segmentation errors because
 \noindent \textit{Table of contents}
 
 \noindent
-In the next section, we summarized related works in areas of transfer learning and learning with noisy labels for deep learning.
-In Section \ref{sec:robustness} we formulated the segmentation errors into three categories, misannotation, misclassification and incomplete annotation, and tested feature transferability against them separately.
-In Section \ref{sec:pulearning} we connected training with inexhaustive annotations to Positive and Unlabeled Learning.
-We tested our hypothesis in Section \ref{sec:results}, studying whether the misannotation and misclassification had an impact on learning ``transferable'' features.
+In the next section, we summarize related works in areas of transfer learning and learning with noisy labels for deep learning.
+In Section \ref{sec:robustness} we formulate the segmentation errors into three categories, mis-segmentation, misclassification and incomplete annotation, and test feature transferability against them separately.
+In Section \ref{sec:pulearning} we connect training with inexhaustive segmentations to positive and unlabeled (PU) learning.
+We experiment with synthesized noisy dataset in Section \ref{subsec:robustness} to study whether the mis-segmentation, misclassification and inexhaustive segmentation noises have impacts on learning transferable features.
+Section \ref{subsec:pulearning} contains experiments for methods to learn with positive and unlabled examples.
+Conclusions are summarized in section \ref{sec:conclusion}.
 
 %Features learned by predicting the pixel objectness with inexaustive annotations were then validated with experiments described in Section \ref{sec:results}.
 

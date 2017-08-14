@@ -9,6 +9,10 @@
 \usepackage{makecell}
 
 % Include other packages here, before hyperref.
+\usepackage{subfig}
+\newcommand{\subsubfloat}[2]{%
+  \begin{tabular}{@{}c@{}}#1\\#2\end{tabular}%
+}
 
 % If you comment hyperref and then uncomment it, you should delete
 % egpaper.aux before re-running latex.  (Or just hit 'q' on the first latex
@@ -60,7 +64,7 @@ First line of institution2 address\\
 
 \input{experiments}
 
-\input{results}
+% \input{results}
 
 \input{conclusion}
 

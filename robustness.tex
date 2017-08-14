@@ -66,7 +66,7 @@ Given a corruption model and true annotations, one can synthesized the correspon
 \noindent
 % In the above model, label errorness for pixels is assumed to be independent to each other despite the fact that neighboring pixels are likely to have the same label in practice.
 %Conditional random fields (CRF) were introduced to interpret the neighboring pixel dependence.\cite{chen2016deeplab}
-In our works, we considered three types of errors for a semantic segmentation problem, \textit{misannotation}, \textit{misclassification} and \textit{inexaustive annotation}, and modified the NNAR model accordingly.
+In our works, we considered three types of errors for a semantic segmentation problem, \textit{mis-segmentation}, \textit{misclassification} and \textit{inexhaustive segmentation}, and modified the NNAR model accordingly.
 Note that all these label errors apply to the whole segment instead of to individual pixels.
 That is pixels for the same segments will have the same true labels and observed labels.
 We exluded segmenting errors such as inprecise boundaries, oversegmenting or undersegmenting the objects from study because they are more difficulty to synthesize than the preceding classification errors.
@@ -77,24 +77,24 @@ It would be of more value to use a real dataset for such errors than to synthesi
 % $p(\tilde{y_{ij}},x) = p(\tilde{y_{ij}} \vert x, y, e_{ij}) p(e_{ij} \vert x,y)$.
 
 
-\paragraph{Misannotation}
+\paragraph{Mis-segmentation}
 \noindent
-Misannotation denotes the wrongly segmented objects for categories that are semantically meaningful but are not predefined.
+Mis-segmentation denotes the wrongly segmented objects for categories that are semantically meaningful but are not predefined.
 For example, a toy dog can be misannotated as a dog, assuming that ``dog'' is predefined and ``toy dog'' is not.
-In the presence of misannotation, pixel labels of segment $S$ transit from $0$ to $k$ with probability
+In the presence of mis-segmentation, pixel labels of segment $S$ transit from $0$ to $k$ with probability
 $$p(\tilde{y_{ij}}=k \vert x, y_{ij}=0), ij \in S $$
 % $\{\tilde{y_{kl}}, kl \in P \setminus \{ij\} \}$
 % where P is all the pixels in image $x$, and $ij$, $kl$ are both pixels in the image.
-The dependence of observed pixel labels $\tilde{y_{ij}}$ on the original image $x$ interpret the premise that misannotation would only happen to semantically meaningful segments in an image.
+The dependence of observed pixel labels $\tilde{y_{ij}}$ on the original image $x$ interpret the premise that mis-segmentation would only happen to semantically meaningful segments in an image.
 It is natural to include this premise because semantically meaningless partitions of an image are less likely to be segmented by an annotator.
 However, it is difficult to estimate the above proability in practice because it is conditioning on the semantic meaning of $x$.
-Alternatively, we can synthesize misannotation errors by selecting part of the categories as non-target categories so that instances of these categories should have zero labels for correct segmentations.
+Alternatively, we can synthesize mis-segmentation errors by selecting part of the categories as non-target categories so that instances of these categories should have zero labels for correct segmentations.
 We can then misannotate these non-target instances stochastically with a simplified probability $p(\tilde{y_{ij}}=k \vert y_{ij}=0)=p_k$ without  interpreting semantic meaning of $x$ in probability.
 Note that $p_k$ sums up to 1 for all classes, including class 0, $\sum_0^K p_k = 1$.
 
 \noindent
 \paragraph{Misclassification}
-Different from misannotation, misclassification error means labels were misclassified between pre-defined categories.
+Different from mis-segmentation, misclassification error means labels were misclassified between pre-defined categories.
 For example, cats may be misclassified as dogs occasionally if both ``cat'' and ``dog'' are target classes.
 In the presence of misclassification, pixel labels of segment $S$ are transited from $k$ to $j$ stochastically with probability:
 $$p(\tilde{y_{ij}}=j \vert y_{ij}=k) = p_{jk}, ij \in S, k,j \in [1,K]$$
@@ -106,17 +106,17 @@ But the difficulty of modeling the depence of $x$ leads to simply assuming an in
 Given the class transition probabilities, one can easily synthesize noisy annotations including misclassification errors given a well-annotated segmentation dataset.
 
 \noindent
-\paragraph{Inexaustive annotation}
-Inexaustive annotation denotes that there exists unsegmented instances for pre-defined categories.
-Pixels of an unannotated object $S$ have labels flipped from $k$ to $0$ with probability:
+\paragraph{Inexhaustive segmentation}
+Inexhaustive segmentation denotes that there exists unsegmented instances for pre-defined categories.
+Pixels of an unsegmented object $S$ have labels flipped from $k$ to $0$ with probability:
 $$p(\tilde{y_{ij}}=0\vert y_{ij}=k) = q_k, ij \in S, k \in [1,K]$$
 In words, an instance of category $k$ is left unsegmented stochastically with probability $q_k$.
 The probability of correctly segmented in annotations is then:
 $$p(\tilde{y_{ij}}=k\vert y_{ij}=k) = 1-q_k, ij \in S, k \in [1,K]$$
-Again we assumed inexaustive annotations to be noisy at random (NAR).
+Again we assumed inexhaustive segmentations to be noisy at random (NAR).
 
 
-% The inexhaustive annotations need to be properly handled given the prior knowledge modeling the missing pattern of the annotations.
+% The inexhaustive segmentations need to be properly handled given the prior knowledge modeling the missing pattern of the annotations.
 % Given that we believe any annotated instance provide information, all the foreground pixels that correspond to the annotated instances become reliable and the background pixels may contain both the true background pixels and object pixels unannotated.
 % That satisfies a Positive and Unlabeled learning setup where the training dataset contains only the positive examples and unlabeled examples that are the mixed of the positive samples and negative samples.
 
@@ -128,10 +128,10 @@ Again we assumed inexaustive annotations to be noisy at random (NAR).
 % If we consider further lower features, for exmaple those for detecting edges and corners, they are commonly transferable to many categories, not necessarily ones that look alike.
 % dissimilar categories (man-made classes and natural classes)
 %If we constraint ourselves to perceive only part of the dog and the toy dog, for example the ears, it may become difficult even for us to distinguish the two because given only the local information there is not much difference between them.
-% The generality of the low-level features can introduce the robustness to misannotations regarding the transferability when we want to transfer hieraychical features for semantic segmentation in the presence misannotated objects because the low-level features are not dependent on the exact category assigned to the objects.
+% The generality of the low-level features can introduce the robustness to mis-segmentations regarding the transferability when we want to transfer hieraychical features for semantic segmentation in the presence misannotated objects because the low-level features are not dependent on the exact category assigned to the objects.
 % This annotation error robustness for the low-level features could result in noise robustness for the multiple level pre-trained weights for semantic segmentation with noisy labels.
-% In Section \ref{sec:objectness}, we tested whether object misannotation had an impact on the transfehen we transfer the learned features to a new dataset with new categories.
+% In Section \ref{sec:objectness}, we tested whether object mis-segmentation had an impact on the transfehen we transfer the learned features to a new dataset with new categories.
 % That leads us to the following research question:
 % \begin{enumerate}
-%   \item How do misannotation and misclassification of instances influence the ``transferability'' of the learned features respectively?
+%   \item How do mis-segmentation and misclassification of instances influence the ``transferability'' of the learned features respectively?
 % \end{enumerate}
