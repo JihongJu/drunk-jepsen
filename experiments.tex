@@ -96,6 +96,7 @@ RandomWeights    & \makecell{$0.29\pm0.01$} & \makecell{$0.29\pm0.03$} & \makece
 NoMisSegmented   & \makecell{$0.26\pm0.01$} & \makecell{$0.37\pm0.03$} & \makecell{$0.27\pm0.01$} & \makecell{$0.33\pm0.04$} & \makecell{$0.31\pm0.02$}\\
 AllMisSegmented  & \makecell{$0.30\pm0.02$} & \makecell{$0.35\pm0.01$} & \makecell{$0.29\pm0.02$} & \makecell{$0.35\pm0.03$} & \makecell{$0.32\pm0.02$}\\
 HalfMisSegmented & \makecell{$0.27\pm0.01$} & \makecell{$0.34\pm0.01$} & \makecell{$0.30\pm0.01$} & \makecell{$0.32\pm0.01$} & \makecell{$0.31\pm0.01$}\\
+ExponentialU. & \makecell{$0.31\pm0.00$} & \makecell{$0.37\pm0.00$} & \makecell{$0.33\pm0.00$} & \makecell{$0.35\pm0.00$} & \makecell{$0.xx\pm0.00$}\\
 \hline
 TrueLabels       & \makecell{$0.29\pm0.01$} & \makecell{$0.36\pm0.01$} & \makecell{$0.29\pm0.01$} & \makecell{$0.37\pm0.01$} & \makecell{$0.33\pm0.01$}\\
 AllRandomLabels  & \makecell{$0.29\pm0.01$} & \makecell{$0.33\pm0.03$} & \makecell{$0.26\pm0.01$} & \makecell{$0.28\pm0.01$} & \makecell{$0.29\pm0.01$}\\
@@ -143,7 +144,7 @@ Binarizing or categorizing classes into higher hierarchy can be beneficial when 
    \includegraphics[width=1.\linewidth]{img/num_classes.eps}
 \caption{
 Test performance for fine-tuned models initialized with weights pre-trained with categorized 15 classes.
-Separate error bars located aside from the lines denote random categorizations (RC) of the 15 classes.
+Isolated error bars located aside from the lines denote random categorizations (RC) of the 15 classes.
 The displayed mean IU/mean accuracies and standard deviations were averaged over four folds listed in Table \ref{tab:robustness}.
 Experiments were repeated three times.
 }
@@ -285,3 +286,8 @@ The coarse results were mainly due to the limited compacity of AlexNet model.
 \caption{Selective predictions for models in Table \ref{tab:pusegment}.}
 \label{fig:pusegment}
 \end{figure}
+
+
+%%%%%%%% Text Fine-tuning performance with exponential loss
+\noindent \textit{Exponential loss help improve fine-tuning performance}
+Additionally,
