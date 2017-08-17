@@ -9,7 +9,6 @@
 
 \paragraph{Transfer Learning}
 \noindent \textit{transfer learning}
-\noindent
 
 The convolutional layers were proved ``transferable'' not only to another dataset\cite{yosinski2014transferable} but also to another application\cite{girshick2014rich,long2015fully}.
 This feature transferability allows reusing the convolutional features for tasks and applications different from which they were originally trained with in a transfer learning scenario, and it helps to achieve better performance when there are only limited number of training samples\cite{long2015fully}.
@@ -26,6 +25,22 @@ Yosinski et al. discovered that feature transferability is negatively affected b
 Their experiments showed that low-level features, which are less dependent to particular categories, are more transferable than high-level features.
 % Given the superiority of transferring pre-trained weights and the availability of larger but noisier dataset, we learn transferable features with the noisy dataset and fine-tune the model with small dataset.
 % In Section \ref{sec:robustness}, we explored whether transferability of features is robust to annotation errors in the pre-training dataset.
+
+Convolutional neural networks for processing images are believed to extract a rich hierarchy of visual features that vary from simple to complex and from local to global.\cite{girshick2014rich}
+Neurons in the lower hierarchy capture simple patterns such as edges, textures or material properties within small receptive fields, whereas the high-level features capture conceptual information such as people and text in larger receptive fields.
+It is natural that simple patterns can be found for many categories whereas conceptual features are often specific to particular categories.
+By training a CNN with half of the ImageNet categories and transfer features to the other half, Yosinski et al.\cite{yosinski2014transferable} found transferability of features decreases from the bottom layers to the top layers, indicating that features change gradually from category independent to class dependent.
+Additionally, filters from the first convolutional layer are often observed as Gabor filters or color blobs regardless the training dataset and target categories.\cite{zeiler2014visualizing,lee2009convolutional,krizhevsky2012imagenet,shin2016deep}
+Correspondingly, low-level filters, especially ones from the first two layers, were proved well-transferable to dissimilar categories, as reported in \cite{yosinski2014transferable} from natural objects to man-made objects.
+These category-independent convolutional filters are denoted \textit{general} in the sense that they are generally usable for many classes.
+
+Given the evidence that some convolutional filters can be applied regardless the exact categories they were trained, we wondered if they can also be learned in a more general way than using the exact labels of specific classes.
+For example, labels assigned examples from categories that are visually similar can be inconsistent in practice if not additional human efforts made for correctness.
+These noises in labels may have a significant negative influence to the top layers which are sensitive to the given labels but not necessarily to the bottom layers which have already shown class independence to some extent.
+If we train models in a transfer learning scenario where we only care about the transferability of a pre-trained model rather than performance achieved on the pre-training task, a label noise robustness of weights transferability can be beneficial to save additional human efforts for label correction.
+We studied the influence of three types of segmentation noises on weights transferability in Section \ref{subsec:robustness}.
+The research problem is formulated in Section \ref{subsec:formulation} and the segmentation noises of interest are described in Section \ref{subsec:noises}.
+
 {TODO:R} Relations to our work.
 We studied if feature transferability is negatively affected by the presence of label noises.
 

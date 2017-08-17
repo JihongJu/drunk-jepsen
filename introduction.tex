@@ -88,7 +88,7 @@ For example, one can use digital maps, like OpenStreetMap, to segment aerial ima
 These segmentations constructed from maps would suffer from the incomplete annotation as well as registration problems.\cite{mnih2012learning}
 % Besides, Pl@ntNet\footnote{https://identify.plantnet-project.org/}, a crowdsourcing platform, provide millions of images of plants and corresponding labels which may or may not be correct.
 Ideally, the use of these noisy datasets for pre-training should not affect the result weights transferring to another dataset.
-If negative influences of label noises on weights transferability were remarkable, methods of compensating the noises are then relevant.
+If negative influences of label noises on weights transferability were remarkable, methods of compensating the noises then become relevant.
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -108,18 +108,31 @@ If negative influences of label noises on weights transferability were remarkabl
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%% TEXT Why binarizing classes?
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\noindent \textit{Why binarizing classes?}
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%% TEXT Why PU learning
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
+\noindent \textit{Why PU learning is relevant?}
 
-\noindent \textit{Why PU learning is relevant?
-}
-
-
-If we consider the inexhaustive segmenation issue only, i.e., the segmentation contains only a proportion of the target instances while leaving the rest unsegmented, the problem becomes similar to a so-called \textit{positive and unlabelled learning} (PU learning) setup\cite{li2005learning}.
+If we consider inexhaustive segmenation only, i.e., there exists objects left unsegmented, the problem becomes similar to a so-called \textit{positive and unlabelled learning} (PU learning) setup\cite{li2005learning}.
 In the positive and unlabeled learning setup, the training dataset has two sets of examples: the \textit{positive (P) set}, containing only positive examples, and the \textit{unlabeled (U) set}, containing a mix of positive or negative examples.
-The segmented pixels in the presence of inexhaustive segmentation then form the P set and the unsegmented images construct the U set.
-Methods to learn with only positive examples and unlabeled examples become relevant because of the difficulty of distinguish object pixels and background pixels in the U set.
+The P set in an inexhaustively segmented dataset, is comprised of segmented pixels while the rest of the pixels construct the U set.
+The main characteristic of the U set is that there is no easy way to generate reliable negative labels out of it.
+The pixels containing unsegmented objects can fulfill this property of U set.
+Learning to segment in the presence of inexhaustive segmentation can be thus considered as a learning problem with only positive examples and unlabeled examples.
+
+% \noindent
+% Experiments in Section \ref{subsec:robustness} indicates that inexhaustive segmentation can have significant negative influences on feature transferability.
+% Besides, including mis-segmented objects for training can aggravate the inexhaustive segmentation problem.
+% For example, the existence a mis-segmented toy dog does not mean that every toy dogs are mis-segmented.
+% The other unsegmented toy dogs then become a source of inexhaustive segmentation and lead to worse fine-tuning performance as we discovered in Section \ref{sec:experiments}.
+% Method to compensate inexhaustive segmentation is therefore necessary to train better transferable representation.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%% TEXT Table of contents
@@ -128,36 +141,19 @@ Methods to learn with only positive examples and unlabeled examples become relev
 \noindent \textit{Table of contents}
 
 \noindent
-In the next section, we summarize related works in areas of transfer learning and learning with noisy labels for deep learning.
+In the next section, we summarize related works in areas of transfer learning, deep learning with noisy labels and PU learning.
 In Section \ref{sec:robustness} we formulate the segmentation errors into three categories, mis-segmentation, misclassification and incomplete annotation, and test feature transferability against them separately.
 In Section \ref{sec:pulearning} we connect training with inexhaustive segmentations to positive and unlabeled (PU) learning.
 We experiment with synthesized noisy dataset in Section \ref{subsec:robustness} to study whether the mis-segmentation, misclassification and inexhaustive segmentation noises have impacts on learning transferable features.
 Section \ref{subsec:pulearning} contains experiments for methods to learn with positive and unlabled examples.
 Discussions are included in Section \ref{sec:discussion} and conclusions are summarized in Section \ref{sec:conclusion}.
-
-
+%Features learned by predicting the pixel objectness with inexaustive annotations were then validated with experiments described in Section \ref{sec:discussion}.
 
 
 \noindent \textit{This paragraph should introduce the idea of studying the impact of annotation noise on feature transferability.}
 \noindent
-In cases where only a clean but small dataset is available, an extra noisy but large dataset in a similar domain might be helpful as it can be used to pre-train the convolutional features of the CNNs model.
 Previous studies\cite{sukhbaatar2014training,patrini2016making} have reported a negative impact of label noises on classification performance, but not yet on convolutional feature transferability.
 In general, optimal classification performance on test set often indicates that the extracted features are also optimal, whereas suboptimal classification performance does not necessarily reflect the convolutional features are also suboptimal, especially concerning feature transferability.
 Feature transferability describes the \textit{generality of features}, i.e., the category-independence of features.
 Low-level features were proved to be less dependent to categories and thus more transferable to new tasks than high-level features. \cite{yosinski2014transferable}
 We experimented in Section \ref{sec:robustness} that how much label noises interfere the transferability of convolutional features.
-
-\noindent \textit{Narrow the problem of discussion down to Segmentation}
-\noindent
-In this paper, we considered three types noises that happen to semantic image segmentation: mis-segmentation, misclassification and inexhaustive segmentation, as described in details in Section \ref{subsec:formulation}.
-
-
-%Features learned by predicting the pixel objectness with inexaustive annotations were then validated with experiments described in Section \ref{sec:discussion}.
-
-
-% %%%%%%%% TEXT Missing positive label is different
-% \textit{This paragraph should explain the difference between inexaustive/imprecise and misclassification.}
-% Classification with label noise
-
-%Millions of images are available through Flikr, ImageNet and many other sources on the Internet but only a few of them \cite{everingham2015pascal,mottaghi2014role,lin2014microsoft} have been well-annotated for semantic segmentation tasks.
-%The largest segmentation dataset, COCO2014\cite{lin2014microsoft}, contains annotations for only 164,000 training images, smaller by a factor of 10 than the ILSVRC2012 dataset with 1,281,167 labeled training images.

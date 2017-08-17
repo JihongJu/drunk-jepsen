@@ -1,17 +1,6 @@
 \section{Positive and Unlabeled Learning}
 \label{sec:pulearning}
 
-\noindent \textit{This part should explain the necessarity of Positive and Unlabeled Learning setup}
-\noindent
-Experiments in Section \ref{subsec:robustness} indicates that inexhaustive segmentation can have significant negative influences on feature transferability.
-% In practice, misclassification error is less likely to \textit{dorminate}, meaning that the misclassified rate is often not larger than the correct rate.
-% In practice, unsegmented instances can be dominant for a large-scale dataset.
-Besides, including mis-segmented objects for training can aggravate the inexhaustive segmentation problem.
-For example, the existence a mis-segmented toy dog does not mean that every toy dogs are mis-segmented.
-The other unsegmented toy dogs then become a source of inexhaustive segmentation and lead to worse fine-tuning performance as we discovered in Section \ref{sec:experiments}.
-Method to compensate inexhaustive segmentation is therefore necessary to train better transferable representation.
-% Therefore, we explored in this section how to compensate the negative impact of inexhaustive annotations for segmentation.
-
 %%%%%%%% TEXT PU Learning setup
 \paragraph{Learning with inexhaustive segmentation fits a PU learning setup}
 \noindent \textit{This part should formulate the PU learning probleml and discuss why PU Learning instead of semi-supervised learning is the way to go.}
