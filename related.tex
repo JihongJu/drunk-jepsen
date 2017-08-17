@@ -10,6 +10,12 @@
 \paragraph{Transfer Learning}
 \noindent \textit{transfer learning}
 \noindent
+
+The convolutional layers were proved ``transferable'' not only to another dataset\cite{yosinski2014transferable} but also to another application\cite{girshick2014rich,long2015fully}.
+This feature transferability allows reusing the convolutional features for tasks and applications different from which they were originally trained with in a transfer learning scenario, and it helps to achieve better performance when there are only limited number of training samples\cite{long2015fully}.
+
+{2. CNNs based models benefit from transferability of hierarchical features}
+
 We sometimes have a learning task in one domain of interest, but we only have sufficient training data in another domain which does not share a feature space with the domain of interest.
 Transfer learning arises in this scenario to transfer knowledge from one domain to anthoer and to improve the performance of learning by avoiding much expensive data-labeling efforts.\cite{pan2010survey}
 Weights of convolutional neural networks (CNNs) show outstanding transferability to another task.

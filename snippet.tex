@@ -47,6 +47,13 @@ Ours & Makes one's heart Frob\\
 
 \subsection{segmentation}
 
+%%%%%%%% Why segmentation?
+\begin{enumerate}
+  \item It is more difficult to correct noisy segmentation than to correct classification noises for object recognition;
+  \item Semantic segmentation can be treated as pixel-wise classification so that the existing noise-robust methods can be applied by assuming classifications for each pixels are made independently.
+\end{enumerate}
+
+
 \noindent
 The different levels of hierarchical features in CNNs are believed to play different roles in extracting information from the images.
 The low-level features process the local information within small neighborhood and the high-level features ensemble information from lower-level features to extract abstract information.

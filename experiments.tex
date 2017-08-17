@@ -157,27 +157,31 @@ Experiments were repeated three times.
 
 \subsection{PU Learning for classification and for segmentation}
 \label{subsec:pulearning}
-\noindent
+
 In order to compare exponential unlabeled loss with class weighted logistic/softmax loss, we synthesized positive and unlabeled learning setups for classification and segmentation respectively.
 
-\noindent
 In the classification setup, we combined the CIFAR10 dataset and CIFAR100 dataset, using CIFAR10 as the positive (P) set and CIFAR100 as the negative (N) set.
 The learning objective is to classify images into eleven classes: ten positive classes from CIFAR10 and a negative class for images from CIFAR100.
 Note that there is no category overlap between CIFAR10 dataset and CIFAR100 dataset.
 To synthesize a positive and unlabeled (PU) learning setup, we selected only part of positive images from CIFAR10 to be correctly labeled and the rest of the CIFAR10 images were mixed with CIFAR100 images, forming the unlabeled (U) set.
 Models were then trained with the labeled part of P set and U set.
 An eight layer VGG net was used together with different choices of losses.
-The architecture of this VGG8 model can be found in Appendix {TODO:Jihong}.
-Each model was trained from scratch with Adam optimizer base and learning rate 0.0001.
+The architecture of this VGG8 model can be found in Appendix \ref{sec:support}.
+Each model was trained from scratch with Adam optimizer and base learning rate 0.0001.
 Model performances were evaluated on a separate test set of combined CIFAR10 and CIFAR100 with true labels.
 
 %%%%%%%% TABLE CIFAR10 50%
-\noindent
 Table \ref{tab:cifar} summarizes the test precisions and recalls for training with different losses in the PU setup, compared with training with complete positive labels.
 With a training set containing 50\% labeled CIFAR10 images and the rest unlabeled, the normal cross-entropy loss led to an imbalanced model with high precision but low recall, and therefore with a low f1-score.
 By reweighing the negative loss by a factor of 0.5, we were able to balance precision and recall and improve the resulting f1-score.
 Compared to the negative weighted loss, exponential loss and (hard) bootstrapping loss were able to achieve slightly better f1-scores.
-{TODO: explain} Training f-1 0.83 vs 0.81
+The weighted unlabeled loss and hard bootstrap loss were able to achieve more balanced precision and recall than the exponenetial unlabeled loss.
+That is because the two former losses were weighted by classes frequency of observed labels, around 0.67 for the negative class and 2 for positive classes, whereas the exponential unlabeled loss was not.
+The reason for this is that reweighing exponential unlabeled loss by observed label frequencies would trade too much precision for recall (0.74 and 0.83 respectively), resulting in a worse f1-score than not reweighing losses.
+Compared to the weighted unlabeled loss, the exponential unlabeled loss seems to be more sensible to the choice of class weights and easier over-balancing due to the zero contribution to model updates for confident positive predictions.
+One solution to this would be adding a hyperparameter to tune the boundary between confident and unconfident predictions so that a tradeoff between precision and recall can be made in addition to changing the class weights.
+Recently, Lin et al. \cite{lin2017focal} proposed a Focal Loss\cite{lin2017focal} for object detection with imbalanced dataset, which takes the form of $l_{y=t} = - \alpha_t (1-p(y=t \vert x)))^{\gamma} \log p(y=t \vert x)$.
+This focal loss can be considered as an attempt going towards this direction.
 
 
 \begin{table}[t]
@@ -189,7 +193,7 @@ Annotation  & Loss & acc. & mean prec. & mean rec. & mean $F_1$ \\
 Complete    & CrossEntropyU.   & 0.87 & 0.88 & 0.82 & 0.85 \\
 50\%(P+N)   & CrossEntropyU.   & 0.83 & 0.84 & 0.78 & 0.80 \\
 \hline
-50\%P+U     & CrossEntropyU.   & 0.66 & 0.94 & 0.39 & 0.50 \\
+50\%P+U     & CrossEntropyU.   & 0.76 & 0.xx & 0.xx & 0.xx \\
 50\%P+U     & WeightedU.       & 0.78 & 0.75 & 0.75 & 0.76 \\
 50\%P+U     & ExponentialU.    & \textbf{0.81} & \textbf{0.85$\pm0.03$} & 0.72$\pm0.03$ & 0.77 \\
 50\%P+U     & BootstrapHard    & 0.80 & 0.76 & \textbf{0.81} & \textbf{0.78} \\
@@ -252,7 +256,7 @@ Complete       & CrossEnt.U       &  0.90 & 0.85 & 0.82 & 0.75 \\
 }
 \caption{
 Best binary segmentation performance achieved on the test set of PASCAL VOC2011 segmentation dataset in the presence of inexhaustive segmentation.
-Class weight 0.7:1.75 was used to balance the sample frequency difference of the two classes and negative loss were further weighted by a factor of 0.5 for weighted unlabeled loss.
+Class weight 0.7:1.75 was used to balance the sample frequency differences of the two classes and negative loss were further weighted by a factor of 0.5 for weighted unlabeled loss.
 Mean accuracy is equivalent to mean recall over classes.
 Mean IU is the average intersection over union ratio (IU) over two classes and f.w. IU is the frequency weighted average of IU over the two classes.
 Experiments were repeated twice and standard deviations were approximately 0.01.

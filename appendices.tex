@@ -8,7 +8,7 @@
 \section{Convolutional Networks for Semantic Segmentation}
 \subsection{Convolutional Neural Networks}
 
-A Convolutional Neural Network (CNN) for image processing is often comprised of stacked convolutional layers with interlacing subsampling layers for feature extraction, followed by a few other layers for either classification or regression, depending on the task-specific objectives.
+A Convolutional Neural Network (CNN) for image processing is often comprised of stacked convolutional layers with interlacing subsampling layers for feature extraction, followed by a few task-specific layers.% for either classification or regression.
 For instance, fully connected layers are often used for object recognition\cite{lecun1998gradient,krizhevsky2012imagenet}, region proposal\cite{ren2015faster}, etc., and transposed convolutions or dilated convolutions together with convolutional layers can be used for semantic segmentation\cite{long2015fully,yu2015multi}.
 
 An example, LeNet-5 (1998) \cite{lecun1998gradient}, is shown in Figure \ref{fig:lenet}.
@@ -84,6 +84,7 @@ Such a noise model is called noisy not at random (NNAR) \cite{frenay2014classifi
 %%%%%%%%%%%%%%%% Supportive information
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Supportive information}
+\label{sec:support}
 
 \subsection{An 8-layer Convolutional neural network}
 

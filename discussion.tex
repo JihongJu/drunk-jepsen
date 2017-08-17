@@ -1,16 +1,23 @@
 \section{Discussion}
 \label{sec:discussion}
 
-\paragraph{Why mis-segmentation can have little negative effect?}
 
-
-\paragraph{Why binarizing/catergoring classes have little negative effect?}
+\paragraph{Binarizing/catergoring classes}
+\begin{itemize}
+  \item tradeoff between precise and inaccurate labels and inprecise and accurate labels
+  \item The success of region proposal network is a prove of binarized labels can information about ``objectness''.
+\end{itemize}
 
 \paragraph{Upsides and downsides of exponential loss}
-Upside:
+% Imbalanced
+% Easily classified negatives comprise
+% the majority of the loss and dominate the gradient. While
+% α balances the importance of positive/negative examples, it
+% does not differentiate between easy/hard examples
 \begin{itemize}
+  \item treat easy/hard classifications differently
   \item not over-punish confident positive prediction for negatively labeled examples
-  \item easy to implement with Pixel independent noise assumption
+  \item easy to implement with the assumption of label noise spatial independence
 \end{itemize}
 
 
@@ -22,3 +29,10 @@ Downside:
 
 
 \paragraph{Future works}
+
+\begin{itemize}
+  \item Parameterizing exponential unlabeled loss to determine boundaries of confident and unconfident predictions
+  \item Take into account label noise spatial dependence for neighboring pixels
+  \item Experiment with over-segmentation and under-segmentation noises (negative influence expected)
+  \item Experiment with real datasets
+\end{itemize}
