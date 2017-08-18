@@ -53,6 +53,20 @@ Ours & Makes one's heart Frob\\
   \item Semantic segmentation can be treated as pixel-wise classification so that the existing noise-robust methods can be applied by assuming classifications for each pixels are made independently.
 \end{enumerate}
 
+%%%%%%%% Why general features can be robustness?
+Convolutional neural networks for processing images are believed to extract a rich hierarchy of visual features that vary from simple to complex and from local to global.\cite{girshick2014rich}
+Neurons in the lower hierarchy capture simple patterns such as edges, textures or material properties within small receptive fields, whereas the high-level features capture conceptual information such as people and text in larger receptive fields.
+It is natural that simple patterns can be found for many categories whereas conceptual features are often specific to particular categories.
+% By training a CNN with half of the ImageNet categories and transfer features to the other half, Yosinski et al.\cite{yosinski2014transferable} found transferability of features decreases from the bottom layers to the top layers, indicating that features change gradually from category independent to class dependent.
+Additionally, filters from the first convolutional layer are often observed as Gabor filters or color blobs regardless the training dataset and target categories.\cite{zeiler2014visualizing,lee2009convolutional,krizhevsky2012imagenet,shin2016deep}
+Correspondingly, low-level filters, especially ones from the first two layers, were proved well-transferable to dissimilar categories, as reported in \cite{yosinski2014transferable} from natural objects to man-made objects.
+These category-independent convolutional filters are denoted \textit{general} in the sense that they are generally usable for many classes.
+
+Given the evidence that some convolutional filters can be applied regardless the exact categories they were trained, we wondered if they can also be learned in a more general way than using the exact labels of specific classes.
+For example, labels assigned examples from categories that are visually similar can be inconsistent in practice if not additional human efforts made for correctness.
+These noises in labels may have a significant negative influence to the top layers which are sensitive to the given labels but not necessarily to the bottom layers which have already shown class independence to some extent.
+If we train models in a transfer learning scenario where we only care about the transferability of a pre-trained model rather than performance achieved on the pre-training task, a label noise robustness of weights transferability can be beneficial to save additional human efforts for label correction.
+
 
 \noindent
 The different levels of hierarchical features in CNNs are believed to play different roles in extracting information from the images.

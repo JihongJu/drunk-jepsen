@@ -10,16 +10,9 @@ To simplify the demonstration, let us consider a binary segmentation problem whe
 The goal of compensating incompleteness is to learn a model that predicts as many positive pixels as possible while keeping the false positive rate low.
 A pixel with a negative label can be either a truly negative pixel or a wrongly unsegmented positive pixel.
 % It will require extra manual works to distinguish the two cases explicitly.
-In other words, there is no explicitly labeled negative examples in the training set.
-This naturally fit in a Positive and Unlabeled Learning (PU Learning) setup where the training dataset consists of only a set of positive examples (P set) and a set of unlabeled examples (U set), meaning that there are no reliable negative examples available.
-The traditional semi-supervised learning techniques are not applicable in such a setup as a result of the absence of negative training samples.
-
 %%%%%%%% TEXT Weighted loss for negatives
 \paragraph{Class-weighted Logistic Loss}
 \noindent \textit{This part should discuss the difficulty of applying traditional PU learning methods to deep learning and then introduce the idea of re-weigh positive and negative classes.}
-Traditional PU learning methods often follow a two-step strategy: first identifying a set of reliable negative samples (RN set) from U set and then iteratively build classifiers, either naïve Bayesian (NB) or supported vector machine (SVM), with RN and P sets and update the RN set with expectation-maximization (EM) algorithm.
-However, this strategy requires training multiple classification models.
-It is unrealistic to train iteratively a sequence of deep learning models because it would take significantly longer time to train neural networks than to train a naïve Bayesian (NB) model or supported vector machine (SVM).
 
 \noindent
 Our original goal was to achieve high precision as well as high recall regardless the existence of false negative labels.
@@ -46,21 +39,21 @@ with $p(y_i=-1 \vert \tilde{y_i}=-1) = q$ and $p(y_i=+1 \vert \tilde{y_i}=-1) = 
 
 
 %%%%%%%% TEXT Encouraging confident predictions
-\paragraph{Confidence of contrary prediction and probability of false negative label}
-\noindent
-\noindent \textit{The idea of alleviating punishment for confident predictions.}
-Losses above assume that the true label of an observed negative label is independent of the inputs $x$.
-However, the true label $y$ is often dependent on both $x$ and $\tilde{y}$ in practice.
-For instance, in segmentation problems, whether a pixel is left unsegmented correctly or not can be determined by the semantical meaning of this pixel and pixels around.
-It is nevertheless difficult to estimate $p(y \vert x, \tilde{y})$ directly due to the difficulty of exploring the joint distribution of $x$ and $\tilde{y}$.
-Alternatively, one can use the probabilistic prediction $p(y \vert x;\theta)$ a classification model to provide extra information about the inputs.
-The predicted probabilities indicate how confident the current model is for the predictions made.
-Given a good enough model, more confident positive predictions for negatively labeled examples can have a higher probability of being wrongly annotated than the less confident ones.
-\footnote{J: This argument needs more detailed explanation.}
-With a random model by which predictions are made randomly, the high and low confidences do not convey any information about the underlying inputs distribution.
-By contrast, confident predictions made by a trained model indicate that the corresponding samples are possibly close to some previous training samples with positive labels in the feature space.
-The natural trend of similar examples having the same labels supports a higher probability of being annotated wrongly for confident predictions which have opposite labels.
-This thought leads to the idea of not punishing confident contrary predictions more than unconfident ones as the traditional logistic/softmax loss will do.
+% \paragraph{Confidence of contrary prediction and probability of false negative label}
+% \noindent
+% \noindent \textit{The idea of alleviating punishment for confident predictions.}
+% Losses above assume that the true label of an observed negative label is independent of the inputs $x$.
+% However, the true label $y$ is often dependent on both $x$ and $\tilde{y}$ in practice.
+% For instance, in segmentation problems, whether a pixel is left unsegmented correctly or not can be determined by the semantical meaning of this pixel and pixels around.
+% It is nevertheless difficult to estimate $p(y \vert x, \tilde{y})$ directly due to the difficulty of exploring the joint distribution of $x$ and $\tilde{y}$.
+% Alternatively, one can use the probabilistic prediction $p(y \vert x;\theta)$ a classification model to provide extra information about the inputs.
+% The predicted probabilities indicate how confident the current model is for the predictions made.
+% Given a good enough model, more confident positive predictions for negatively labeled examples can have a higher probability of being wrongly annotated than the less confident ones.
+% \footnote{J: This argument needs more detailed explanation.}
+% With a random model by which predictions are made randomly, the high and low confidences do not convey any information about the underlying inputs distribution.
+% By contrast, confident predictions made by a trained model indicate that the corresponding samples are possibly close to some previous training samples with positive labels in the feature space.
+% The natural trend of similar examples having the same labels supports a higher probability of being annotated wrongly for confident predictions which have opposite labels.
+% This thought leads to the idea of not punishing confident contrary predictions more than unconfident ones as the traditional logistic/softmax loss will do.
 
 %%%%%%%% TEXT Exponential loss
 \paragraph{Exponential Loss for unlabeled examples}

@@ -1,33 +1,34 @@
-\section{Noise robustness for convolutional feature transferability}
+\section{Feature transferability with label noises}
 \label{sec:robustness}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%%%%%%%% TEXT Noise model
+%%%%%%%% TEXT Formulation of transferability, synthesized noises
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \subsection{Problem Formulation}
 \label{subsec:formulation}
 
 \paragraph{Semantic Segmentation}
-\noindent \textit{}
-A deep learning model for semantic segmentation normally consists of two main components: a CNN feature extractor $G: R^{h \times w \times c} \rightarrow R^{d}$ and a pixel-by-pixel classifier $H: R^{d} \rightarrow R^{h \times w \times k}$, where $h, w$ are image height and weight respectively; $c$ is the number of image channels and $k$ is the number of classes; $d$ is the total number of extracted features.
-Together they form a segmentation model $F: R^{h \times w \times c} \rightarrow R^{h \times w \times k}$ to predict class probabilities for each of the pixels in a given image $x$:
-$$P(y \vert x; \theta) = F(x) = H(G(x))$$
-where $\theta$ denotes the model weights.
+
+A deep learning model for semantic segmentation normally consists of two main functions: a CNN feature extractor $G$ that extracts hierarchical feature maps $h$ from images $x$, followed by a classifier $H$ that generates pixel-by-pixel prediction to fit labels $y$.
+Together they form a segmentation model $F$ to predict class probabilities for each of the pixels in a given image $x$:
+$$P(y \vert x; F) = F(x) = H(G(x))$$
+% $R^{h \times w \times c} \rightarrow R^{d}$
+% $H: R^{d} \rightarrow R^{h \times w \times k}$
+% $R^{h \times w \times c} \rightarrow R^{h \times w \times k}$,
+% where $h, w$ are image height and weight respectively; $c$ is the number of image channels and $k$ is the number of classes; $d$ is the total number of extracted features.
 % Prediction is then given by:
 % $$P(y \vert x) = \sigma(F(x))$$
 % where $\sigma$ is the sofmtax function.
 
 \paragraph{Feature Transferability}
-In practice, feature extractor $G$ can be transferred from a pre-trained model.
-The transferred feature extractor $G'$ can be used directly in $F$, or used as an initialization of $G$ and fine-tune with the dataset of interest.
+Feature extractor $G$ can be transferred from a pre-trained model.
+The transferred feature extractor $\tilde{G}$ pre-trained with $\tilde{y}$ should be $G^{\ast}$ pre-trained with $y^{\ast}$ and fine-tune with the dataset of interest.
 The pre-trained model is normally an ImageNet model trained by the object recognition task.
 Alternatively, one can also obtain a pre-trained model with semantic segmentation task if there exists a segmentation dataset in a more similar domain than ImageNet.
 The transferability of a pre-trained feature extractor can be measured by performance achieved by $F$ with transferred $G'$ on the test set.
 
 Supposing a pre-training segmentation dataset have both noisy labels $\tilde{y}$ and true labels $y$ available, the influence of label noises can be studied by comparing the transferability of feature extractors learned with $y$ and with $\tilde{y}$. It is difficult to find such a dataset with both clean and noisy labels, so we tried to synthesize segmentation noises with well-annotated labels.
-
-
 
 \subsection{Label noise synthesization}
 \label{subsec:noises}
@@ -47,7 +48,7 @@ where $1 < i < h, 1 < j < w$ and $i,j,k \in \mathrm{Z}^+$.
 % Pixels with $k=0$ are also  \textit{unannotated} since they were not assigned to one of the predefined categories.
 
 A straightforward way to synthesize noisy labels is to corrupt stochastically true labels for each pixel with a corruption model.
-The corruption model describes the probability of an observed label conditioning on the the true label $y_{ij}$, the image $x$ and the label errorness $e_ij$:
+The corruption model describes the probability of an observed label conditioning on the the true label $y_{ij}$, the image $x$ and the label errorness $e_{ij}$:
 $$p(\tilde{y_{ij}} \vert x, y_{ij}, e_{ij})$$
 where the binary error occurence $e_{ij}$ depends on the inputs $x$ and true labels $y$.
 Given a corruption model and true labels, one can stochastically synthesized the corresponding noisy labels.
@@ -59,7 +60,6 @@ In our works, we considered three types of noises for a semantic segmentation pr
 Note that all these label errors apply to the whole segment instead of to individual pixels.
 That is pixels for the same segments will have the same true labels and observed labels.
 Therefore, the above corruption model hides the spatial dependence of $e_{ij}$ from expressions.
-We exluded segmenting errors such as inprecise boundaries, oversegmenting or undersegmenting the objects from study because they are a bit more complex to synthesize than the preceding classification errors.
 % It would be of more value to use a real dataset for such errors than to synthesize.
 % The occurrence of error of each pixel is no longer simply dependent on which segments it belongs to but instead dependent on the neighboring pixels.
 % How to model the pixel label errorness conditioning on neightboring pixels is not the focus of this paper and is left for future studies.
@@ -67,10 +67,11 @@ We exluded segmenting errors such as inprecise boundaries, oversegmenting or und
 % $p(\tilde{y_{ij}},x) = p(\tilde{y_{ij}} \vert x, y, e_{ij}) p(e_{ij} \vert x,y)$.
 
 
-\paragraph{Mis-segmentation}
-Mis-segmentation denotes the wrongly segmented objects for categories that are semantically meaningful but are not predefined.
-For example, a toy dog can be misannotated as a dog, assuming that ``dog'' is predefined and ``toy dog'' is not.
-In the presence of mis-segmentation, pixel labels of segment $S$ transit from $0$ to $k$ with probability
+\paragraph{False segmentations}
+% Mis-segmentation denotes the wrongly segmented objects for categories that are semantically meaningful but are not predefined.
+% For example, a toy dog can be misannotated as a dog, assuming that ``dog'' is predefined and ``toy dog'' is not.
+
+In the presence of false segmentations, pixel labels of segment $S$ transit from $0$ to $k$ with probability
 $$p(\tilde{y_{ij}}=k \vert x, y_{ij}=0), ij \in S $$
 % $\{\tilde{y_{kl}}, kl \in P \setminus \{ij\} \}$
 % where P is all the pixels in image $x$, and $ij$, $kl$ are both pixels in the image.
@@ -82,8 +83,9 @@ We can then misannotate these non-target instances stochastically with a simplif
 Note that $p_k$ sums up to 1 for all classes $\sum_0^K p_k = 1$.
 
 \paragraph{Misclassification}
-Different from mis-segmentation, misclassification error means labels were misclassified between pre-defined categories.
-For example, cats may be misclassified as dogs occasionally if both ``cat'' and ``dog'' are target classes.
+% Different from mis-segmentation, misclassification error means labels were misclassified between pre-defined categories.
+% For example, cats may be misclassified as dogs occasionally if both ``cat'' and ``dog'' are target classes.
+
 In the presence of misclassification, pixel labels of segment $S$ are transited from $k$ to $j$ stochastically with probability:
 $$p(\tilde{y_{ij}}=j \vert y_{ij}=k) = p_{jk}, ij \in S, k,j \in [1,K]$$
 where $\sum_{j=1}^{K}p_{jk}=1$.
@@ -93,24 +95,19 @@ This assumption does not hold in every cases of practice, for example, some inst
 But the difficulty of modeling the depence of $x$ leads to simply assuming an input indepence.
 Given the class transition probabilities, one can easily synthesize noisy annotations including misclassification errors given a well-annotated segmentation dataset.
 
-\noindent
 \paragraph{Inexhaustive segmentation}
-Inexhaustive segmentation denotes that there exists unsegmented instances for pre-defined categories.
+
 Pixels of an unsegmented object $S$ have labels flipped from $k$ to $0$ with probability:
 $$p(\tilde{y_{ij}}=0\vert y_{ij}=k) = q_k, ij \in S, k \in [1,K]$$
 In words, an instance of category $k$ is left unsegmented stochastically with probability $q_k$.
 The probability of correctly segmented in annotations is then:
 $$p(\tilde{y_{ij}}=k\vert y_{ij}=k) = 1-q_k, ij \in S, k \in [1,K]$$
-Again we assumed inexhaustive segmentations to be noisy at random (NAR).
+% Again we assumed inexhaustive segmentations to be noisy at random (NAR).
 
 
-% The inexhaustive segmentations need to be properly handled given the prior knowledge modeling the missing pattern of the annotations.
 % Given that we believe any annotated instance provide information, all the foreground pixels that correspond to the annotated instances become reliable and the background pixels may contain both the true background pixels and object pixels unannotated.
 % That satisfies a Positive and Unlabeled learning setup where the training dataset contains only the positive examples and unlabeled examples that are the mixed of the positive samples and negative samples.
 
-
-
-% Supposing a dog is wrongly annotated as a cat, the error could mislead the model to predict the dog as cat because the learning objective drives the model to fit the given labels.
 % But dogs and cats have visual features: they are both furry, have similiar shape and appearance, etc.
 % These similiarities in features between dogs and cats may correspond to some interm features when a toy dog was misannotated as a dog.
 % If we consider further lower features, for exmaple those for detecting edges and corners, they are commonly transferable to many categories, not necessarily ones that look alike.

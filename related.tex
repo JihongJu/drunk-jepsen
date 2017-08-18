@@ -90,5 +90,5 @@ The problem of weighting unlabeled examples is that it relies on the assumption 
 However, very positive examples are much more likely to be labeled in practice, because they are easier to recognize.
 It is therefore reasonable to instead assume that the probability of being labeled for a positive example is directly related to the posterior probability.\cite{tax2016class}
 In other words, very positive prediction indicates that an unlabeled example is actually positive.
-Lin et al.\cite{lin2017focal} proposed a so-called Focal Loss to down-weight confident examples and thus focus training on hard negatives.
-Our exponential unlabeled loss follows a similar design thinking as Lin et al.(2017).
+Lin et al.\cite{lin2017focal} proposed a so-called Focal Loss to down-weight confident examples and thus focus training on hard negatives for imbalanced learning.
+Our exponential unlabeled loss follows a similar design thinking as \cite{lin2017focal} to compensate noisy negative.
