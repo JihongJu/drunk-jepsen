@@ -7,70 +7,86 @@
 % L. Chen et.al.\cite{chen2016deeplab} removed the last few max pooling layers of the CNNs and upsampled the corresponding filters to avoid the reduced feature resolution by the pooling layers. An additional fully connected Conditional Random Field (CRF) was added to refine the coarse last layer output for better localization performance.
 % S. Zheng et.al.\cite{zheng2015conditional} integrate the CRFs-based probabilistic graphical modeling with CNNs in an end-to-end framework.
 
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%% TEXT Transfer Learning
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
 \paragraph{Transfer Learning}
-\noindent \textit{transfer learning}
 
-The convolutional layers were proved ``transferable'' not only to another dataset\cite{yosinski2014transferable} but also to another application\cite{girshick2014rich,long2015fully}.
-This feature transferability allows reusing the convolutional features for tasks and applications different from which they were originally trained with in a transfer learning scenario, and it helps to achieve better performance when there are only limited number of training samples\cite{long2015fully}.
-
-{2. CNNs based models benefit from transferability of hierarchical features}
-
-We sometimes have a learning task in one domain of interest, but we only have sufficient training data in another domain which does not share a feature space with the domain of interest.
-Transfer learning arises in this scenario to transfer knowledge from one domain to anthoer and to improve the performance of learning by avoiding much expensive data-labeling efforts.\cite{pan2010survey}
-Weights of convolutional neural networks (CNNs) show outstanding transferability to another task.
-For example, weights trained on ImageNet images to perform image classification were shown successfully transfered to new categories and new learning problems\cite{girshick2014rich,long2015fully,shin2016deep}.
-Better performance were achieved for these tasks by using ImageNet pre-trained CNNs as initialization than training full model from scratch.
-%% Why feature transferable?
-Yosinski et al. discovered that feature transferability is negatively affected by the specialization of higher layer neurons and optimization difficulties caused by breaking co-adapted neurons.
-Their experiments showed that low-level features, which are less dependent to particular categories, are more transferable than high-level features.
+%%%%%%%% What Transfer Learning for?
+Weights of convolutional neural networks were proved ``transferable'' not only to another dataset\cite{shin2016deep,yosinski2014transferable} but also to other applications\cite{girshick2014rich,long2015fully}.
+Transferring weights of CNN models for tasks and applications that are different from which the weights were originally trained with allows to improve the performance of learning without engaging in much efforts spent for data-labeling.\cite{pan2010survey}
+Yosinski et al.\cite{yosinski2014transferable} reported that initializing a network with transferred features from almost any number of layers can produce a boost to the fine-tuning performance with better generalization.
 % Given the superiority of transferring pre-trained weights and the availability of larger but noisier dataset, we learn transferable features with the noisy dataset and fine-tune the model with small dataset.
-% In Section \ref{sec:robustness}, we explored whether transferability of features is robust to annotation errors in the pre-training dataset.
 
-Convolutional neural networks for processing images are believed to extract a rich hierarchy of visual features that vary from simple to complex and from local to global.\cite{girshick2014rich}
-Neurons in the lower hierarchy capture simple patterns such as edges, textures or material properties within small receptive fields, whereas the high-level features capture conceptual information such as people and text in larger receptive fields.
-It is natural that simple patterns can be found for many categories whereas conceptual features are often specific to particular categories.
-By training a CNN with half of the ImageNet categories and transfer features to the other half, Yosinski et al.\cite{yosinski2014transferable} found transferability of features decreases from the bottom layers to the top layers, indicating that features change gradually from category independent to class dependent.
-Additionally, filters from the first convolutional layer are often observed as Gabor filters or color blobs regardless the training dataset and target categories.\cite{zeiler2014visualizing,lee2009convolutional,krizhevsky2012imagenet,shin2016deep}
-Correspondingly, low-level filters, especially ones from the first two layers, were proved well-transferable to dissimilar categories, as reported in \cite{yosinski2014transferable} from natural objects to man-made objects.
-These category-independent convolutional filters are denoted \textit{general} in the sense that they are generally usable for many classes.
 
-Given the evidence that some convolutional filters can be applied regardless the exact categories they were trained, we wondered if they can also be learned in a more general way than using the exact labels of specific classes.
-For example, labels assigned examples from categories that are visually similar can be inconsistent in practice if not additional human efforts made for correctness.
-These noises in labels may have a significant negative influence to the top layers which are sensitive to the given labels but not necessarily to the bottom layers which have already shown class independence to some extent.
-If we train models in a transfer learning scenario where we only care about the transferability of a pre-trained model rather than performance achieved on the pre-training task, a label noise robustness of weights transferability can be beneficial to save additional human efforts for label correction.
-We studied the influence of three types of segmentation noises on weights transferability in Section \ref{subsec:robustness}.
-The research problem is formulated in Section \ref{subsec:formulation} and the segmentation noises of interest are described in Section \ref{subsec:noises}.
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%% TEXT Pre-training with weak supervision
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-{TODO:R} Relations to our work.
-We studied if feature transferability is negatively affected by the presence of label noises.
-
-\paragraph{Unsupervised pre-training}
-Apart from supervised pre-training, one can also obtain pre-trained features in an unsupervised or a semi-supervised way.
-The most common method is to train a generative model with either \textit{auto-encoder} variants or \textit{deep beilief networks}.
-Vincent et al.\cite{vincent2010stacked} trained multiple levels of representation robust to the corrupted inputs with stacked denoising auto-encoders.
-Masci et al.\cite{masci2011stacked} presented a stacked convolutional auto-encoder unsupervised pre-training for hierarchical feature extraction.
-Hinton et al.\cite{hinton2006fast} proposed a greedy learning algorithm to train \textit{deep belief nets} one layer at a time to train hierarchical features.
-Lee et al.\cite{lee2009convolutional} presented a \textit{convolutional deep belief network}, to learn hierachical convolutional representations.
-A few studies\cite{erhan2009difficulty,erhan2010does,bengio2012deep} highlighted the advantage of unsupervised pre-training compared to the random initialization, connecting unsupervised pre-training to a norm of regularization and a method that help disentangle the sample variations.
-However, better random initialization strategies, for example, xavier initialization\cite{glorot2010understanding} and its variants, have shortened the gap between unsupervised pre-training and random initialization.
-Using unsupervised pre-training or not now becomes a tradeoff between the time and resources invested and the performance gain.
-Unsupervised deep representation learning is in general not comparable to supervised representation learning especially when large scale dataset is available.
+Apart from supervised pre-training, one can also perform unsupervised learning to obtain pre-trained features typically with auto-encoders\cite{vincent2010stacked,masci2011stacked}, deep belief networks\cite{hinton2006fast,lee2009convolutional}.
+%%%%%%%% Deprecated UL in details
+% The most common method is to train a generative model with either \textit{auto-encoder} variants or \textit{deep beilief networks}.
+% Vincent et al.\cite{vincent2010stacked} trained multiple levels of representation robust to the corrupted inputs with stacked denoising auto-encoders.
+% Masci et al.\cite{masci2011stacked} presented a stacked convolutional auto-encoder unsupervised pre-training for hierarchical feature extraction.
+% Hinton et al.\cite{hinton2006fast} proposed a greedy learning algorithm to train \textit{deep belief nets} one layer at a time to train hierarchical features.
+% Lee et al.\cite{lee2009convolutional} presented a \textit{convolutional deep belief network}, to learn hierachical convolutional representations.
+% A few studies\cite{erhan2009difficulty,erhan2010does,bengio2012deep} highlighted the advantage of unsupervised pre-training compared to the random initialization, connecting unsupervised pre-training to a norm of regularization and a method that help disentangle the sample variations.
+Though a few studies\cite{erhan2009difficulty,erhan2010does,bengio2012deep} discussed the advantage of unsupervised pre-trained features compared to random weights initialization, the distance between the two has been shortened ever since the arises of modern initialization strategies, namely xavier initialization\cite{glorot2010understanding} and its variants.
+We used random weights initialization as the lower bounds for pre-training with noisy labels.
+Features learned in the presence of label noises should at least outperform random weights because noisy information shoudl be still better than no information.
 % A proper method to learn features in the presence of label noise should at least outperform unsupervised pre-training because noisy information is still better than no information.
 
-\paragraph{{Deep Learning with Noisy Labels}}
-A few studies\cite{sukhbaatar2014training,patrini2016making} investigated the impact of label noise on classification performance with convolutional neural networks assuming the labels were randomly transited from one to another given the probabilities fall in a transition matrix.
-They found a significant decrease in classification performance along with the increase of false label proportion when the total number of examples is fixed.
-They then proposed methods to handle this label noise at random (NAR)\cite{frenay2014classification} situation by either introducing a linear noise layer on top of the output layer\cite{sukhbaatar2014training} or correcting the loss functions with an estimation of the noise transition matrix\cite{patrini2016making}.
-Xiao et al.\cite{xiao2015learning} integrated a probabilistic graphic model to an end-to-end deep learning system to train predicting class labels, either correct or wrong, as well as to correct the wrong labels.
-Reed \& Lee\cite{reed2014training} proposed an empirical way of taking into account the \textit{perceptual consistency} for large-scale object recognition and detection when incomplete and noisy labels exist by introducing a bootstrapping modification to the negative log-likelihood, in either a ``Hard'' or a ``soft'' favor.
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%% TEXT DL with noisy labels
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\paragraph{Deep Learning with Noisy Labels}
+
+The impact of random flipped labels on classification performance has been investigated by \cite{sukhbaatar2014training,patrini2016making} for convolutional neural networks.
+They both reported decreases in classification performance as the proportion of flipped labels increases for a fixed number of training samples.
+By contrast, Rolnick et al.\cite{rolnick2017deep} argued that deep neural networks can learn robustly from the noisy dataset as long as appropriate choices of hyperparameters were made.
+They studied the effects of diluting instead of replacing correct labels with noisy labels and concluded that larger training set is of more importance than lower the level of noise.
+Neither of these studies explored the influence of label noises on feature transferability.
+
+Methods, including a linear niose layer on top of the model output\cite{sukhbaatar2014training}, loss correctness with an estimation of the noise transition matrix\cite{patrini2016making} were proposed to compensate the negative effect on classification performance introduced by flipped labels.
+Additionally, Reed \& Lee\cite{reed2014training} proposed a bootstrapping loss to emphasize \textit{perceptual consistency} in training when incomplete and noisy labels exist.
+Artificial datasets synthesized from well-annotated datasets were used to evaluate their methods.
+We designed our experiments using noisy segmentations synthesized with perfect segmentation as well.
+
+%%%%%%%% some more methods
+% Xiao et al.\cite{xiao2015learning} integrated a probabilistic graphic model to an end-to-end deep learning system to train predicting class labels, either correct or wrong, as well as to correct the wrong labels.
 %Pereyra et al.\cite{pereyra2017regularizing} argued that the maximum entropy principle can prevent the model to have high confident predictions and result in better genralization.
 
-\textit{Noise robustness}
-In contrast to the works above, Rolnick et al.\cite{rolnick2017deep} argued that deep neural networks can learn robustly from the noisy dataset as long as an appropriate hyper parameters choice was made.
-They studied instead of replacing the correct labels with noisy labels but diluting correct labels with noisy labels to support their argument.
-They then concluded sufficiently large training set is of more importance than lower the level of noise.
-This work is closely related to our work in Section \ref{sec:robustness}, except that we focus on the label noise robustness regarding the feature transferability instead of the classification performance.
-Additionally, most of these studies focus on the classification problems, whereas our work inclined more to the semantic segmentation problem.
+%%%%%%%% Irrelevant
+% Yosinski et al. discovered that feature transferability is negatively affected by the specialization of higher layer neurons and optimization difficulties caused by breaking co-adapted neurons.
+% discovered that transferability of a feature is correlated with its generality, i.e. by how much it depends on a particular category.
+% Their experiments showed that low-level features, which are less dependent to particular categories, are more transferable than high-level features.
+% In general, optimal classification performance on test set often indicates that the extracted features are also optimal, whereas suboptimal classification performance does not necessarily reflect the convolutional features are also suboptimal, especially concerning feature transferability.
+% Feature transferability describes the \textit{generality of features}, i.e., the category-independence of features.
+% Low-level features were proved to be less dependent to categories and thus more transferable to new tasks than high-level features. \cite{yosinski2014transferable}
+% We experimented in Section \ref{sec:robustness} that how much label noises interfere the transferability of convolutional features.
+
+% Additionally, most of these studies focus on the classification problems, whereas our work inclined more to the semantic segmentation problem.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%% TEXT PU Learning
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \paragraph{Positive and Unlabeled Learning}
-The previous studies about PU learning mainly focus on the binary classification for linear-separable problems\cite{elkan2008learning,lee2003learning}, whereas we showed in Section \ref{sec:pulearning} that it is possible to train deep neural networks for multiple classes with only ``positive'' and unlabeled examples.
+
+Traditional positive and unlabeled learning methods proposed for text classification\cite{liu2003building} do not extend well to deep learning models.
+These traditional methods often follow a two-step strategy: first identifying a set of reliable negative samples (RN set) from U set and then iteratively build a set of classifiers, either na\"ive Bayesian (NB) or supported vector machine (SVM), with RN set and P set, while updating the RN set with a selected classifier.
+It is unrealistic to train iteratively a couple of deep learning models because it would take significantly longer time to train neural networks than to train a na\"ive Bayesian (NB) model or supported vector machine (SVM).
+
+Alternatively, one can treat all unlabeled examples as negative and simply reweigh positive and negative examples\cite{lee2003learning}.
+Under the assumption of randomly labeled positive examples, Elkan and Noto\cite{elkan2008learning} demonstrated that a classifier trained on positive and unlabeled examples predicts probabilities that differ by only a constant factor from the true conditional probabilities of being positive.
+These two works considered only binary classification whereas we showed that it is possible to train deep neural networks for multiple classes with only positive and unlabeled examples.
+
+The problem of weighting unlabeled examples is that it relies on the assumption that positive examples are unlabeled at random.
+However, very positive examples are much more likely to be labeled in practice, because they are easier to recognize.
+It is therefore reasonable to instead assume that the probability of being labeled for a positive example is directly related to the posterior probability.\cite{tax2016class}
+In other words, very positive prediction indicates that an unlabeled example is actually positive.
+Lin et al. \cite{lin2017focal} proposed a so-called Focal Loss to down-weight confident examples and thus focus training on hard negatives.
+Our exponential unlabeled loss follows a similar design thinking as Lin et al.(2017).
