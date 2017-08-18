@@ -18,8 +18,10 @@
 Weights of convolutional neural networks were proved ``transferable'' not only to another dataset\cite{shin2016deep,yosinski2014transferable} but also to other applications\cite{girshick2014rich,long2015fully}.
 Transferring weights of CNN models for tasks and applications that are different from which the weights were originally trained with allows to improve the performance of learning without engaging in much efforts spent for data-labeling.\cite{pan2010survey}
 Yosinski et al.\cite{yosinski2014transferable} reported that initializing a network with transferred features from almost any number of layers can produce a boost to the fine-tuning performance with better generalization.
-% Given the superiority of transferring pre-trained weights and the availability of larger but noisier dataset, we learn transferable features with the noisy dataset and fine-tune the model with small dataset.
+Transferability is possible between completely disimilar tasks, e.g. natural classes and man-made classes.
+It could be also possible to transfer weights trained with noisy labels.
 
+% Given the superiority of transferring pre-trained weights and the availability of larger but noisier dataset, we learn transferable features with the noisy dataset and fine-tune the model with small dataset.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%% TEXT Pre-training with weak supervision
@@ -48,7 +50,7 @@ The impact of random flipped labels on classification performance has been inves
 They both reported decreases in classification performance as the proportion of flipped labels increases for a fixed number of training samples.
 By contrast, Rolnick et al.\cite{rolnick2017deep} argued that deep neural networks can learn robustly from the noisy dataset as long as appropriate choices of hyperparameters were made.
 They studied the effects of diluting instead of replacing correct labels with noisy labels and concluded that larger training set is of more importance than lower the level of noise.
-Neither of these studies explored the influence of label noises on feature transferability.
+None of these studies explored the influence of label noises on feature transferability.
 
 Methods, including a linear niose layer on top of the model output\cite{sukhbaatar2014training}, loss correctness with an estimation of the noise transition matrix\cite{patrini2016making} were proposed to compensate the negative effect on classification performance introduced by flipped labels.
 Additionally, Reed \& Lee\cite{reed2014training} proposed a bootstrapping loss to emphasize \textit{perceptual consistency} in training when incomplete and noisy labels exist.
@@ -81,12 +83,12 @@ These traditional methods often follow a two-step strategy: first identifying a 
 It is unrealistic to train iteratively a couple of deep learning models because it would take significantly longer time to train neural networks than to train a na\"ive Bayesian (NB) model or supported vector machine (SVM).
 
 Alternatively, one can treat all unlabeled examples as negative and simply reweigh positive and negative examples\cite{lee2003learning}.
-Under the assumption of randomly labeled positive examples, Elkan and Noto\cite{elkan2008learning} demonstrated that a classifier trained on positive and unlabeled examples predicts probabilities that differ by only a constant factor from the true conditional probabilities of being positive.
+Under the assumption of randomly labeled positive examples, Elkan \& Noto\cite{elkan2008learning} demonstrated that a classifier trained on positive and unlabeled examples predicts probabilities that differ by only a constant factor from the true conditional probabilities of being positive.
 These two works considered only binary classification whereas we showed that it is possible to train deep neural networks for multiple classes with only positive and unlabeled examples.
 
 The problem of weighting unlabeled examples is that it relies on the assumption that positive examples are unlabeled at random.
 However, very positive examples are much more likely to be labeled in practice, because they are easier to recognize.
 It is therefore reasonable to instead assume that the probability of being labeled for a positive example is directly related to the posterior probability.\cite{tax2016class}
 In other words, very positive prediction indicates that an unlabeled example is actually positive.
-Lin et al. \cite{lin2017focal} proposed a so-called Focal Loss to down-weight confident examples and thus focus training on hard negatives.
+Lin et al.\cite{lin2017focal} proposed a so-called Focal Loss to down-weight confident examples and thus focus training on hard negatives.
 Our exponential unlabeled loss follows a similar design thinking as Lin et al.(2017).

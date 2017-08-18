@@ -122,8 +122,13 @@ We synthesized these three types of noises with a well-annotated dataset and stu
 
 % \noindent \textit{Why binarizing classes?}
 
-{TODO}
-Success of RPN
+Supposing misclassification had negative influence on feature transferability, as we will show in Section \ref{subsec:robustness}, a straightforward way of correcting noisy labels is to binarize classes: positive for foreground pixels and negative for background pixels.
+Jain et al.\cite{jain2017pixel} trained a fully convolutional network to generate foreground segmentationions, and the trained model was demonstrated generalize well for object categories not included in training.
+Binarizing classes can be considered as converting precise but inaccurate labels to accurate but inprecise labels.
+For convolutional feature pre-training, precise supervision are likely not to transfer, because transferability of features is correlated to if features are general, i.e. if they depend on particular categories.
+% There are a few examples proved  the possibility of training binary object detection/segmentation:
+% Ren et al.\cite{ren2015faster} trained CNN model to perform binary classification for region of interest proposals;
+% He et al.\cite{he2017mask} trained binary segmentation in addition to object detection for instance-aware segmentation;
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%% TEXT Why PU learning
