@@ -84,8 +84,8 @@ Pre-trained model trained from a dataset with 50\% percentage of the instances u
 
 
 %%%%%%%% Table Learn Pixel Objectness for pre-training
-\begin{table}[t]
-\resizebox{\columnwidth}{!}{
+\begin{table*}[t]
+% \resizebox{\columnwidth}{!}{
 \centering
 \begin{tabular}{l|lllll}
 \makecell{Initial \\Representation}  & \makecell{mean IU \\(aeroplane,  \\bicycle, bird, \\boat, bottle)} & \makecell{mean IU \\(bus, car, \\cat, chair, \\cow)} & \makecell{mean IU \\ (dining table, \\dog, horse, \\motorbike, person)} & \makecell{mean IU \\(potted plant, \\sheep, sofa, \\train, TV)} & \makecell{avg mean IU \\ and avg std.} \\
@@ -104,7 +104,7 @@ HalfRandomLabels & \makecell{$0.27\pm0.01$} & \makecell{$0.33\pm0.02$} & \makece
 \hline
 InexaustiveSegmented & \makecell{$0.26\pm0.01$} & \makecell{$0.30\pm0.3$} & \makecell{$0.28\pm0.03$} & \makecell{$0.32\pm0.02$} & \makecell{$0.29\pm0.02$}\\
 \end{tabular}
-}
+% }
 \caption{Performances of fine-tuned FCN-AlexNet models with different representation initializations.
 \textbf{ImageNetModel} represents the pre-trained ImageNet model;
 \textbf{RandomWeights} indicates that the weights were randomly initialized;
@@ -118,7 +118,7 @@ Each experiment was repeated three times, the mean and the standard deviation we
 % \textit{IncompleteLabels} was trained with datasets that objects were annotated correctly with a probability of 0.5;
 }
 \label{tab:robustness}
-\end{table}
+\end{table*}
 
 
 %%%%%%%% FIGURE Number of training categories

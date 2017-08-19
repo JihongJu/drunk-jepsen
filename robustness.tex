@@ -22,19 +22,22 @@ $$P(y \vert x; F) = F(x) = H(G(x))$$
 % where $\sigma$ is the sofmtax function.
 
 \paragraph{Feature Transferability}
-Feature extractor $G$ can be transferred from a pre-trained model.
-The transferred feature extractor $\tilde{G}$ pre-trained with $\tilde{y}$ should be $G^{\ast}$ pre-trained with $y^{\ast}$ and fine-tune with the dataset of interest.
-The pre-trained model is normally an ImageNet model trained by the object recognition task.
-Alternatively, one can also obtain a pre-trained model with semantic segmentation task if there exists a segmentation dataset in a more similar domain than ImageNet.
-The transferability of a pre-trained feature extractor can be measured by performance achieved by $F$ with transferred $G'$ on the test set.
+The initialization of feature extractor $G$ can be transferred from a pre-traine model by fine-tuning.
+Ideally, fine-tuning the feature extractor $\tilde{G}$ pre-trained with noisy labels $\tilde{y}$ could result in a segmentation model with equivalent performance as fine-tuning feature extractor $G^{\ast}$ pre-trained with true labels $y^{\ast}$.
+Compared to randomly initialized feature extractor $G$, the fine-tuning performance improvement on test set indicates the transferability of a pre-trained feature extractor.
+The difference of performance improvement for fine-tuned models initialized with $\tilde{G}$ and with $G^{\ast}$ can tell the influence of label noises on feature transferability.
 
-Supposing a pre-training segmentation dataset have both noisy labels $\tilde{y}$ and true labels $y$ available, the influence of label noises can be studied by comparing the transferability of feature extractors learned with $y$ and with $\tilde{y}$. It is difficult to find such a dataset with both clean and noisy labels, so we tried to synthesize segmentation noises with well-annotated labels.
 
 \subsection{Label noise synthesization}
 \label{subsec:noises}
 
-\noindent \textit{How noises synthesized}
-\noindent
+It is difficult to find a dataset with both clean and noisy labels available, so we tried to synthesize segmentation noises with well-annotated labels.
+A straightforward way to synthesize noisy labels is to corrupt true labels stochastically for each segment with a corruption model.
+The corruption model describes the probability of an observed label conditioning on the the true label, the image and binary variable for label errorness.
+% $$p(\tilde{y_{ij}} \vert x, y_{ij}, e_{ij})$$
+% where the binary error occurence $e_{ij}$ depends on the inputs $x$ and true labels $y$.
+% Given a corruption model and true labels, one can stochastically synthesized the corresponding noisy labels.
+
 For segmentation problems, each pixel (or voxel for 3D segmentation) of an training image has a label assigned to one of the pre-defined categories.
 Supposing there are $K$ pre-defined categories, the label of pixel ${ij}$
 \[
@@ -47,19 +50,13 @@ Supposing there are $K$ pre-defined categories, the label of pixel ${ij}$
 where $1 < i < h, 1 < j < w$ and $i,j,k \in \mathrm{Z}^+$.
 % Pixels with $k=0$ are also  \textit{unannotated} since they were not assigned to one of the predefined categories.
 
-A straightforward way to synthesize noisy labels is to corrupt stochastically true labels for each pixel with a corruption model.
-The corruption model describes the probability of an observed label conditioning on the the true label $y_{ij}$, the image $x$ and the label errorness $e_{ij}$:
-$$p(\tilde{y_{ij}} \vert x, y_{ij}, e_{ij})$$
-where the binary error occurence $e_{ij}$ depends on the inputs $x$ and true labels $y$.
-Given a corruption model and true labels, one can stochastically synthesized the corresponding noisy labels.
 
-\noindent \textit{Clarity for noises considered.}
+% \noindent \textit{Clarity for noises considered.}
 % In the above model, label errorness for pixels is assumed to be independent to each other despite the fact that neighboring pixels are likely to have the same label in practice.
 %Conditional random fields (CRF) were introduced to interpret the neighboring pixel dependence.\cite{chen2016deeplab}
-In our works, we considered three types of noises for a semantic segmentation problem, \textit{mis-segmentation}, \textit{misclassification} and \textit{inexhaustive segmentation}, and modified the above corruption model for each type of noise accordingly.
-Note that all these label errors apply to the whole segment instead of to individual pixels.
-That is pixels for the same segments will have the same true labels and observed labels.
-Therefore, the above corruption model hides the spatial dependence of $e_{ij}$ from expressions.
+% Note that all these label errors apply to the whole segment instead of to individual pixels.
+% That is pixels for the same segments will have the same true labels and observed labels.
+% Therefore, the above corruption model hides the spatial dependence of $e_{ij}$ from expressions.
 % It would be of more value to use a real dataset for such errors than to synthesize.
 % The occurrence of error of each pixel is no longer simply dependent on which segments it belongs to but instead dependent on the neighboring pixels.
 % How to model the pixel label errorness conditioning on neightboring pixels is not the focus of this paper and is left for future studies.
@@ -81,6 +78,7 @@ However, it is difficult to estimate the above proability in practice because it
 Therefore, we synthesized mis-segmentation errors by selecting part of the categories as non-target categories so that instances of these categories should have zero labels for correct segmentations.
 We can then misannotate these non-target instances stochastically with a simplified probability $p(\tilde{y_{ij}}=k \vert y_{ij}=0)=p_k$ without  interpreting semantic meaning of $x$ in probability.
 Note that $p_k$ sums up to 1 for all classes $\sum_0^K p_k = 1$.
+{TODO} This is an emulation of xxx
 
 \paragraph{Misclassification}
 % Different from mis-segmentation, misclassification error means labels were misclassified between pre-defined categories.
