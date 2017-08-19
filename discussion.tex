@@ -1,8 +1,17 @@
 \section{Discussion}
 \label{sec:discussion}
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%% Influence of label noises
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
 We exluded segmenting errors such as inprecise boundaries, oversegmenting or undersegmenting the objects from study because they are a bit more complex to synthesize than the preceding classification errors.
+
+We assumed misclassification error is independent of the exact shape and appearance of the objects, i.e.information from $x$.
+This model is often called \textit{noisy at random} \cite{frenay2014classification}.
+This assumption does not hold in every cases of practice, for example, some instances can be more likely to be misclassifified due to its ambiguity in shapes or apperances.
+But the difficulty of modeling the depence of $x$ leads to simply assuming an input indepence.
+Given the class transition probabilities, one can easily synthesize noisy annotations including misclassification errors given a well-annotated segmentation dataset.
 
 %%%%%%%% Binarizing classes
 \paragraph{Binarizing/catergoring classes}
@@ -13,6 +22,8 @@ We exluded segmenting errors such as inprecise boundaries, oversegmenting or und
 \end{itemize}
 
 %%%%%%%% Exponential loss
+\paragraph{The relationship between PU learning and Imbalanced learning}
+
 \paragraph{Upsides and downsides of exponential loss}
 % Imbalanced
 % Easily classified negatives comprise

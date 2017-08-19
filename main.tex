@@ -19,6 +19,8 @@
 % run, let it finish, and you should be clear).
 \usepackage[breaklinks=true,bookmarks=false]{hyperref}
 \usepackage{multirow}
+\DeclareMathOperator*{\argmin}{argmin}
+\DeclareMathOperator*{\argmax}{argmax}
 
 
 \begin{document}
@@ -27,9 +29,9 @@
 \pagenumbering{gobble}
 \include{preface}
 
+%%%%%%%%% TITLE
 \twocolumn
 \pagenumbering{arabic}
-%%%%%%%%% TITLE
 \newpage
 \title{Learn transferable features with noisy segmentation datasets}
 
@@ -56,12 +58,26 @@ First line of institution2 address\\
 %%%%%%%%% ABSTRACT
 \begin{abstract}
 {TODO: brief introduction}
-We experimented in this work the influence of segmentation noises on transferability of pre-trained convolutional neural network (CNN) models.
+{TODO: brief introduction}
+{TODO: brief introduction}
+{TODO: brief introduction}
+{TODO: brief introduction}
+{TODO: brief introduction}
+{TODO: brief introduction}
+{TODO: brief introduction}
+{TODO: brief introduction}
+{TODO: brief introduction}
+{TODO: brief introduction}
+{TODO: brief introduction}
+{TODO: brief introduction}
+{TODO: brief introduction}
+We invested in this work the influence of segmentation noises on transferability of pre-trained convolutional neural network (CNN) models.
+We found binarizing classes as foreground and background can improve feature transferability with a small training set corrupted heavily with random labels.
+We modified the cross-entropy loss by down-weighting the loss of very positive predictions to balance precision and recall in the presence of mislabeled positive examples.
 
 \end{abstract}
 
 %%%%%%%%% BODY TEXT
-\input{draft}
 
 \input{introduction}
 

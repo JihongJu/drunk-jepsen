@@ -53,9 +53,10 @@ They studied the effects of diluting instead of replacing correct labels with no
 None of these studies explored the influence of label noises on feature transferability.
 
 Methods, including a linear niose layer on top of the model output\cite{sukhbaatar2014training}, loss correctness with an estimation of the noise transition matrix\cite{patrini2016making} were proposed to compensate the negative effect on classification performance introduced by flipped labels.
+We designed our experiments using noisy segmentations synthesized with perfect segmentation as well.
 Additionally, Reed \& Lee\cite{reed2014training} proposed a bootstrapping loss to emphasize \textit{perceptual consistency} in training when incomplete and noisy labels exist.
 Artificial datasets synthesized from well-annotated datasets were used to evaluate their methods.
-We designed our experiments using noisy segmentations synthesized with perfect segmentation as well.
+We modified the hard bootstrapping loss to focus on the incomplete labels problem only.
 
 %%%%%%%% some more methods
 % Xiao et al.\cite{xiao2015learning} integrated a probabilistic graphic model to an end-to-end deep learning system to train predicting class labels, either correct or wrong, as well as to correct the wrong labels.
@@ -91,4 +92,4 @@ However, very positive examples are much more likely to be labeled in practice, 
 It is therefore reasonable to instead assume that the probability of being labeled for a positive example is directly related to the posterior probability.\cite{tax2016class}
 In other words, very positive prediction indicates that an unlabeled example is actually positive.
 Lin et al.\cite{lin2017focal} proposed a so-called Focal Loss to down-weight confident examples and thus focus training on hard negatives for imbalanced learning.
-Our exponential unlabeled loss follows a similar design thinking as \cite{lin2017focal} to compensate noisy negative.
+Our sigmoidal negative loss follows a similar design thinking as \cite{lin2017focal} to compensate noisy negative.

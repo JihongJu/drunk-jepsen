@@ -99,6 +99,104 @@ A large number of annotated images are of great value to train sufficiently gene
 Allowing noisy annotations to exist could help significantly increase the number of annotated images and the number of training samples could compensate the impact of annotation errors.
 We will further discuss this in the related works.
 
+
+%%%%%%%%%%%%%%%%% Feature noise robustness
+% But dogs and cats have visual features: they are both furry, have similiar shape and appearance, etc.
+% These similiarities in features between dogs and cats may correspond to some interm features when a toy dog was misannotated as a dog.
+% If we consider further lower features, for exmaple those for detecting edges and corners, they are commonly transferable to many categories, not necessarily ones that look alike.
+% dissimilar categories (man-made classes and natural classes)
+%If we constraint ourselves to perceive only part of the dog and the toy dog, for example the ears, it may become difficult even for us to distinguish the two because given only the local information there is not much difference between them.
+% The generality of the low-level features can introduce the robustness to mis-segmentations regarding the transferability when we want to transfer hieraychical features for semantic segmentation in the presence misannotated objects because the low-level features are not dependent on the exact category assigned to the objects.
+% This annotation error robustness for the low-level features could result in noise robustness for the multiple level pre-trained weights for semantic segmentation with noisy labels.
+% In Section \ref{sec:objectness}, we tested whether object mis-segmentation had an impact on the transfehen we transfer the learned features to a new dataset with new categories.
+% That leads us to the following research question:
+% \begin{enumerate}
+%   \item How do mis-segmentation and misclassification of instances influence the ``transferability'' of the learned features respectively?
+% \end{enumerate}
+
+
+%%%%%%%%%%%%%%%% Spatial label noise dependency
+% \noindent \textit{Clarity for noises considered.}
+% $p(\tilde{y_{ij}},x) = p(\tilde{y_{ij}} \vert x, y, e_{ij}) p(e_{ij} \vert x,y)$.
+% In the above model, label errorness for pixels is assumed to be independent to each other despite the fact that neighboring pixels are likely to have the same label in practice.
+%Conditional random fields (CRF) were introduced to interpret the neighboring pixel dependence.\cite{chen2016deeplab}
+% Note that all these label errors apply to the whole segment instead of to individual pixels.
+% That is pixels for the same segments will have the same true labels and observed labels.
+% Therefore, the above corruption model hides the spatial dependence of $e_{ij}$ from expressions.
+% It would be of more value to use a real dataset for such errors than to synthesize.
+% The occurrence of error of each pixel is no longer simply dependent on which segments it belongs to but instead dependent on the neighboring pixels.
+% How to model the pixel label errorness conditioning on neightboring pixels is not the focus of this paper and is left for future studies.
+
+
 \subsection{assumptions}
 They all assume that positive examples in the positive set P and the positive examples in
 the unlabeled set U are generated from the same distribution.
+
+
+%%%%%%%%%%%%% Bullets
+% \section{Bullet points}
+%
+%
+% \paragraph{Data for Semantic Segmatation}
+% \begin{itemize}
+%   \item Rich unlabeled data, but lack of annotations
+%   \item (Conventionally) The annotations need to be:
+%   \begin{itemize}
+%     \item \textbf{precise}: no false positive
+%     \item \textbf{complete}: no false negative
+%     \item \textbf{consistent}: no misclassification
+%   \end{itemize}
+%
+%   % \item (Conventional) Workflow:
+%   % \begin{enumerate}
+%   %   \item Filter out the irrelavant images
+%   %   \item Annotate the relavant images
+%   %   \item Iterate for multiple times Step 1. and 2.
+%   % \end{enumerate}
+%
+%   \item Annotations that
+%   \begin{itemize}
+%       \item contain \textbf{imprecise} annotations
+%       \item are \textbf{imcomplete}
+%       \item contain \textbf{misclassification}
+%   \end{itemize}
+%
+%   % \item Motivation:
+%   % \begin{itemize}
+%   %   \item Correcting annotation errors take much more effort than annotating more data
+%   %   \item Annotation errors could be compensated with appropriate assumptions
+%   % \end{itemize}
+% \end{itemize}
+%
+%
+% \paragraph{Methods}
+% \begin{itemize}
+%   \item Incomplete annotations: Positive and Unlabelled learning
+%   \item Imprecise annotations: Learning ``objectness''
+%   \item Inconsistent classifications: ``Bootstrapping''(Entropy Regularization), Linear Noise model, Dropout Regularization
+% \end{itemize}
+
+
+%%%%%%%% TEXT Encouraging confident predictions
+% \paragraph{Confidence of contrary prediction and probability of false negative label}
+% \noindent
+% \noindent \textit{The idea of alleviating punishment for confident predictions.}
+% Losses above assume that the true label of an observed negative label is independent of the inputs $x$.
+% However, the true label $y$ is often dependent on both $x$ and $\tilde{y}$ in practice.
+% For instance, in segmentation problems, whether a pixel is left unsegmented correctly or not can be determined by the semantical meaning of this pixel and pixels around.
+% It is nevertheless difficult to estimate $p(y \vert x, \tilde{y})$ directly due to the difficulty of exploring the joint distribution of $x$ and $\tilde{y}$.
+% Alternatively, one can use the probabilistic prediction $p(y \vert x;\theta)$ a classification model to provide extra information about the inputs.
+% The predicted probabilities indicate how confident the current model is for the predictions made.
+% Given a good enough model, more confident positive predictions for negatively labeled examples can have a higher probability of being wrongly annotated than the less confident ones.
+% \footnote{J: This argument needs more detailed explanation.}
+% With a random model by which predictions are made randomly, the high and low confidences do not convey any information about the underlying inputs distribution.
+% By contrast, confident predictions made by a trained model indicate that the corresponding samples are possibly close to some previous training samples with positive labels in the feature space.
+% The natural trend of similar examples having the same labels supports a higher probability of being annotated wrongly for confident predictions which have opposite labels.
+% This thought leads to the idea of not punishing confident contrary predictions more than unconfident ones as the traditional logistic/softmax loss will do.
+
+%%%%%%%%% Spatial independent noise assumption
+% For example, we stochastically flipped pixel labels for the whole segment, instead of individual pixel label, to synthesize incomplete segmentation errors in Section \ref{sec:robustness},
+% Even with annotation errors like under-segmented objects, the probability for a pixel to be unsegmented depends on its neighbor pixels.
+% We made a strong assumption of spatial independence for false negative labels for inexhaustive segmentation noises.
+% % This assumption allows to keep the problem simple and straightforward but we showed in Section \ref{subsec:pulearning} that this assumption become an issue to recover the whole unsegmented objects rather than individual pixels.
+% Future works maybe required to relax this assumption and make use of the spatial dependence of label noises to achieve higher mean intersection over union (mean IU) not only higher accuracy.
