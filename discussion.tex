@@ -5,50 +5,67 @@
 %%%%%%%% Influence of label noises
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-We exluded segmenting errors such as inprecise boundaries, oversegmenting or undersegmenting the objects from study because they are a bit more complex to synthesize than the preceding classification errors.
+We assumed incomplete segmentation, misclassification and false segmentation of objects had occurred independently to the exact shape and appearance of the objects when we synthesized the segmentation noises stochastically in our experiments.
+However, some categories can be more likely to be misclassified due to its ambiguity in shapes or appearances in practice, such as bear and teddy bear.
+Similarly,  ambiguous objects can have a higher probability of being missing than easily recognizable objects.
+A real dataset with both clean and noisy segmentation would be valuable to evaluate the influence of noises on feature transferability further.
+% In addtion, we exluded segmenting errors such as imprecise boundaries, oversegmenting or undersegmenting the objects from study because they are a bit more complex to synthesize than the three classification errors.
 
-We assumed misclassification error is independent of the exact shape and appearance of the objects, i.e.information from $x$.
-This model is often called \textit{noisy at random} \cite{frenay2014classification}.
-This assumption does not hold in every cases of practice, for example, some instances can be more likely to be misclassifified due to its ambiguity in shapes or apperances.
-But the difficulty of modeling the depence of $x$ leads to simply assuming an input indepence.
-Given the class transition probabilities, one can easily synthesize noisy annotations including misclassification errors given a well-annotated segmentation dataset.
-
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%% Binarizing classes
-\paragraph{Binarizing/catergoring classes}
-\begin{itemize}
-  \item Tradeoff between precise bu inaccurate labels and accurate but inprecise labels
-  \item The success of region proposal network is a prove of binarized labels can information about ``objectness''.
-  \item Though it may depends on the scale of dataset. But since segmentation dataset is often small, it could be fine.
-\end{itemize}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-%%%%%%%% Exponential loss
-\paragraph{The relationship between PU learning and Imbalanced learning}
+We proposed to binarize or categorize classes to produce accurate but imprecise labels when misclassification of segments dominates a small pre-training dataset.
+The result feature transferability depends on whether the inaccurate labels or the imprecise labels is more severe in the decrease of feature transferability.
+In our experiment, the limited amounts of training images, the low-resolution of images and the constraint capacity of the FCN-AlexNet model may explain that more precise labels cannot improve the fine-tuning performance for the pre-trained models.
+In general, a trade-off between precise but less ccurate labels and more accurate but less precise labels need to be made to train better transferable features, given a particular dataset.
 
-\paragraph{Upsides and downsides of exponential loss}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%% Sigmoidal loss
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+We argued that not over-punishing confident, positive predictions for samples with negative labels can be beneficial by assuming the confident predictions are more likely to be mislabeled given a nonrandom model.
+However, there can also be disadvantageous for over-excusing losses for confident predictions.
+One typical problem is that a model made bad predictions with confidence will keep emphasizing its wrong predictions.
+Therefore, the threshold between punishing and excusing a certain model for make confident contrary predictions need to be tuned appropriately to achieve both high precision and high recall.
+Unfortunately, the sigmoidal negative loss has no such hyperparameter to tune, which can be a direction to improve it in the future.
+For example, the Focal Loss\cite{lin2017focal} could be a parametrizable alternative of the sigmoidal negative loss.
+
+Besides, applying the sigmoidal negative loss to segmentation assumes that the foreground-to-background mislabeling for each pixel occurred independently.
+This assumption made it possible to implement sigmoidal negative loss directly to classification for individual pixels.
+However, there is normally a spatial dependence for noises in pixel labels which may help improve the spatial consistency of predictions.
+Therefore, future works may be possible to make use of the spatial dependence of pixel label noises.
+
+% Upside:
+% \begin{itemize}
+%   \item treat easy/hard classifications differently
+%   \item not over-punish confident positive prediction for negatively labeled examples
+% \end{itemize}
+%
+% Downside:
+% \begin{itemize}
+%   \item Optimization diffilculty introduced as a result of non-convex objective
+% \end{itemize}
+
+% The sigmoidal loss was introduced in \cite{tax2016class} to get rid of the effect of outliers.
+% In our case, the negative examples given confident predictions by classifier can be considered as outliers.
+
+% Another challenge of difficulty encountered in implementingin extending sigmoidal negative loss to multi-class scenario
+
+% \paragraph{The relationship between PU learning and Imbalanced learning}
+
 % Imbalanced
 % Easily classified negatives comprise
 % the majority of the loss and dominate the gradient. While
 % α balances the importance of positive/negative examples, it
 % does not differentiate between easy/hard examples
-\begin{itemize}
-  \item treat easy/hard classifications differently
-  \item not over-punish confident positive prediction for negatively labeled examples
-  \item easy to implement with the assumption of label noise spatial independence
-\end{itemize}
 
-
-Downside:
-\begin{itemize}
-  \item Non-parameterizable
-  \item Optimization diffilculty introduced as a result of non-convex objective
-\end{itemize}
-
-
-\paragraph{Future works}
-
-\begin{itemize}
-  \item Parameterizing exponential unlabeled loss to determine boundaries of confident and unconfident predictions
-  \item Take into account label noise spatial dependence for neighboring pixels
-  \item Experiment with over-segmentation and under-segmentation noises (negative influence expected)
-  \item Experiment with real datasets
-\end{itemize}
+% \paragraph{Future works}
+%
+% \begin{itemize}
+%   \item Parameterizing exponential unlabeled loss to determine boundaries of confident and unconfident predictions
+%   \item Take into account label noise spatial dependence for neighboring pixels
+%   \item Experiment with over-segmentation and under-segmentation noises (negative influence expected)
+%   \item Experiment with real datasets
+% \end{itemize}

@@ -10,11 +10,12 @@
 
 \paragraph{Semantic Segmentation}
 
-A deep learning model for semantic segmentation normally consists of two main functions: a CNN feature extractor $g$ that extracts hierarchical feature maps $F$ from images $I$, followed by a classifier $h$ that generates pixel-by-pixel prediction to fit labels $S$.
+A deep learning model for semantic segmentation normally consists of two principal functions: a CNN feature extractor $g$ that extracts hierarchical feature maps $F$ from images $I$, followed by a classifier $h$ that generates pixel-by-pixel prediction to fit labels $S$.
 Together they form a segmentation model $f$ to predict class probabilities for each of the pixels in a given image $I$:
 $$f(I) = h(g(I))$$
 Training is to find an optimal $f$ from the space of functions which minimizes a loss function $L$ that measures the distance between $S$ and $f(I)$:
 $$f^{\ast} = \argmin_{f}{L(S, f(I))}$$
+
 % $R^{h \times w \times c} \rightarrow R^{d}$
 % $H: R^{d} \rightarrow R^{h \times w \times k}$
 % $R^{h \times w \times c} \rightarrow R^{h \times w \times k}$,
@@ -24,6 +25,7 @@ $$f^{\ast} = \argmin_{f}{L(S, f(I))}$$
 % where $\sigma$ is the sofmtax function.
 
 \paragraph{Feature Transferability}
+
 A pre-trained feature extractor, $g_t$, can be transferred as an initialization of the feature extractor and is expected to result in a better performed $f^{\ast}$ on the fine-tuning test set than a random choice of initialization $g_0$.
 The corresponding fine-tuning performance improvement indicates the transferability of the pre-trained feature extractor.
 Ideally, a feature extractor pre-trained with noisy labels would result in a fine-tuned model with equivalent performance as one pre-trained with true labels.
@@ -33,13 +35,13 @@ The difference in the result fine-tuning performance improvement between the noi
 \subsection{Label noise synthesization}
 \label{subsec:noises}
 
-It is difficult to find a dataset with both clean and noisy labels available, so we tried to synthesize segmentation noises with correct labels.
+It is challenging to find a dataset with both clean and noisy labels available, so we tried to synthesize segmentation noises with correct labels.
 A straightforward way to synthesize noisy labels is to corrupt true labels stochastically for each segment with a corruption model.
 The corruption model simply describes the probability of the observed labels given the true labels.
 % $$p(\tilde{y_{ij}} \vert x, y_{ij}, e_{ij})$$
 % where the binary error occurence $e_{ij}$ depends on the inputs $x$ and true labels $y$.
 
-For segmentation problems, each pixel (or voxel for 3D segmentation) of an training image has a label assigned to one of the pre-defined categories.
+For segmentation problems, each pixel (or voxel for 3D segmentation) of a training image has a label assigned to one of the pre-defined categories.
 Supposing there are $K$ pre-defined categories, the label of a pixel in the $i$-th row and $j$-th column from an image of size $h \times w$:
 \[
   y_{ij} =
@@ -52,6 +54,7 @@ where $1 \leq i \leq h, 1 \leq j \leq w$ and $i,j,k \in \mathrm{Z}^+$.
 
 
 \textbf{Inexhaustive segmentation}
+
 Given the true labels, which pixels belong to the same object is known.
 Inexhaustive segmentation can be synthesized as flipping all pixels for an object of the $k$-th category from $k$ to $0$ with probability $p_{0k}$.
 The probability for these pixels to have correct labels is then: $1-p_{0k}$.
@@ -60,12 +63,12 @@ The probability for these pixels to have correct labels is then: $1-p_{0k}$.
 % $$p(\tilde{y_{ij}}=k\vert y_{ij}=k) = 1-p_{0k}$$
 
 \textbf{Misclassification}
+
 To synthesize misclassification, we can stochastically convert pixel labels of segment for an object of the $k$-th category from $k$ to $j$ with probability $p_{jk}$, where $j, k \leq K$ and $j,k \in \mathrm{Z}^+$.
 Probabilities for all possible combinations of $j$ and $k$ form a \textit{confusion matrix} in which probabilities in each column sum up to 1.
 % $$p(\tilde{y_{ij}}=j \vert y_{ij}=k) = p_{jk}, ij \in S, k,j \in [1,K]$$
 % where $\sum_{j=1}^{K}p_{jk}=1$.
 
 \textbf{False segmentations}
-The presence of false segmentations can be synthesized in two steps: excluding classes execpt one from the foreground categories, forming the clean labels set, and assigning pixels of the excluded categories with foreground labels with a probability of $p_{10}$, constructing the noisy labels set.
-% $$p(\tilde{y_{ij}}=k \vert x, y_{ij}=0), ij \in S $$
-% The dependence of observed pixel labels $\tilde{y_{ij}}$ on the original image $x$ interpret the premise that mis-segmentation would only happen to semantically meaningful segments in an image.
+
+The presence of false segmentations can be synthesized in two steps: excluding classes except one from the foreground categories, forming the clean labels set, and assigning pixels of the excluded categories with foreground labels with a probability of $p_{11}$, constructing the noisy labels set.% $$p(\tilde{y_{ij}}=k \vert x, y_{ij}=0), ij \in S $$

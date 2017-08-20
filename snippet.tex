@@ -200,3 +200,17 @@ the unlabeled set U are generated from the same distribution.
 % We made a strong assumption of spatial independence for false negative labels for inexhaustive segmentation noises.
 % % This assumption allows to keep the problem simple and straightforward but we showed in Section \ref{subsec:pulearning} that this assumption become an issue to recover the whole unsegmented objects rather than individual pixels.
 % Future works maybe required to relax this assumption and make use of the spatial dependence of label noises to achieve higher mean intersection over union (mean IU) not only higher accuracy.
+
+%%%%%%%% noises synthesization
+% The noisy dataset containing labels for target segments stochastically transited to a random class with probability $p_{jk}=\frac{1}{20}$.
+% The resulted trained model was denoted as the AllRandomLabels model in Table \ref{tab:robustness}.
+% Similiarly, if a random half of the segmented objects were assigned random labels, the resulting pre-trained model is called the HalfRandomLabels model.
+% The noise-free counterpart of these two noisy models was the model trained with true labels, denoting as the TrueLabels model.
+% True labels can be considered as labels transiting with probability $p_{jk}=\delta(j-k)$.
+% $$p(\tilde{y_{ij}}=l \vert y_{ij}=k) = \delta(l-k)$$.
+
+
+%%%%%%%% noises synthesization
+% The small pre-training dataset can be a reason of similarly performed binary and multi-class pre-trained models.
+% In our experiment, most classes had only around one hundred images, and the dining table had only 20 images.
+% The limited number of class samples may increase the difficulty to segment individual classes and may explain why binarized labels could achieve comparable fine-tuning performance to true labels.

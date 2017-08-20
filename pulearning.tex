@@ -13,6 +13,7 @@
 \caption{
 The differences in losses (top figure) and derivatives (bottom figure) with repect to logits between the weighted logistic negative loss and the sigmoidal negative loss.
 The \textbf{+} sign represents loss for positive samples and the \textbf{-} sign stands for loss for negative samples.
+The sigmoidal loss for negative examples reaches a plataeu and the derivative drops to zero in the very positive region, whereas the weighted logistic loss for negative is just a linearly scaled logistic loss.
 }
 \label{fig:losses}
 \end{figure}
@@ -22,7 +23,8 @@ The \textbf{+} sign represents loss for positive samples and the \textbf{-} sign
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \paragraph{Learning with only positive and unlabeled examples}
-Training set of the positive and negative (PU) learning problems contains only a set of positive examples (P set) and a set of unlabeled samples (U set).
+
+A training set of the positive and negative (PU) learning problems contains only a set of positive examples (P set) and a set of unlabeled samples (U set).
 Unlabeled examples can be either positive or negative, meaning there is no reliable negative examples available
 One straightforward way to generate negative examples for training is to treat all the unlabeled examples as a set of negative examples with noises.
 The problem then converts to learning with clean positive and noisy negative labels.
@@ -35,7 +37,7 @@ The ultimate goal of solving such a problem is to learn a model that predicts as
 
 \paragraph{Weighted negative loss}
 
-Clearly, it is possible to compensate the negative influence of false negative labels by simply weighing the positive and negative examples differently, namely let the positive and negative examples have different rates of contribution to the total loss.
+Clearly, it is possible to compensate the negative influence of false negative labels by simply weighing the positive and negative examples differently, namely, let the positive and negative examples have different rates of contribution to the total loss.
 Suppose a logistic loss is used, the corresponding weighted losses for positive and negative samples are:
 \begin{equation*}
   \begin{aligned}
@@ -45,7 +47,7 @@ Suppose a logistic loss is used, the corresponding weighted losses for positive 
 \end{equation*}
 where $p(y_i \vert x_i)=\sigma(f(x))$ denotes the probablistic predictions for the i-th example given by model $f(\cdot)$, with the sigmoid function $\sigma(\cdot)$ as the activation function.
 This loss is called \textbf{weighted negative loss} in this paper.
-Emprically, the choice of $q$ can be made based on the highest precision and recall achieved on validation set.
+Empirically, the choice of $q$ can be made based on the highest precision and recall achieved on a validation set.
 % Alternatively, one can also roughly assign $q=p(y=-1 \vert \tilde{y}=-1)$.
 % This turns out to be part of the backward corrected loss proposed in \cite{patrini2016making}:
 % \begin{equation*}
@@ -62,6 +64,7 @@ Emprically, the choice of $q$ can be made based on the highest precision and rec
 
 %%%%%%%% TEXT Sigmoidal Negative loss
 \paragraph{Sigmoidal Negative Loss}
+
 We used a class-dependent loss to down-weight the loss contribution of very positive predictions negative labels and still making full use of the clean positive labels.
 The loss for positive examples is still a normal logistic loss and the loss for negative examples is replaced with a sigmoidal loss \cite{tax2016class}:
 \begin{equation*}
@@ -71,7 +74,7 @@ The loss for positive examples is still a normal logistic loss and the loss for 
   \end{aligned}
 \end{equation*}
 where $p$ again denotes the sigmoid-activated model output.
-We called this class-dependent loss \textbf{sigmoidal negative loss} in the sense it uses a sigmoidal function as the loss for negative samples.
+We called this class-dependent loss \textbf{sigmoidal negative loss} in a sense it uses a sigmoidal function as the loss for negative samples.
 
 Figure \ref{fig:losses} shows the differences in losses and derivatives with respect to model output between weighted negative logistic loss and sigmoidal negative loss.
 The main feature of sigmoidal loss for negative examples is its relatively small changes in the region of confident positive, compared to the logistic negative loss and 0.5 weighted negative loss.
@@ -80,7 +83,7 @@ As a consequence of this feature, the corresponding derivative decreases to zero
 
 %%%%%%%% TEXT Bootstrapping
 \paragraph{Modification to the bootstrapping loss for PU learning}
-\noindent
+
 We have also modified the hard bootstrapping loss by Reed et al.\cite{reed2014training} to encourage confident positive predictions and compensate noisy negative labels:
 % $$l_- = - \beta \log p(y=-1 \vert x) - (1-\beta) \sum_{j\in \{-1, +1\}} p(y=j \vert x) \log p(y=j \vert x)$$
 \begin{equation*}
@@ -102,15 +105,17 @@ This loss is referred as \textbf{bootstrapping negative loss} for the rest of th
 
 %%%%%%%% TEXT Multiple classes
 \paragraph{Extend PU learning to multiclass problems}
-For classification problems with multiple positive classes and one negative class, the weighted negative loss, sigmoidal negative loss and bootstraping negative loss can be extented to train deep learning models in the presence of negatively labeled examples from various positive classes.
+
+For classification problems with multiple positive classes and one negative class, the weighted negative loss, sigmoidal negative loss and bootstrapping negative loss can be extended to train deep learning models in the presence of negatively labeled examples from various positive classes.
 The logistic loss naturally extends to the multi-class scenario as the sigmoid activation extends to the softmax function.
 Similar modifications can be then made to the cross-entropy loss, namely, keeping the losses for positive classes unchanged and applying the modifications to the loss for the negative class.
 We used the manner of extending the losses in this work.
-Alternatively, one can apply an one-vs-all strategy, with which the normal logistic loss is used for positive classes while the weighted, sigmoidal and bootstrapping loss can be used for the negative class.
+Alternatively, one can apply a one-vs-all strategy, with which the normal logistic loss is used for positive classes while the weighted, sigmoidal and bootstrapping loss can be used for the negative class.
 
 %%%%%%%% TEXT Segmentation
 \paragraph{Extend PU learning to segmentation}
-By assuming the probability of missing positive label for a pixel is independent of its neighbor pixels, the weighted negative loss, sigmoidal negative loss and bootstraping negative loss are all applicable to per-pixel classification problems if classification for each pixel is made independently.
+
+By assuming the probability of missing positive label for a pixel is independent of its neighbor pixels, the weighted negative loss, sigmoidal negative loss and bootstrapping negative loss are all applicable to per-pixel classification problems if classification for each pixel is made independently.
 
 % It is nevertheless difficult to fit such a NNAR model directly because it is difficult to estimate of $p(e \vert x,y)$ with limited number of samples.
 % An alternatie model is the \textit{noisy at random (NAR)} model in which the occurence of errors $e$ are independent to $x$ only on $y$: $p(\tilde{y} \vert y)p(y \vert x)$
@@ -118,15 +123,17 @@ By assuming the probability of missing positive label for a pixel is independent
 
 %%%%%%%% TEXT Expontial loss FADE IN
 \paragraph{Implementation details}
+
 We introduced the sigmoidal negative loss after training with the normal cross entropy loss for a few epochs.
-The sigmoidal loss for negative examples saturates for very positive outputs, meaning that the confident positive prediction has little contribution to the total loss.
+The sigmoidal loss for negative examples saturates for very positive outputs, meaning that the confident, positive prediction has little contribution to the total loss.
 This can introduce problems at the beginning of the training procedure when the confident predictions are likely to be made at random.
 Additionally, optimization could reach the plateau where the model made all positive predictions with high confidence.
-We applied a similar ``fade-in'' mechanism to the modified hard bootstrapping loss as well because it also relies on a non-random model for sufficiently trustworthy prediction $\hat{y}$.
+We applied a similar ``fade-in'' mechanism to the modified hard bootstrapping loss as well because it also relies on a nonrandom model for sufficiently reliable prediction $\hat{y}$.
 
 
 %%%%%%%% TEXT Imbalanced
+
 Another problem encountered in the PU learning setup is the class imbalance introduced by negatively labeled positive samples.
 A balanced dataset can become imbalanced in the presence of false negative labels, especially if only a small portion of positive samples are correctly labeled.
 We reweighed positive and negative samples based on their occurrences of the observed labels to alleviate the influence of imbalance for training.
-Note that the class-weighted logistic loss reweighed the classes in addtion to this frequency balancing class weight.
+Note that the class-weighted logistic loss reweighed the classes in addition to this frequency balancing class weight.

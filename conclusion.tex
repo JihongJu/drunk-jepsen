@@ -1,17 +1,11 @@
 \section{Conclusion}
 \label{sec:conclusion}
 
-
-\begin{itemize}
-  \item Feature transferability is robust to false segmentation but not to misclassification and inexhaustive segmentation.
-  \item Misclassification noises can be alleviated by binarizing/categorizing classes.
-  \item Inexhausitive segmentation can be translated as learning with only positive and unlabeled examples.
-  \item We proposed a class dependent loss to not over-punish confident positive predictions in the presence of noisy negative labels, and it showed slightly better results than class-weighted loss.
-\end{itemize}
-
-% Given the mis-segmentation robustness of feature transferability discussed in section \ref{subsec:robustness}, we proposed to include mis-segmented objects to learn pre-trained model.
-% Misclassification noises had also negative impact on weights transferability, but categorizing classes into categories or even binarizing can alleviate the randomness of labels while still achieve comparable fine-tuning performance.
-% Lastly, inexhaustive segmentation can have significant influence on feature transferability and it can be compensate partially by modifying the loss function for the deep learning models.
-% We proposed a particular class dependent loss in order to not over-punish confident contrary predictions.
-% The proposed loss led to better pre-trainig performance as well as better fine-tuning performance with a synthesized dataset as discussed in section \ref{subsec:pulearning}.
-% The types of segmentation noises we concentrated on in this study are mis-segmentation, misclassification and inexhaustive segmentation.
+We studied how to pre-train transferable convolutional weights in the presence of inexhaustive segmentation, misclassification and false segmentation.
+Given that including false segmentations of meaningful objects had little impact on the fine-tuning performance of transferred weights, we proposed to include false segmentation objects to learn the pre-trained model.
+By contrast, misclassification noises can have negative impacts on feature transferability, but binarizing classes to foreground and background can produce accurate but not necessarily precise labels to train better transferable features.
+We presented that for a small pre-training set, binarizing classes can recover the negative influence of misclassification of object segments on the fine-tuning performance of the transferred models.
+Inexhaustive segmentation can also negatively affect feature transferability of the pre-trained model.
+The decrease of the fine-tuning performance due to the unsegmented objects in the pre-training set can be compensated by modifying the loss function for deep learning models.
+We then proposed a class-dependent loss to not over-punish the confident positive predictions for examples with negative labels.
+The proposed sigmoidal negative loss was demonstrated to improve both the pre-training and fine-tuning performance of models pre-trained in the presence of inexhaustive segmentations.
