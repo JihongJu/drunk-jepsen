@@ -57,10 +57,11 @@ First line of institution2 address\\
 
 %%%%%%%%% ABSTRACT
 \begin{abstract}
-{TODO: brief introduction}
+
+The existence of noisy datasets motivates us to study if we can make use of them to pre-train models for image segmentation.
 We invested in this work the influence of segmentation noises on transferability of pre-trained convolutional neural network (CNN) models.
-We discovered binarizing classes as foreground and background can improve feature transferability with a small training set corrupted heavily with random labels.
-A modification to the cross-entropy loss was proposed to balance precision and recall in the presence of unsegmented objects of interest by down-weighting the loss of confident predictions.
+We discovered binarizing classes as foreground and background can improve feature transferability for a small training set corrupted heavily with random labels.
+A class-dependent modification to the cross-entropy loss was proposed to balance precision and recall in the presence of unsegmented objects of interest by down-weighting the loss of confident predictions.
 
 \end{abstract}
 
