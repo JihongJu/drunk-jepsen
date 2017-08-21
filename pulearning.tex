@@ -49,7 +49,7 @@ where $p(y_i \vert x_i)=\sigma(f(x))$ denotes the probablistic predictions for t
 This loss is called \textbf{weighted negative loss} in this paper.
 Empirically, the choice of $q$ can be made based on the highest precision and recall achieved on a validation set.
 % Alternatively, one can also roughly assign $q=p(y=-1 \vert \tilde{y}=-1)$.
-% This turns out to be part of the backward corrected loss proposed in \cite{patrini2016making}:
+% This turns out to be part of the backward corrected loss proposed in  \cite{patrini2016making}:
 % \begin{equation*}
 %   \begin{aligned}
 %     l_{\tilde{y_i}=-1} = - p(y_i=-1 \vert \tilde{y_i}=-1) \log p(y_i=-1 \vert x_i) \\ - p(y_i=+1 \vert \tilde{y_i}=-1) \log p(y_i=+1 \vert x_i)
@@ -66,7 +66,7 @@ Empirically, the choice of $q$ can be made based on the highest precision and re
 \paragraph{Sigmoidal Negative Loss}
 
 We used a class-dependent loss to down-weight the loss contribution of very positive predictions negative labels and still making full use of the clean positive labels.
-The loss for positive examples is still a normal logistic loss and the loss for negative examples is replaced with a sigmoidal loss \cite{tax2016class}:
+The loss for positive examples is still a normal logistic loss and the loss for negative examples is replaced with a sigmoidal loss  \cite{tax2016class}:
 \begin{equation*}
   \begin{aligned}
     & l_{+} = - \log p(y_i=+1 \vert x_i) \\
@@ -84,7 +84,7 @@ As a consequence of this feature, the corresponding derivative decreases to zero
 %%%%%%%% TEXT Bootstrapping
 \paragraph{Modification to the bootstrapping loss for PU learning}
 
-We have also modified the hard bootstrapping loss by Reed et al.\cite{reed2014training} to encourage confident positive predictions and compensate noisy negative labels:
+We have also modified the hard bootstrapping loss by Reed et al. \cite{reed2014training} to encourage confident positive predictions and compensate noisy negative labels:
 % $$l_- = - \beta \log p(y=-1 \vert x) - (1-\beta) \sum_{j\in \{-1, +1\}} p(y=j \vert x) \log p(y=j \vert x)$$
 \begin{equation*}
   % & l_{\tilde{y_i}=+1} = - \log p(y_i=+1 \vert x_i) \\
@@ -101,7 +101,7 @@ This loss is referred as \textbf{bootstrapping negative loss} for the rest of th
 %     \sim - \sum_{j\in\{-1,+1\}} \delta(y_i - \hat{y_i}) \log p(y_i=j \vert x_i)
 %   \end{aligned}
 % \end{equation*}
-% which intuitively encourages the model to make confident predictions\cite{grandvalet2005semi}.
+% which intuitively encourages the model to make confident predictions \cite{grandvalet2005semi}.
 
 %%%%%%%% TEXT Multiple classes
 \paragraph{Extend PU learning to multiclass problems}

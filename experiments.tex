@@ -8,9 +8,9 @@
 
 \paragraph{Experiment setup}
 
-To investigate the influence of inexhaustive segmentations, misclassifications and false segmentations on feature transferability, we set up experiments with synthesized label noises from a well-annotated dataset, the PASCAL VOC2011 segmentation dataset\cite{everingham2015pascal}.
+To investigate the influence of inexhaustive segmentations, misclassifications and false segmentations on feature transferability, we set up experiments with synthesized label noises from a well-annotated dataset, the PASCAL VOC2011 segmentation dataset  \cite{everingham2015pascal}.
 Fifteen out of twenty categories of the VOC2011 dataset were selected to form a \textit{pre-training dataset} and the other categories formed a \textit{fine-tuning dataset}.
-The pre-training dataset was used to train a Fully Convolutional Network with AlexNet (FCN-AlexNet) model\cite{long2015fully} for segmentation in the presence or absence of synthesized segmentation errors.
+The pre-training dataset was used to train a Fully Convolutional Network with AlexNet (FCN-AlexNet) model \cite{long2015fully} for segmentation in the presence or absence of synthesized segmentation errors.
 The fine-tuning dataset was used to fine-tune the weights of convolutional layers from the pre-trained FCN-AlexNet models.
 Inexhaustive segmentations, misclassifications, and false segmentations were synthesized separately with stochastical corruptions to the well-annotated pre-training dataset, followed the descriptions in Section \ref{subsec:formulation}.
 Fine-tuned models were evaluated by mean intersection over union ratio (mean IU) achieved on the fine-tuning test set, referring to as the \textit{fine-tuning performance}.
@@ -20,14 +20,14 @@ Performance improvement of fine-tuning transferred models compared to an randoml
 
 To avoid that the choice of pre-training and fine-tuning splitting for categories influence the results, the 20 categories of VOC2011 were divided equally into four folds.
 Each fold was studied separately, and the exact partitions of each fold are listed in Table \ref{tab:robustness}.
-The training dataset was enriched with extra segmentations by Hariharan et al.\cite{hariharan2011semantic}
+The training dataset was enriched with extra segmentations by Hariharan et al. \cite{hariharan2011semantic}
 To keep the segmentation task simple, we used only single-object images, resulting in totally 4000 training images for 20 categories available for pre-training, fine-tuning and evaluation.
 In order to accelerate the training process, we subsampled the original images by four times.
 Fully Convolutional Networks with AlexNet was used for experiments because of its relatively small capacity and thus short training time.
 The existence of an ImageNet model for AlexNet can be beneficial to set a performance reference.
 The non-transferred layers were randomly initialized with Xavier Initialization.
 The ImageNet model and completely random weight initialization were considered as the upper bound and lower bound, respectively, for various pre-trained weights summarized in Table \ref{tab:robustness}.
-The default hyperparameters of FCN-AlexNet in \cite{long2015fully} were kept unchanged.
+The default hyperparameters of FCN-AlexNet in  \cite{long2015fully} were kept unchanged.
 Training run 240,000 iterations for pre-training phase, and 12,000 iterations for fine-tuning phase.
 Snapshots for trained models were taken every 4,000 iterations.
 Each experiment was repeated three times, mean and standard deviation were computed over the last five snapshots for all repetitions.
@@ -61,7 +61,7 @@ Binarized labels are accurate but imprecise because pixel labels were randomized
 This observation indicates that inaccurate labels may have more significant negative influence than imprecise labels for feature transferability.
 
 Additionally, we studied the influence of categorizing classes for pre-training to keep the labels precise to some extent.
-We categorized the fifteen classes in the pre-training set into person, animal, vehicle, indoor according to \cite{everingham2015pascal} and trained a model to transfer, shown as the error bars on lines in figure \ref{fig:categories} at categories 4.
+We categorized the fifteen classes in the pre-training set into person, animal, vehicle, indoor according to  \cite{everingham2015pascal} and trained a model to transfer, shown as the error bars on lines in figure \ref{fig:categories} at categories 4.
 As a comparison, the fifteen classes were also randomly categorized into 4, 7, 11 categories and shown as isolated error bars in figure \ref{fig:categories} at categories 4, 7, 11 respectively.
 Figure \ref{fig:categories} shows that categorizing pre-training classes had little effect to the fine-tuning performance of transferred models.
 Even categorizing classes at random without explicit meaning could pre-train weights better than random initialization (shown as error bar at categories 0).
@@ -255,7 +255,7 @@ The test performances of the three different losses did not show significant dif
 %%%%%%%% Text Segmentation Pascal VOC2011
 \paragraph{Pascal VOC2011 segmentation task}
 
-To study the effect of sigmoidal negative loss on compensating incomplete segmentations, we used again the PASCAL VOC2011 dataset with extra segmentation\cite{hariharan2011semantic}.
+To study the effect of sigmoidal negative loss on compensating incomplete segmentations, we used again the PASCAL VOC2011 dataset with extra segmentation \cite{hariharan2011semantic}.
 We synthesized inexhaustive segmentations the same way as described in Section \ref{subsec:robustness}.
 The same AlexNet-FCN model was trained together with the different loss functions for class 0 to predict binary segmentation, determining whether a pixel belongs to an object or not.
 Only single-object images were used for training and testing to avoid the influence of two adjacent objects joining as one object because of binary segmentation.
