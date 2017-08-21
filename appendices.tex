@@ -37,7 +37,7 @@ Another sequence of convolutional and pooling layers generate feature maps of si
 Neurons in the last three layers of LeNet are fully connected to the layer before and the layer after if exists, creating the final prediction for 10 classes.
 
 %%%%%%%% Feature Hierarchy
-
+Features produced by CNN models have a rich hierarchy.
 The bottom layers in the convolutional layer stack have smaller receptive fields while the top layers have larger receptive fields.
 A small receptive field means that the filter have access to information only in a local sub-region of the image while a large receptive field can convey more global information.
 This trend of varying pattern responses from local to global, from simple to complex for stacked convolutional layers is a reflect of emulating animals visual cortex.
@@ -89,7 +89,27 @@ By combining them together, it becomes possible to create accurate and detailed 
 %%%%%%%% FCN
 Figure \ref{fig:fcn} shows the architecture of so-called fully convolutional networks (FCN) by Long et al. (2015).
 
-\subsection{Transferring convolutional neural nets}
+%%%%%%%% Transferring convolutional neural nets
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%% Deep Learning with label noise
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\section{Objective and optimization}
+
+Model outputs are from negative infinity to positive infinity.
+Large output value for one class means for
+Model Outputs for all classes needs to be normalized to sum up to one.
+The softmax function plays this role.
+
+$p(y \vert x)$
+Negative log-likelihood
+
+Cross-entropy loss
+
+Backpropagation
+
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%% Deep Learning with label noise
