@@ -2,7 +2,7 @@
 \label{sec:conclusion}
 
 We studied how to pre-train transferable convolutional weights in the presence of inexhaustive segmentation, misclassification and false segmentation.
-Given that including false segmentations of meaningful objects had little impact on the fine-tuning performance of transferred weights, we proposed to include false segmentation objects to learn the pre-trained model.
+We discovered that including false segmentations of meaningful objects for pre-training had little impact on the fine-tuning performance of transferred weights
 By contrast, misclassification noises can have negative impacts on feature transferability, but binarizing classes to foreground and background can produce accurate but not necessarily precise labels to train better transferable features.
 We presented that for a small pre-training set, binarizing classes can recover the negative influence of misclassification of object segments on the fine-tuning performance of the transferred models.
 Inexhaustive segmentation can also negatively affect feature transferability of the pre-trained model.

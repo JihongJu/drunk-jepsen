@@ -6,11 +6,30 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \section{Convolutional Networks for Semantic Segmentation}
+
 \subsection{Convolutional Neural Networks}
 
-A Convolutional Neural Network (CNN) for image processing is often comprised of stacked convolutional layers with interlacing subsampling layers for feature extraction, followed by a few task-specific layers.% for either classification or regression.
-For instance, fully connected layers are often used for object recognition\cite{lecun1998gradient,krizhevsky2012imagenet}, region proposal\cite{ren2015faster}, etc., and transposed convolutions or dilated convolutions together with convolutional layers can be used for semantic segmentation\cite{long2015fully,yu2015multi}.
+%%%%%%%% CNN in one sentence
+The primary components of a typical convolutional neural network (CNN) are several layers of convolution and sub-sampling, followed by a few fully-connected layers.
+Convolutions
 
+Convolutional layer
+Subsampling
+
+%%%%%%%% FIGURE LeNet
+\begin{figure}[t]
+\centering
+   \includegraphics[width=\linewidth]{img/no_padding_no_strides_00.pdf}
+\caption{
+A basic convolution operation.
+A 3x3 convolutional filter convolves with a 3x3 window sliding over the image (bottom).
+The output of convolutions at each sliding position form a feature map (top).
+This figure was drawn by Dumoulin and Visin\cite{dumoulin2016guide}
+}
+\label{fig:lenet}
+\end{figure}
+
+%%%%%%%% LeNet
 An example, LeNet-5 (1998) \cite{lecun1998gradient}, is shown in Figure \ref{fig:lenet}.
 The first convolutional layer of LeNet contains 6 convolutional kernels of size 5x5 and each convolutional kernels convolve with small windows sliding over the images and produce a feature map of size 28x28.
 Each output in the produced feature map is corresponding to a small sub-region of the visual field (the image), called a \textit{receptive field}.
@@ -19,6 +38,7 @@ The result feature map S2 has a shape of 14 by 14 and a receptive field of 6 by 
 Another sequence of convolutional and pooling layers generate feature maps of size 5x5 with receptive field 16x16.
 Neurons in the last three layers of LeNet are fully connected to the layer before and the layer after if exists, creating the final prediction for 10 classes.
 
+%%%%%%%% Feature Hierarchy
 The bottom layers in the convolutional layer stack have smaller receptive fields while the top layers have larger receptive fields.
 A small receptive field means that the filter have access to information only in a local sub-region of the image while a large receptive field can convey more global information.
 This trend of varying pattern responses from local to global, from simple to complex for stacked convolutional layers is a reflect of emulating animals visual cortex.
@@ -35,6 +55,8 @@ The shallower convolutional layers play a similar functionlity as simple cells w
 \label{fig:lenet}
 \end{figure}
 
+%%%%%%%% Design of CNN
+
 The main benefit of CNN compared to the traditional multilayer perceptron is that it is easier to optimize due to the local connectivy pattern of convolutional layers and spatial weights sharing.
 Because of the design choice of convolutional neurons and maximum pooling, translation invariance as well as scaling invariance and distortion invariance to some extent are achievable for convolutional neural networks.\cite{lecun1998gradient}
 Different from the traditional handcrafted features, learnable convolutional features normally generalize well and can achieve better performance for dataset with a complex input distribution.\cite{krizhevsky2012imagenet}
@@ -44,6 +66,7 @@ This can be beneficial for datasets of immense complexity, for example, ILSVRC\c
 
 \subsection{Semantic image segmentation}
 
+%%%%%%%% Segmentation
 Semantic image segmentation is to segment images into semantically meaningful partitions, a.k.a.,\textit{segments}.
 It can be operated as classifying pixels into the corresponding pre-defined categories.
 The success of CNN models on object classification tasks can be extended for semantic image segmentation tasks.\cite{long2015fully}
@@ -55,6 +78,8 @@ The low-level features are fine, presenting appearances and the high-level featu
 By combining them together, it becomes possible to create accurate and detailed segmentation.
 % in an end-to-end, pixel-by-pixel fully convolutional neural networks for semantic segmentation.%%%%%%%% FIGURE LeNet
 
+%%%%%%%% Difficulty in adapting CNN
+
 \begin{figure}[t]
 \centering
    \includegraphics[width=\linewidth]{img/fcn}
@@ -62,6 +87,7 @@ By combining them together, it becomes possible to create accurate and detailed 
 \label{fig:fcn}
 \end{figure}
 
+%%%%%%%% FCN
 Figure \ref{fig:fcn} shows the architecture of so-called fully convolutional networks (FCN) by Long et al. (2015).
 
 \subsection{Transferring convolutional neural nets}
@@ -117,19 +143,19 @@ layer name             & output size                     & 8-layer              
 
 \subsection{Evaluation metrics}
 
-(overall) accuracy
+% \noindent (overall) accuracy
 $$ \text{accuracy} = \frac{\text{true pos. + true neg.}}{\text{true pos. + false pos. + true neg. + false neg.}}$$
 
-precision
+% \noindent precision
 $$\text{precision} = \frac{\text{true pos.}}{\text{true pos. + false pos.}}$$
 
-recall
+% \noindent recall
 $$\text{recall} = \frac{\text{true pos.}}{\text{true pos. + false neg.}}$$
 
-f1-score
+% \noindent f1-score
 $$F_1 = 2 \cdot \frac{\text{precision} \cdot \text{recall}}{\text{precision}+\text{recall}}$$
 
-intersection over union (IU)
+% \noindent intersection over union (IU)
 $$ \text{IU} = \frac{\text{true pos.}}{\text{true pos. + false pos. + false neg.}}$$
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

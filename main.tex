@@ -65,7 +65,7 @@ First line of institution2 address\\
 % Modify loss for incomplete segmentation
 
 The broad existence of noisy datasets motivates us to consider if it is possible to utilize noisy segmentations in training better image segmentation models with limited training samples.
-We investigated in this work to pre-train convolutional neural network (CNN) models with potential incomplete, mislabeled segmentations.
+We investigated in this work how to pre-train convolutional neural network (CNN) models with potentially incomplete, mislabeled segmentations.
 The influence of segmentation noises on model transferability was investigated in an experimental setup with synthesized segmentation noises.
 With the same setup, we discovered that binarizing classes as foreground and background could improve feature transferability for a small training set corrupted heavily with random labels.
 A class-dependent modification to the cross-entropy loss was proposed to balance precision and recall for training with incomplete segmentations.
