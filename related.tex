@@ -38,7 +38,7 @@ Apart from supervised pre-training, one can also perform unsupervised learning t
 % Lee et al. \cite{lee2009convolutional} presented a \textit{convolutional deep belief network}, to learn hierachical convolutional representations.
 % A few studies \cite{erhan2009difficulty,erhan2010does,bengio2012deep} highlighted the advantage of unsupervised pre-training compared to the random initialization, connecting unsupervised pre-training to a norm of regularization and a method that help disentangle the sample variations.
 Though a few studies \cite{erhan2009difficulty,erhan2010does,bengio2012deep} discussed the advantage of unsupervised pre-trained features compared to random weights initialization, the distance between the two has been shortened ever since the arises of modern initialization strategies, namely Xavier initialization \cite{glorot2010understanding} and its variants.
-We used random weights initialization as the lower bounds for pre-training with noisy labels.
+We used random weights initialization as the lower baseline for pre-training with noisy labels.
 Features learned in the presence of label noises should at least outperform random weights because noisy information should be still better than no information.
 % A proper method to learn features in the presence of label noise should at least outperform unsupervised pre-training because noisy information is still better than no information.
 
@@ -48,14 +48,16 @@ Features learned in the presence of label noises should at least outperform rand
 
 \paragraph{Deep Learning with Noisy Labels}
 
-The impact of randomly flipped labels on classification performance has been investigated by  \cite{sukhbaatar2014training,patrini2016making} for convolutional neural networks.
+The impact of randomly flipped labels on classification performance has been investigated by \cite{sukhbaatar2014training,patrini2016making} for convolutional neural networks.
 They both reported decreases in classification performance as the proportion of flipped labels increases for a fixed number of training samples.
-By contrast, Rolnick et al. \cite{rolnick2017deep} argued that deep neural networks can learn robustly from the noisy dataset as long as appropriate choices of hyperparameters were made.
+On the other hand, Rolnick et al. \cite{rolnick2017deep} argued that deep neural networks can learn robustly from noisy datasets as long as appropriate choices of hyperparameters were made.
 They studied the effects of diluting instead of replacing correct labels with noisy labels and concluded that larger training set is of more importance than lower the level of noise.
 None of these studies explored the influence of label noises on feature transferability.
+To our best knowledge, we are the first work to evaluate feature robustness label noises.
 
 Methods, including a linear noise layer on top of the model output \cite{sukhbaatar2014training}, loss correctness with an estimation of the noise transition matrix \cite{patrini2016making} were proposed to compensate the negative effect on classification performance introduced by flipped labels.
-We designed our experiments using noisy segmentations synthesized with perfect segmentation as well.
+To study if the proposed methods can alleviate the influence of noisy labels as expected, both works synthesized the random flipped labels from clean labels.
+We designed our experiments using stochastically synthesized noisy segmentations from perfect segmentation as well.
 
 %%%%%%%% some more methods
 % Xiao et al. \cite{xiao2015learning} integrated a probabilistic graphic model to an end-to-end deep learning system to train predicting class labels, either correct or wrong, as well as to correct the wrong labels.

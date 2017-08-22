@@ -12,8 +12,8 @@
    \includegraphics[width=1.05\linewidth]{img/losses}
 \caption{
 The differences in losses (top figure) and derivatives (bottom figure) with repect to logits between the weighted logistic negative loss and the sigmoidal negative loss.
-The \textbf{+} sign represents loss for positive samples and the \textbf{-} sign stands for loss for negative samples.
-The sigmoidal loss for negative examples reaches a plataeu and the derivative drops to zero in the very positive region, whereas the weighted logistic loss for negative is just a linearly scaled logistic loss.
+The \textbf{+} sign represents the loss of positive samples and the \textbf{-} sign stands for the loss of negative samples.
+The sigmoidal loss of negative examples reaches a plataeu and the derivative drops to zero in the very positive region, whereas the weighted logistic loss for negative is just a linearly scaled logistic loss.
 }
 \label{fig:losses}
 \end{figure}
@@ -66,7 +66,7 @@ Empirically, the choice of $q$ can be made based on the highest precision and re
 \paragraph{Sigmoidal Negative Loss}
 
 We used a class-dependent loss to down-weight the loss contribution of very positive predictions negative labels and still making full use of the clean positive labels.
-The loss for positive examples is still a normal logistic loss and the loss for negative examples is replaced with a sigmoidal loss  \cite{tax2016class}:
+The loss of positive examples is still a normal logistic loss and the loss of negative examples is replaced with a sigmoidal loss  \cite{tax2016class}:
 \begin{equation*}
   \begin{aligned}
     & l_{+} = - \log p(y_i=+1 \vert x_i) \\
@@ -74,7 +74,7 @@ The loss for positive examples is still a normal logistic loss and the loss for 
   \end{aligned}
 \end{equation*}
 where $p$ again denotes the sigmoid-activated model output.
-We called this class-dependent loss \textbf{sigmoidal negative loss} in a sense it uses a sigmoidal function as the loss for negative samples.
+We called this class-dependent loss \textbf{sigmoidal negative loss} in a sense it uses a sigmoidal function as the loss of negative samples.
 
 Figure \ref{fig:losses} shows the differences in losses and derivatives with respect to model output between weighted negative logistic loss and sigmoidal negative loss.
 The main feature of sigmoidal loss for negative examples is its relatively small changes in the region of confident positive, compared to the logistic negative loss and 0.5 weighted negative loss.
@@ -124,11 +124,11 @@ By assuming the probability of missing positive label for a pixel is independent
 %%%%%%%% TEXT Expontial loss FADE IN
 \paragraph{Implementation details}
 
-We introduced the sigmoidal negative loss after training with the normal cross entropy loss for a few epochs.
-The sigmoidal loss for negative examples saturates for very positive outputs, meaning that the confident, positive prediction has little contribution to the total loss.
-This can introduce problems at the beginning of the training procedure when the confident predictions are likely to be made at random.
-Additionally, optimization could reach the plateau where the model made all positive predictions with high confidence.
-We applied a similar ``fade-in'' mechanism to the modified hard bootstrapping loss as well because it also relies on a nonrandom model for sufficiently reliable prediction $\hat{y}$.
+We introduced the sigmoidal negative loss after training with a class-weighted cross entropy loss for a few epochs.
+The sigmoidal loss of negative examples saturates for very positive outputs, meaning that the confident, positive prediction has little contribution to the weights update.
+The wrong confident predictions can introduce problems at the beginning of the training procedure when the confident predictions are likely to be made at random.
+Otimization could reach the plateau where the model made all positive predictions with high confidence.
+Besides, we applied the modified hard bootstrapping loss after a few epochs trained with class-weighted loss because it also relies on a nonrandom model for sufficiently reliable prediction $\hat{y}$.
 
 
 %%%%%%%% TEXT Imbalanced

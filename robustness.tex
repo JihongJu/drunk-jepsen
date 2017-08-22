@@ -36,7 +36,7 @@ The difference in the result fine-tuning performance improvement between the noi
 \label{subsec:noises}
 
 It is challenging to find a dataset with both clean and noisy labels available, so we tried to synthesize segmentation noises with correct labels.
-A straightforward way to synthesize noisy labels is to corrupt true labels stochastically for each segment with a corruption model.
+A straightforward way to simulate noisy labels is to corrupt true labels stochastically for each segment with a corruption model.
 The corruption model simply describes the probability of the observed labels given the true labels.
 % $$p(\tilde{y_{ij}} \vert x, y_{ij}, e_{ij})$$
 % where the binary error occurence $e_{ij}$ depends on the inputs $x$ and true labels $y$.

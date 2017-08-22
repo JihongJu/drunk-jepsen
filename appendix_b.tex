@@ -1,0 +1,65 @@
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%% Deep Learning with label noise
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+%%%%%%%% To explain why modifying losses
+
+\section{Cost function and Optimization}
+
+\subsection{Cross entropy loss}
+\label{subsec:crossentropy}
+
+The cross entropy loss (a.k.a. softmax loss) is one of the most commonly used cost function for convolutional neural networks in classification problems.
+Let $x^{(i)}$ be an input example from totally $m$ examples, $y^{(i)} \in {0,...,K}$ be the corresponding label, and $\theta$ be parameteres of model $f(\cdot)$.
+The cross entropy loss is defined as:
+$$J(\theta) = - \sum_{i=1}^{m}\sum_{k=0}^{K} 1\{y^{(i)}=k\} \log P(y^{(i)}=k \vert x^{(i)}; \theta)$$
+In the equation above, $1\{\cdot\}$ is the ``indicator function'' defined as:
+\[
+  1\{\text{statement}\} =
+    \begin{cases}
+      1, & \text{statement is true} \\
+      0, & \text{otherwise}
+    \end{cases}
+\]
+$P(y^{(i)} = k | x^{(i)} ; \theta) = \sigma(f(x;\theta))_k$ is the likelihood of $y^{(i)}$ being $k$, predicted by model $f(\cdot)$, where $\sigma(\cdot)_{k}$ is the softmax function that applies to model output for the $k$-th class.
+
+Model outputs $f(x^{(i)};\theta)$ is a vector of $k$ elments with values varying from negative infinity to positive infinity.
+Each element of the output vector is corresponding to one class out of $K$ classes.
+A larger output value for one class, $k$, than another, $j$, means that the example $x^{(i)}$ is more likely to be class $k$ than class $j$.
+The softmax function ensures that the model outputs are normalized to a region between 0 and 1, and sum up to 1 for all classes so that the result outputs fullfils a probability distribution over $K$ different possible outcomes.
+
+The cross entropy loss is a form of negative log-likelihood.
+The loss is closed to zero if the predicted probability of $y^{(i)}$ is large, and takes a large positive value if the probability is small.
+Minimizing the negative log likelihood of the correct class can be interpreted as performing Maximum Likelihood Estimation (MLE), a commonly optimization.
+
+\subsection{Gradient based optimization and Backpropagation}
+\label{subsec:backprop}
+
+The model is optimized by solving the optimal $\theta$ that minimizes the loss function.
+It is impossible to solve $\theta$ for a non-linear model analytically so that a gradient-based optimization can be used as an efficient alternative.
+
+The derivative of the cross entropy loss with respect to the $k$-th parameter of the last layer $\theta_k^{(L)}$ is:
+\begin{equation*}
+  \resizebox{\columnwidth}{!}{
+  $ \nabla_{\theta^{(L)}_k} J(\theta) = - \sum_{i=1}^{m}{ \left[ z^{(i)} \left( 1\{ y^{(i)} = k\}  - P(y^{(i)} = k | x^{(i)}; \theta) \right) \right]  } $
+  }
+\end{equation*}
+where the superscription $(L)$ of $\theta$ denotes the layer number of the last layer, and $z^{(i)}$ is the output of the last layer for the $i$-th example.
+
+Weights of the last layer in the $t+1$-th iteration is updated by:
+$$\theta_{t+1}^{(L)} = \theta_t^{(L)} - \alpha \nabla_{(\theta^{(L)})} J(\theta)$$
+where $\alpha$ is the learning rate determining how quickly the weights are updated.
+
+Gradients in the layers $l<L$ are calculated via a so-called back propagation of errors.
+The error of $l$-th layer is propagated the layer after $l+1$:
+$$\delta^{(l)} = \left((\theta^{(l)})^T \delta^{(l+1)}\right) \bullet f'(z^{(l)})$$
+where $f'(z^{(l)})$ is the derivative of the activation function.
+Gradients with respect to weights for the $l$-th layer is:
+$$
+\nabla_{\theta^{(l)}} J(\theta) = \delta^{(l+1)} (a^{(l)})^T
+$$
+
+The weights update for the $l$-th layer in the $t+1$ is computed similarly as the last layer by:
+$$\theta_{t+1}^{(l)} = \theta_t^{(l)} - \alpha \nabla_{(\theta^{(l)})} J(\theta)$$
