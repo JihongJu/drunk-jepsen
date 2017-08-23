@@ -216,11 +216,11 @@ P+N         & CrossEntropyU.   & 0.87 & 0.88 & 0.82 & 0.85 \\
 \caption{
 Overall accuracy, the average of precision, recall, and f1-score over classes on a test set of the CIFAR dataset with true labels.
 CIFAR10 images were used as positive images (P), and CIFAR100 images were used as negative images (N).
-The top columns summarize the upper baseline, middle baseline, and lower baseline for learning with positive and unlabeled examples.
+The \textbf{top three rows} summarize the upper baseline, middle baseline, and lower baseline for learning with positive and unlabeled examples.
 \textbf{Upper baseline} Model trained with the complete positive and negative labels;
 \textbf{Middle baseline} Model trained with 50\% of the positive and negative examples;
 \textbf{Lower baseline} Model trained with 50\% labeled positive examples and unlabeled examples;
-The proposed losses should achieve as high recall as possible while keeping the precision high as well.
+The proposed losses in the \textbf{bottom three rows} should achieve as high recall as possible while keeping the precision high as well.
 The modified hard bootstrap loss achieved the highest average f1-score with 50\% positive examples unlabeled.
 }
 \label{tab:cifar}

@@ -13,8 +13,7 @@
    \includegraphics[width=1.05\linewidth]{img/figure1}
 \end{center}
    \caption{
-   Pre-train segmentation models pre-trained in the presence of mislabeled segmentations.
-   The result convolutional neural network (CNN) for feature extraction is transferred and fine-tuned with a small set of clean segmentation in the domain of interest.
+   Transferring feature extractor($g$) from convolutional neural networks for semantic segmentation pre-trained by potentially incomplete, mislabeled segmentations.
    }
 \label{fig:figure1}
 \end{figure}
@@ -33,15 +32,14 @@
 % \end{itemize}
 % }
 
-Most state-or-the-art convolution neural nets \cite{long2015fully,chen2016deeplab,he2017mask} benefit from transferring convolutional neural network (CNN) models trained on a subset of images from ImageNet.
-These ImageNet models \cite{krizhevsky2012imagenet,simonyan2014very,szegedy2015going,he2016deep} were originally trained for an object recognition task, the ILSVRC \cite{russakovsky2015imagenet} challenge, using around 1.2 million labeled images.
-In contrast to object recognition tasks, it is tougher to collect a  semantic segmentation dataset on that large-scale.
-The largest segmentation datasets, Microsoft COCO2014 \cite{lin2014microsoft}, contains 123,287 images of 80 object categories, smaller by a factor of 10 than the ILSRVC dataset.
+The often limited availability of training samples motivates most state-or-the-art deep learning based segmentation models \cite{long2015fully,chen2016deeplab,he2017mask} to transfer convolutional neural network (CNN) models \cite{krizhevsky2012imagenet,simonyan2014very,szegedy2015going,he2016deep} trained on a subset of images from ImageNet.
+% These ImageNet models \cite{krizhevsky2012imagenet,simonyan2014very,szegedy2015going,he2016deep} were originally trained for an object recognition task, the ILSVRC \cite{russakovsky2015imagenet} challenge, using around 1.2 million labeled images.
+Compared to object recognition tasks, it is tougher to collect a dataset for semantic segmentation on a large scale.
+The difficulty of obtaining manual segmentations is natural because it costs much more efforts for people to segment than to classify an image.
+One of the largest segmentation datasets, Microsoft COCO2014 \cite{lin2014microsoft}, contains 123,287 images of 80 object categories, smaller in the number of images than the ILSRVC dataset by a factor of 10 approximately.
 % the Pascal VOC2012 challenge \cite{everingham2015pascal} provides a segmentation dataset with only 9,993 segmented images for 20 object categories;
 % The PASCAL-context Dataset \cite{mottaghi2014role} enriches the PASCAL VOC dataset by segmenting all 11,530 training images for 540 categories;
-The difficulty of obtaining segmentations is natural because it costs much more efforts for people to segment than to classify an image.
-Therefore, Semantic segmentation datasets normally have a much smaller scale than object recognition dataset.
-A commonly used method of improving segmentation performance in the limitation of lacking training samples is to transfer weights from the pre-trained ImageNet models as performed in  \cite{long2015fully,chen2016deeplab}.
+Transferring weights from the pre-trained ImageNet models can provide a segmentation performance boost in the limitation of lacking training samples, as reported in \cite{long2015fully} and adopted by \cite{chen2016deeplab,he2017mask}.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%% TEXT Why pre-training with segmentation?
@@ -55,17 +53,17 @@ A commonly used method of improving segmentation performance in the limitation o
 % \end{itemize}
 % }
 
-However, it can be challenging to adapt the ImageNet models for semantic segmentation.
-Firstly, ImageNet models cannot be employed directly to RGB-D images or 3D images like CT scans and MRI scans in 3D.
-Secondly, segmentation models do not necessarily follow the architecture design of classification models.
-For example, the object recognition models pursue features invariance to better capture semantics regardless the variations in objects.
-The result translation invariant and resolution-reduced features could reduce the localization accuracy which is not essential for object recognition but is critical for object segmentation. \cite{zheng2015conditional,chen2016deeplab}
-The challenges in adapting ImageNet models can result in CNN architectures different for segmentation models \cite{zheng2015conditional}.
-Lastly, ImageNet models were trained with natural images at relatively low resolution.
+However, it can be challenging to employ directly the ImageNet CNN models for semantic segmentation.
+Firstly, the first layer of ImageNet models is not compatible with RGB-D images and 3D images like CT scans and MRI scans in 3D.
+\cite{zheng2015conditional}.
+Secondly, ImageNet models were originally trained with natural images at relatively low resolution.
 In some domains of interest, images can be non-natural, such as aerial images, images from bird's eye view, and medical images;
 In some other domains, images may have different lighting conditions or have a high resolution than the ImageNet ones.
-It can be beneficial to further train ImageNet models using a dataset in a similar domain as the one of interest.
-In any of these three cases, pre-training a segmentation model with another segmentation dataset can be valuable to achieve good segmentation performance with a small training set available.
+Lastly, segmentation models do not necessarily follow the architecture design of classification models.
+For example, the object recognition models pursue features invariance to better capture semantics regardless the variations in objects.
+The result translation invariant and resolution-reduced features could reduce the localization accuracy which is not essential for object recognition but is critical for object segmentation. \cite{zheng2015conditional,chen2016deeplab}
+This difference in requirements of features can result in different neural network architectures for segmentation models
+Therefore, re-training ImageNet models, or even pre-train models from scratch in particular cases, using a segmentation dataset similar to but different from the one of interest can be more beneficial than employing ImageNet models directly.
 
 % \footnote{The KITTI Vision Benchmark Suite http://www.cvlibs.net/datasets/kitti/}
 
@@ -89,12 +87,12 @@ In any of these three cases, pre-training a segmentation model with another segm
 % \end{itemize}
 % }
 
-The segmentation datasets for pre-training may, however, contain label noises.
-The use of the crowd-sourcing platform like Mechanical Turk is common nowadays to collect datasets on a large-scale.
+The segmentation datasets for pre-training may contain label noises.
+The use of the crowd-sourcing platform like Mechanical Turk is common nowadays to collect annotations on a large-scale.
 It is natural for crowd-sourcing workers to make mistakes as a result of lack of expertise, inherent ambiguity of tasks or unconscious bias.
 Enormous efforts are required, according to  \cite{lin2014microsoft,everingham2015pascal}, to ensure the correctness of segmentations.
 %A slight decrease in the percentage of segmentation errors, such as from 1\% to 0\%, may require extraordinary extra efforts due to the difficulty of identifying errors.
-If not requiring ``gold standard'' segmentations, the efforts saved for correctness can be made to segment more images for a larger dataset.
+If not requiring ``gold standard'' segmentations for training, the efforts saved for correctness can be made to segment more images for a larger dataset.
 %In some domains, for example, medical imaging, the ``gold standard'' itself can be ambiguous and cause disagreements among experts.
 % \footnote{TODO M: But that's OK or not?  This is what probabilities solve...}
 Besides,  some labels other than the manual ones may be freely available for particular tasks.
@@ -102,10 +100,6 @@ But these labels often contain structural noises depending on the way they were 
 For example, digital maps, like OpenStreetMap, can be used to segment aerial images.
 Segmentations constructed from the maps could suffer from incompleteness as well as registration problems. \cite{mnih2012learning}
 % Besides, Pl@ntNet\footnote{https://identify.plantnet-project.org/}, a crowdsourcing platform, provide millions of images of plants and corresponding labels which may or may not be correct.
-
-Ideally, the use of these noisy datasets for pre-training should not affect transferring the learned model to another dataset.
-But if negative influences introduced by label noises are remarkable, methods of compensating the noises become necessary.
-
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%% TEXT What types of noises exist and motivate them?
@@ -121,28 +115,32 @@ But if negative influences introduced by label noises are remarkable, methods of
 
 % \paragraph{Segmentation noises}
 Noises of different kinds can exist in segmentation labels. %inexhaustive segmentation, misclassification of segments, false segmentation, over-segmenting, under-segmenting, etc.
-In particular, we consider mislabeling for the whole segment, assuming the outline of objects is always correct.
+In particular, we consider mislabeling errors for the whole segment, assuming the outline of objects is always correct.
 We categorized object mislabelling into three categories: inexhaustive segmentation, misclassification, and false segmentation.
+\textbf{Misclassification} of objects from one category to another exist occasionally even for well-annotated datasets.
+For example, the Microsoft COCO dataset \cite{lin2014microsoft} contains some misclassified bears and teddy bears even though annotators were asked to segment only one category at a time;
 \textbf{Inexhaustive segmentation} means that there exist objects left unsegmented.
 A typical scenario where incomplete segmentation emerges is to segment images containing massive amounts of objects of the same kind, e.g., a flock of sheep or a pile of products;
-\textbf{Misclassification} of objects from one category to another can exist occasionally.
-For example, the Microsoft COCO dataset \cite{lin2014microsoft} contains some misclassified bears and teddy bears even though annotators were asked to segment only one category at a time;
 \textbf{False segmentation} denotes that semantically meaningful objects from an undefined category are wrongly segmented, as objects of interest.
 It may occur due to the unclear definition of categories, visual similarities between objects, etc.
-We synthesized these three types of noises with a well-annotated dataset separately and studied their influences to the trained weights transferability.
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%% TEXT Why binarizing classes?
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
+We simulated these three types of noises with a well-annotated dataset separately and studied their influences to the trained weights transferability in a transfer learning setup demonstrated in Figure \ref{fig:figure1}.
+Ideally, noises in the pre-training datasets should not significantly affect transferring the learned model to another dataset.
+But if negative influences introduced by label noises are remarkable, methods of compensating the noises become necessary.
+
 % \noindent \textit{Why binarizing classes?}
 
-Supposing misclassification had a negative influence on feature transferability, as we will show in Section \ref{subsec:robustness}, simply segmenting the foreground objects against the background can be a straightforward way to correct misclassified objects.
+Supposing misclassification had a negative influence on feature transferability, as we will show in Section \ref{subsec:robustness}, simply segmenting the foreground objects against the background can produce correct labels for misclassified objects.
 It can be regarded as converting precise but potentially inaccurate labels to accurate but imprecise labels.
-Jain et al. \cite{jain2017pixel} proved the possibility of training a fully convolutional network to generate foreground segmentations.
-Surprisingly, the model trained on over 1 million images generalizes well to object categories not included in the training.
 Training transferable features may not require as precise supervision as training classifiers because transferability of features are correlated to feature generality, i.e., if they are independent of particular categories \cite{yosinski2014transferable}.
+Besides, Jain et al. \cite{jain2017pixel} proved the possibility of training a fully convolutional network to generate foreground segmentations.
+Surprisingly, the model trained on over 1 million images generalizes well to object categories not included in the training.
+Therefore, we argue that it should be possible to learn transferable representations by segmenting foreground and background in images.
 
 % Deprecated examples
 % There are a few examples proved the possibility of training binary object detection/segmentation:
@@ -160,7 +158,7 @@ The main characteristic of the U set is no easy way to generate reliable negativ
 The traditional semi-supervised learning techniques are consequently not applicable as a result of the absence of negative training samples.
 The set of background pixels containing unsegmented objects can fulfill this property of U set.
 Learning to segment objects in the presence of inexhaustive segmentation can be therefore considered as a learning problem with only positive examples and unlabeled examples.
-In this work, we treated the unlabeled set as a set of examples with noisy negative labels, following a branch of previous studies for PU learning as discussed in Section \ref{sec:related}.
+In this work, we treat the unlabeled set as a set of examples with noisy negative labels and modify the loss for the negative class accordingly, following a branch of previous studies for PU learning as discussed in Section \ref{sec:related}.
 % We then proposed a sigmoidal loss for negative samples based on the idea of not over-punishing confident, positive predictions when learning in the presence of mislabeled positive samples.
 
 % \noindent
@@ -177,9 +175,9 @@ In this work, we treated the unlabeled set as a set of examples with noisy negat
 
 The main topics discussed in this thesis are:
 \begin{enumerate}
-  \item How labels noises influence feature transferability of CNN models for semantic segmentation.
-  \item If binarizing classes for pre-training could alleviate the negative effects of misclassified objects in segmentations if the negative effect exists.
-  \item If modifications to the cross-entropy loss could achieve better performance in the presence of inexhaustive segmentations.
+  \item How mislabeling of segmentations influence feature transferability of CNN models for semantic segmentation?
+  \item Compared to the inaccuracy of pre-training labels, how impreciseness of labels affect feature transferability?
+  \item How to modify the loss function to achieve better pre-training and fine-tuning performances in the presence of incomplete segmentations?
 \end{enumerate}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -192,6 +190,6 @@ In the next section, we summarize related works.
 In Section \ref{sec:robustness} we formulate the problem of transferring segmentation models pre-trained with noisy segmentations, and how to synthesize the three types segmentation noises.
 We introduce a sigmoidal loss for the negative class to compensate noisy negative labels in Section \ref{sec:pulearning}.
 Experiments in Section \ref{subsec:robustness} was designed to study the influences of inexhaustive segmentations, misclassification and false segmentation separately.
-The proposed sigmoidal loss, together with the class-weighted loss and a modified hard bootstrapping loss, was evaluated in synthesized PU learning setups in Section \ref{subsec:pulearning}.
+The proposed sigmoidal loss, together with the class-weighted loss and a modified hard bootstrapping loss, is evaluated in simulated PU learning setups in Section \ref{subsec:pulearning}.
 Discussions are presented in Section \ref{sec:discussion} and conclusions are summarized in Section \ref{sec:conclusion}.
 %Features learned by predicting the pixel objectness with inexaustive annotations were then validated with experiments described in Section \ref{sec:discussion}.
