@@ -80,7 +80,7 @@ We designed our experiments using stochastically synthesized noisy segmentations
 
 \paragraph{Positive and Unlabeled Learning}
 
-Traditional positive and unlabeled learning methods originally proposed for text classification \cite{liu2003building} do not extend well to deep learning models.
+Traditional positive and unlabeled learning methods originally proposed for text classification \cite{liu2003building,li2005learning} do not extend well to deep learning models.
 These traditional methods often follow a two-step strategy: first identifying a set of reliable negative samples (RN set) from U set and then iteratively build a set of classifiers with RN set and P set, while updating the RN set with a selected classifier.
 It would take tremendously longer time to train a couple of deep learning models iteratively than to train a sequence of na\"ive Bayesian (NB) models or supported vector machines (SVMs).
 Therefore, it would be unrealistic to train CNN models in this manner.
