@@ -155,7 +155,7 @@ If we consider inexhaustive segmentation only, the problem becomes similar to a 
 In the positive and unlabeled learning setup, the training dataset has two sets of examples: a \textit{positive (P) set}, containing only positive examples, and an \textit{unlabeled (U) set}, containing a mix of positive or negative examples.
 The P set in an incompletely segmented dataset is comprised of segmented pixels while the rest of the pixels construct the U set.
 The main characteristic of the U set is no easy way to generate reliable negative labels out of it.
-The traditional semi-supervised learning techniques are consequently not applicable as a result of the absence of negative training samples.
+Semi-supervised learning techniques are consequently not applicable as a result of the absence of negative training samples.
 The set of background pixels containing unsegmented objects can fulfill this property of U set.
 Learning to segment objects in the presence of inexhaustive segmentation can be therefore considered as a learning problem with only positive examples and unlabeled examples.
 In this work, we treat the unlabeled set as a set of examples with noisy negative labels and modify the loss for the negative class accordingly, following a branch of previous studies for PU learning as discussed in Section \ref{sec:related}.
@@ -175,8 +175,8 @@ In this work, we treat the unlabeled set as a set of examples with noisy negativ
 
 The main topics discussed in this thesis are:
 \begin{enumerate}
-  \item How mislabeling of segmentations influence feature transferability of CNN models for semantic segmentation?
-  \item Compared to the inaccuracy of pre-training labels, how impreciseness of labels affect feature transferability?
+  \item How mislabeling of segmentations influences feature transferability of CNN models for semantic segmentation?
+  \item Compared to the inaccuracy of pre-training labels, how impreciseness of labels affects feature transferability?
   \item How to modify the loss function to achieve better pre-training and fine-tuning performances in the presence of incomplete segmentations?
 \end{enumerate}
 

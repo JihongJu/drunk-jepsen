@@ -37,6 +37,14 @@ This assumption made it possible to implement sigmoidal negative loss directly t
 However, there is normally a spatial dependence for noises in pixel labels which may help improve the spatial consistency of predictions.
 Therefore, future works may be possible to make use of the spatial dependence of pixel label noises.
 
+%%%%%%%% confidence
+% The problem of weighting negative examples is that it assumes the probability for a negative label being wrong is independent of the underlying distribution of inputs.
+% % However, perceptual similar examples are more likely to have the same label, and the negative label is probably wrong if they are assigned contrary labels, supposing the positive labels are always correct.
+% Given a nonrandom model, the confidence of a model prediction conveys information about the underlying inputs distribution.
+% A confident, positive prediction indicates the example is more likely to be positive than to be negative.
+% Therefore, we instead assumed that the probability of mislabeling for a negative label is correlated to the prediction confidence of a trained model.
+% In other words, we assumed the confident contrary prediction is more likely to be mislabeled than unconfident examples.
+
 % Upside:
 % \begin{itemize}
 %   \item treat easy/hard classifications differently

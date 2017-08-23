@@ -39,7 +39,7 @@ Apart from supervised pre-training, one can also perform unsupervised learning t
 % A few studies \cite{erhan2009difficulty,erhan2010does,bengio2012deep} highlighted the advantage of unsupervised pre-training compared to the random initialization, connecting unsupervised pre-training to a norm of regularization and a method that help disentangle the sample variations.
 Though a few studies \cite{erhan2009difficulty,erhan2010does,bengio2012deep} discussed the advantage of unsupervised pre-trained features compared to random weights initialization, the distance between the two has been shortened ever since the arises of modern initialization strategies, namely Xavier initialization \cite{glorot2010understanding} and its variants.
 We used random weights initialization as the lower baseline for pre-training with noisy labels.
-Features learned in the presence of label noises should at least outperform random weights because noisy information should be still better than no information.
+Features learned with supervision in the presence of label noises should at least outperform random weights because noisy information should be still better than no information.
 % A proper method to learn features in the presence of label noise should at least outperform unsupervised pre-training because noisy information is still better than no information.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -80,22 +80,24 @@ We designed our experiments using stochastically synthesized noisy segmentations
 
 \paragraph{Positive and Unlabeled Learning}
 
-Traditional positive and unlabeled learning methods proposed for text classification \cite{liu2003building} do not extend well to deep learning models.
+Traditional positive and unlabeled learning methods originally proposed for text classification \cite{liu2003building} do not extend well to deep learning models.
 These traditional methods often follow a two-step strategy: first identifying a set of reliable negative samples (RN set) from U set and then iteratively build a set of classifiers with RN set and P set, while updating the RN set with a selected classifier.
 It would take tremendously longer time to train a couple of deep learning models iteratively than to train a sequence of na\"ive Bayesian (NB) models or supported vector machines (SVMs).
 Therefore, it would be unrealistic to train CNN models in this manner.
 
-Alternatively, one can treat all unlabeled examples as negative and simply reweigh positive and negative examples \cite{lee2003learning}.
+Alternatively, one can treat all unlabeled examples as negative and simply reweigh positive and negative examples. \cite{lee2003learning}
 Under the assumption of randomly labeled positive examples, Elkan \& Noto \cite{elkan2008learning} demonstrated that a classifier trained on positive and unlabeled examples predicts probabilities that differ by only a constant factor from the true conditional probabilities of being positive.
-These two works considered only binary classification whereas we showed that it is possible to train deep neural networks for multiple classes with only positive and unlabeled examples.
+These two works considered only binary classification but it is possible to extend the weighted logistic loss and train deep neural networks for multiple classes with only positive and unlabeled examples.
 
-The problem of weighting negative examples is that it assumes the probability for a negative label being wrong is independent of the underlying distribution of inputs.
-% However, perceptual similar examples are more likely to have the same label, and the negative label is probably wrong if they are assigned contrary labels, supposing the positive labels are always correct.
-Given a nonrandom model, the confidence of a model prediction conveys information about the underlying inputs distribution.
-A confident, positive prediction indicates the example is more likely to be positive than to be negative.
-Therefore, we instead assumed that the probability of mislabeling for a negative label is correlated to the prediction confidence of a trained model.
-In other words, we assumed the confident contrary prediction is more likely to be mislabeled than unconfident examples.
+The problem of weighting negative examples is the superfluous penalty for confident, positive predictions, i.e., samples far from the decision boundary have a large influence on the final solution. \cite{tax2016class}
+Du et al. \cite{du2015convex} illustrated that logistic loss and hinge loss perform worse than ramp loss in the PU classification setting due to their superfluous penalty for confident predictions.
+se different losses for positive and negative data.
+The non-convex Ramp loss \cite{du2014analysis} and a convex double hinge-loss \cite{du2015convex} were proposed separately to learn from positive and unlabeled data by Du et al.
+But neither of the two losses are continuous, which is problematic for gradient based optimization.
+
+To avoid over-punish confident predictions unnecessarily, Tax \& Wang \cite{tax2016class} uses class-dependent, non-convex loss to train classifiers to retrieve small set of relevant objects from objects of a large, dominant class;
 Lin et al. \cite{lin2017focal} proposed a so-called Focal Loss to down-weight confident predictions and thus focus training on hard negatives for imbalanced learning.
-The sigmoidal negative loss we proposed in Section \ref{sec:pulearning} follows a similar design as  \cite{lin2017focal} to not over-punish confident positive predictions for samples with negative labels.
+We proposed in Section \ref{sec:pulearning} to use a sigmoidal loss for the negative class to alleviate superfluous punishment for confident, positive predictions.
 Additionally, Reed \& Lee \cite{reed2014training} proposed a bootstrapping loss to emphasize \textit{perceptual consistency} in training when incomplete and noisy labels exist.
+It has a similar effect of reducing loss for confident predictions.
 We modified the hard bootstrapping loss to interpret the prior knowledge that positive labels are reliable.
