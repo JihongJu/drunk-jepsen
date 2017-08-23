@@ -4,25 +4,24 @@
 %%%%%%%%%%%%%%%% Deep Learning with label noise
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-\section{Deep Learning with Label Noises}
+\section{Label noises}
 
 %%%%%%%% To clarify inputs independence and spatial independence of noises
 
-\subsection{Label noises}
-Label noises can be categories into three statistical models, noisy complete at random (NCAR), noisy at random (NAR) and noisy not at random (NNAR), based on whether label noises depends on classes and distribution of inputs. (Figure \ref{fig:noises})
+Label noises can be categoried into three statistical models, noisy complete at random (NCAR), noisy at random (NAR) and noisy not at random (NNAR), based on whether label noises depends on classes and distribution of inputs. (Figure \ref{fig:noises})
 For noisy completely at random models, the occurrence of an error $E$ is independent of neither the true class $Y$ nor the input $X$.
-Noisy at random models are similar to NCAR models except that the label noise is asymmetric, meaning it depends on classes.
-The NAR model can be interpreted in terms of a transition (or confusion) matrix:
+The noisy at random model is similar to the noisy completely at random model except that the label noise is asymmetric, meaning it depends on classes.
+The noisy at random model model can be interpreted in terms of a transition (or confusion) matrix for $K$ classes:
 \[
 \gamma =
 \begin{bmatrix}
-    P(Y^{\ast}=1\vert Y=1)   & \dots  & P(Y^{\ast}=n_y\vert Y=1) \\
+    P(Y^{\ast}=1\vert Y=1)   & \dots  & P(Y^{\ast}=K\vert Y=1) \\
     \vdots                   & \ddots & \vdots \\
-    P(Y^{\ast}=1\vert Y=n_y) & \dots  & P(Y^{\ast}=n_y\vert Y=n_y)
+    P(Y^{\ast}=1\vert Y=K) & \dots  & P(Y^{\ast}=K\vert Y=K)
 \end{bmatrix}
 \]
-where $Y^{\ast}$ is a random variable for observed label and $Y$ is another variable for true label.
-NNAR:
+where $Y^{\ast}$ is a random variable for observed label and $Y$ true label.
+The noisy not at random, on the other hand, represents that the label noise depends on both class and example.
 
 \begin{figure}[t]
 \begin{center}
@@ -32,6 +31,12 @@ NNAR:
    \caption{
    Graphical models for three types of label noises. \cite{frenay2014classification}
    The graphical models describe if the probability of the errorness and observed value of a label conditions on the true class and inputs.
+   $X$ is the random variable denotes the inputs;
+   $Y$ is stands for the variable for class;
+   $E$ is a binary variable determining errorness;
+   $Y^{\ast}$ represents a variable for the observed label;
    }
 \label{fig:noises}
 \end{figure}
+
+In this paper, we assumed mislabeling of segmentations is noisy at random. {TODO}

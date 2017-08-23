@@ -40,7 +40,7 @@ Neurons in the last three layers of LeNet are fully connected to the layer befor
 
 %%%%%%%% Feature Hierarchy
 Features produced by CNN models have a rich hierarchy varying from local to global, from simple to complex.
-The bottom layers in the convolutional layer stack have smaller receptive fields while the top layers have larger receptive fields.
+The bottom layers in the convolutional layer stack have smaller receptive fields and the top layers have larger receptive fields.
 A small receptive field means that the filter have access to information only in a local sub-region of the image while a large receptive field can convey more global information.
 
 The various pattern responses from local to global, from simple to complex for stacked convolutional layers is a reflect of emulating animals visual cortex.
@@ -79,22 +79,24 @@ It can be operated as classifying pixels into the corresponding pre-defined cate
 %%%%%%%% Difficulty in adapting CNN
 
 CNN models on object classification tasks can be adapted to perform semantic image segmentation tasks. \cite{long2015fully}
-One of the primary difficulties of applying CNN model to segmentation tasks is how to combine global information and local information to solve semantics and locations altogether.
+One of the primary challenges of applying CNN model to segmentation tasks is how to combine global information and local information to solve semantics and localization altogether.
 In contrast to object classification tasks, which normally only need global information to resolve semantics, segmentation tasks also require local information to resolve locations.
 
 %%%%%%%% An example segmentation framework: FCN
 
-Long et al. \cite{long2015fully} proposed a so-called skip architecture in Fully convovolutional networks (FCN) to aggregate information from the local low-level features in the hierarchy with global information from the high-level features.
-As we discussed in the previous session, convolutional layers can extract hierarchical features, which from low-level to high-level encode information from local to global.
+Long et al. \cite{long2015fully} proposed a so-called skip architecture in the Fully convovolutional networks (FCN) to aggregate information from the local low-level features in the hierarchy with global information from the high-level features.
+As we discussed in the previous session, convolutional layers can extract hierarchical features, varying from low-level to high-level encode information from local to global.
 The low-level features are fine, presenting appearances and the high-level features are coarse, revealing semantics.
 By combining them together, it becomes possible to create accurate and detailed segmentation.
-% in an end-to-end, pixel-by-pixel fully convolutional neural networks for semantic segmentation.%%%%%%%% FIGURE LeNet
+% in an end-to-end, pixel-by-pixel fully convolutional neural networks for semantic segmentation.
 
+%%%%%%%% FIGURE FCN
 
 \begin{figure}[t]
 \centering
    \includegraphics[width=\linewidth]{img/fcn}
-\caption{Fully convolutional network (FCN) by Long et al. (2015)  \cite{long2015fully}.}
+\caption{Fully convolutional network (FCN) by Long et al. (2015)  \cite{long2015fully}.
+Each }
 \label{fig:fcn}
 \end{figure}
 

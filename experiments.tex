@@ -161,13 +161,13 @@ The result decision boundary becomes more distant from the positive cluster, and
    \includegraphics[width=0.95\linewidth]{img/moons}
 \end{center}
    \caption{
-   Decision boundaries, optimal losses, and derivatives of a 2-layer multilayer perceptron trained with different losses on a 2D moons dataset with the unlabeled positive.
-   The \textbf{top row} demonstrates the per-class normalized training losses with \textbf{markers sizes} and the \textbf{bottom row} displays the per-class normalized loss derivatives w.r.t the output with marker sizes.
+   Decision boundaries of a 2-layer multilayer perceptron trained with different losses on a 2D moons dataset with the unlabeled positive.
   %%  The \textbf{leftmost} figures have complete positive labels, meaning the positive and negative labels are all correct, whereas, in \textbf{the other figures} only half of the positives were correctly labeled and the rest were mixed with the negative samples.
    A \textbf{red circle} indicates an example labeled as positive and a \textbf{blue square} indicates the example has a negative label.
    The \textbf{background colors} represent the probability for the area to be positive given by the classifier trained with the given samples and labels: \textbf{red} for high probability areas, \textbf{blue} for low probability areas and \textbf{white} for the class transition areas, i.e.decision boundaries.
+   The \textbf{markers sizes} demonstrates the per-class normalized training losses.
    Compared to the normal logistic loss and weighted logistic loss, the decision boundary optimized with sigmoidal negative loss is more distant from the positive cluster.
-   The sigmoidal negative loss has saturated losses and low derivatives for predictions farther from the decision boundary.
+   (Best view with color)
    }
 \label{fig:moons}
 \end{figure*}
@@ -178,6 +178,9 @@ The result decision boundary becomes more distant from the positive cluster, and
    \includegraphics[width=\linewidth]{img/moons_diff}
 \end{center}
    \caption{
+   Normalized derivatives w.r.t the output per class (marker size).
+   The sigmoidal loss has small derivatives for predictions farther from the decision boundary.
+   (Best view with color)
    }
 \label{fig:moonsdiff}
 \end{figure}
