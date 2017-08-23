@@ -22,32 +22,35 @@ The sigmoidal loss of negative examples reaches a plataeu and the derivative dro
 %%%%%%%% TEXT PU Learning setup
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-\paragraph{Learning with only positive and unlabeled examples}
+\paragraph{PU Learning}
 
 A training set of the positive and negative (PU) learning problems contains only a set of positive examples (P set) and a set of unlabeled samples (U set).
-Unlabeled examples can be either positive or negative, meaning there is no reliable negative examples available
+Unlabeled examples can be either positive or negative, meaning that there is no reliable negative examples available
 One straightforward way to generate negative examples for training is to treat all the unlabeled examples as a set of negative examples with noises.
-The problem then converts to learning with clean positive and noisy negative labels.
-The ultimate goal of solving such a problem is to learn a model that predicts as many positives as possible while keeping the false positive rate low, regardless the influence of false negative labels.
+The problem then converts to learning with clean positive labels and noisy negative labels.
+The goal of solving a PU learning problem is to learn a classifier that predicts as many positives as possible while keeping the false positive rate low, regardless the influence of false negative labels.
+In other words, the purpose is to achieve high recall without sacrificing too much precision.
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%% TEXT Weighted loss for negatives
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-\paragraph{Weighted negative loss}
+\paragraph{Weighted logistic loss for negative class}
 
-Clearly, it is possible to compensate the negative influence of false negative labels by simply weighing the positive and negative examples differently, namely, let the positive and negative examples have different rates of contribution to the total loss.
-Suppose a logistic loss is used, the corresponding weighted losses for positive and negative samples are:
-\begin{equation*}
-  \begin{aligned}
-    & l_{+} = - \log p(y_i=+1|x_i) \\
-    & l_{-} = - q \log p(y_i=-1 \vert x_i), 0<q<1
-  \end{aligned}
-\end{equation*}
-where $p(y_i \vert x_i)=\sigma(f(x))$ denotes the probablistic predictions for the i-th example given by model $f(\cdot)$, with the sigmoid function $\sigma(\cdot)$ as the activation function.
-This loss is called \textbf{weighted negative loss} in this paper.
-Empirically, the choice of $q$ can be made based on the highest precision and recall achieved on a validation set.
+The mislabeled negative samples bias the classifier to have low recall.
+It is possible to balance precision and recall by simply weighing the positive and negative examples differently, namely, let the positive and negative examples have different rates of contribution to the total loss.
+Suppose a logistic loss is used, the corresponding weighted loss for a input-output pair $(x, y)$ for a classifier determined by parameters $\theta$ is:
+\[
+  l(x, y; \theta) =
+    \begin{cases}
+      - \alpha \log P(y=+1 \vert x; \theta), & y = +1 \\
+      - \beta \log P(y=-1 \vert x; \theta), & y = -1
+    \end{cases}
+\]
+where $\alpha$ and $\beta$ are weights for positive and negative class respectively, and $P(y\vert x; \theta)=\sigma(f(x; \theta))$ is the probablistic predictions by model $f(\cdot)$, activated by the sigmoid function $\sigma(\cdot)$.
+This loss is referred to as the \textbf{weighted loss} in the rest of paper.
+Empirically, the choice of $p$, $q$ can be made based on the highest precision and recall achieved on a validation set, or alternatively based on a class priors estimation\cite{du2014class}.
 % Alternatively, one can also roughly assign $q=p(y=-1 \vert \tilde{y}=-1)$.
 % This turns out to be part of the backward corrected loss proposed in  \cite{patrini2016making}:
 % \begin{equation*}
@@ -63,38 +66,41 @@ Empirically, the choice of $q$ can be made based on the highest precision and re
 
 
 %%%%%%%% TEXT Sigmoidal Negative loss
-\paragraph{Sigmoidal Negative Loss}
+\paragraph{Sigmoidal Loss for negative class}
 
-We used a class-dependent loss to down-weight the loss contribution of very positive predictions negative labels and still making full use of the clean positive labels.
-The loss of positive examples is still a normal logistic loss and the loss of negative examples is replaced with a sigmoidal loss  \cite{tax2016class}:
-\begin{equation*}
-  \begin{aligned}
-    & l_{+} = - \log p(y_i=+1 \vert x_i) \\
-    & l_{-} = 1 - p(y_i=-1|x_i)
-  \end{aligned}
-\end{equation*}
-where $p$ again denotes the sigmoid-activated model output.
-We called this class-dependent loss \textbf{sigmoidal negative loss} in a sense it uses a sigmoidal function as the loss of negative samples.
+As motivated in Section \ref{sec:related}, we used a class-dependent loss to down-weight the loss contribution of very positive predictions negative labels and still making full use of the clean positive labels.
+The loss of positive examples is still a normal logistic loss and the loss of negative examples is replaced with a sigmoidal loss \cite{tax2016class}:
+\[
+  l(x, y; \theta) =
+    \begin{cases}
+      - \alpha \log P(y=+1 \vert x; \theta), & y = +1 \\
+      - \beta (1 - P(y=-1 \vert x; \theta)), & y = -1
+    \end{cases}
+\]
+We called this class-dependent loss \textbf{sigmoidal loss} in a sense it uses a sigmoidal function as the loss of negative samples.
 
-Figure \ref{fig:losses} shows the differences in losses and derivatives with respect to model output between weighted negative logistic loss and sigmoidal negative loss.
-The main feature of sigmoidal loss for negative examples is its relatively small changes in the region of confident positive, compared to the logistic negative loss and 0.5 weighted negative loss.
-As a consequence of this feature, the corresponding derivative decreases to zero as the model prediction increases in the positive direction.
+Figure \ref{fig:losses} shows the differences in losses and derivatives with respect to model output between weighted logistic loss and sigmoidal loss.
+The main feature of sigmoidal loss for negative examples is its small changes in the region of confident positive, compared to the weighted loss with $\alpha=1$ and $\beta=0.5$.
+As a consequence, the corresponding derivative decreases to zero as the model prediction increases in the positive direction.
 
 
 %%%%%%%% TEXT Bootstrapping
-\paragraph{Modification to the bootstrapping loss for PU learning}
-
-We have also modified the hard bootstrapping loss by Reed et al. \cite{reed2014training} to encourage confident positive predictions and compensate noisy negative labels:
+\paragraph{Hard bootstrapping loss for negative class}
+In addition to the proposed sigmoidal loss, we also modify the hard bootstrapping loss by Reed et al. \cite{reed2014training} for PU learning to set a benchmark.
+The modified class-dependent hard bootstrapping loss a pair of inputs and label $(x,y)$ is:
 % $$l_- = - \beta \log p(y=-1 \vert x) - (1-\beta) \sum_{j\in \{-1, +1\}} p(y=j \vert x) \log p(y=j \vert x)$$
 \begin{equation*}
-  % & l_{\tilde{y_i}=+1} = - \log p(y_i=+1 \vert x_i) \\
-  \resizebox{\columnwidth}{!}{
-    $l_{-} = - \beta \log p(y_i=-1 \vert x_i) - (1-\beta) \log p(y_i=\hat{y_i} \vert x_i)$
-    }
+\resizebox{\columnwidth}{!}{$
+  l(x, y; \theta) =
+    \begin{cases}
+      - \log P(y=+1 \vert x; \theta), & y = +1 \\
+      - \beta \log P(y=-1 \vert x;\theta) - (1-\beta) \log P(y=\hat{y} \vert x;\theta), & y = -1
+    \end{cases}
+$}
 \end{equation*}
-where $\hat{y} = \argmax_{j\in\{-1,+1\}}{p(y_i=j \vert x_i)}$ is the model prediction and $0<\beta<1$.
-The first term of the objective is a weighted negative loss and the second term can be considered as a regularization term to encourage consistent predictions.
-This loss is referred as \textbf{bootstrapping negative loss} for the rest of this paper.
+where $\hat{y} = \argmax_{j\in\{-1,+1\}}{P(y=j \vert x)}$ is the class with the highest predicted probability and $0<\beta<1$.
+The first term of the objective is a weighted logistic loss and the second term can be considered as a regularization term to encourage consistent predictions.
+This loss is referred as \textbf{bootstrapping loss} for the rest of this paper.
 % \begin{equation*}
 %   \begin{aligned}
 %     H = - \sum_{j\in\{-1,+1\}} p(y_i=j \vert x_i) \log p(y_i=j \vert x_i) \\
@@ -127,8 +133,8 @@ By assuming the probability of missing positive label for a pixel is independent
 We introduced the sigmoidal negative loss after training with a class-weighted cross entropy loss for a few epochs.
 The sigmoidal loss of negative examples saturates for very positive outputs, meaning that the confident, positive prediction has little contribution to the weights update.
 The wrong confident predictions can introduce problems at the beginning of the training procedure when the confident predictions are likely to be made at random.
-Otimization could reach the plateau where the model made all positive predictions with high confidence.
-Besides, we applied the modified hard bootstrapping loss after a few epochs trained with class-weighted loss because it also relies on a nonrandom model for sufficiently reliable prediction $\hat{y}$.
+Otimization would reach the plateau when the model made all positive predictions with high confidence.
+Besides, we also introduce the modified hard bootstrapping loss only after a few epochs trained with class-weighted loss because it also relies on a nonrandom model for sufficiently reliable prediction $\hat{y}$.
 
 
 %%%%%%%% TEXT Imbalanced
