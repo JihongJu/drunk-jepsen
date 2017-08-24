@@ -92,7 +92,8 @@ This observation indicates that false segmented meaningful objects may have a li
 \multirow{3}{*}{\begin{tabular}[c]{@{}l@{}}Inexaustive \\ Segmention\end{tabular}}    & CompleteLabels                                                      & $0.29\pm0.01$                                                                                           & $0.36\pm0.01$                                                                               & $0.29\pm0.01$                                                                                                  & $0.37\pm0.01$                                                                                           & $\mathbf{0.33\pm0.01}$                                                                                                 \\
                                                                                       & HalfUnsegmented                                                     & $0.26\pm0.01$                                                                                           & $0.30\pm0.03$                                                                               & $0.28\pm0.03$                                                                                                  & $0.32\pm0.02$                                                                                           & $0.29\pm0.02$                                                                                                          \\
                                                                                       & SigmoidalLoss                                                       & \multicolumn{1}{l}{$0.30\pm0.01$}                                                                       & \multicolumn{1}{l}{$0.37\pm0.01$}                                                           & \multicolumn{1}{l}{$0.31\pm0.02$}                                                                              & \multicolumn{1}{l|}{$0.34\pm0.02$}                                                                      & $\mathbf{0.33\pm0.02}$                                                                                                 \\ \hline
-\multirow{3}{*}{Misclassification}                                                    & AllRandomLabels                                                     & $0.29\pm0.01$                                                                                           & $0.33\pm0.03$                                                                               & $0.26\pm0.01$                                                                                                  & $0.28\pm0.01$                                                                                           & $0.29\pm0.01$                                                                                                          \\
+\multirow{4}{*}{Misclassification}                                                    & TrueLabels                                                      & $0.29\pm0.01$                                                                                           & $0.36\pm0.01$                                                                               & $0.29\pm0.01$                                                                                                  & $0.37\pm0.01$                                                                                           & $\mathbf{0.33\pm0.01}$                                                                                                 \\
+                                                                                      & AllRandomLabels                                                     & $0.29\pm0.01$                                                                                           & $0.33\pm0.03$                                                                               & $0.26\pm0.01$                                                                                                  & $0.28\pm0.01$                                                                                           & $0.29\pm0.01$                                                                                                          \\
                                                                                       & HalfRandomLabels                                                    & $0.27\pm0.01$                                                                                           & $0.33\pm0.02$                                                                               & $0.25\pm0.01$                                                                                                  & $0.29\pm0.01$                                                                                           & $0.29\pm0.01$                                                                                                          \\
                                                                                       & BinarizedLabels                                                     & $0.30\pm0.02$                                                                                           & $0.35\pm0.01$                                                                               & $0.29\pm0.02$                                                                                                  & $0.35\pm0.03$                                                                                           & $\mathbf{0.32\pm0.02}$                                                                                                 \\ \hline
 \multirow{2}{*}{\begin{tabular}[c]{@{}l@{}}False \\ Segmentaion\end{tabular}}         & NoFalseSegmented                                                    & $0.26\pm0.01$                                                                                           & $0.37\pm0.03$                                                                               & $0.27\pm0.01$                                                                                                  & $0.33\pm0.04$                                                                                           & $\mathbf{0.31\pm0.02}$                                                                                                 \\
@@ -101,14 +102,15 @@ This observation indicates that false segmented meaningful objects may have a li
 \end{tabular}
 }
 \caption{
-Segmentation performance for FCN-AlexNet models pre-trained with 15 categories from the PASCAL VOC2011 dataset and fine-tuned with the other 5 categories.
+Segmentation performance for fine-tuned FCN-AlexNet models pre-trained on 15 categories from the PASCAL VOC2011 dataset and fine-tuned on the other 5 categories.
 \textbf{ImageNetModel} represents the pre-trained ImageNet model (upper baseline);
 \textbf{RandomWeights} indicates that the randomly initialized weights (lower baseline);
-All the other extractors were pre-trained in the presence or absence of the corresponding label noises listed in the leftmost column.
-Half of the objects unsegmented result in pre-trained models not significantly better than random weight initialization.
-Introducing the sigmoidal negative loss in the pre-training phase was able to improve the fine-tuning performance to be comparable to pre-trained model with complete segmentations.
-Random labels interfered the fine-tuning performance of transferred models and binarizing classes as foreground and background for in the pre-training dataset help overcome the negative effects of random labels.
-Including false segmentations had little influence on transferred models.
+All the other extractors were pre-trained in the presence/absence of the corresponding label noises listed in the leftmost column.
+Half of the objects unsegmented (\textbf{HalfUnsegmented}) result in pre-trained models not better than random weight initialization.
+Introducing the sigmoidal negative loss in the pre-training phase was able to improve the fine-tuning performance to be comparable to pre-trained model with complete segmentation (\textbf{CompleteLabels}).
+Using random labels (\textbf{RamdomLabels}) decreased the fine-tuning performance of transferred models, compared to using true labels (\textbf{TrueLabels}).
+Binarizing pre-training classes as foreground and background help overcome the negative effects of random labels.
+Including false segmentations in training (\textbf{FalseSegmentedHalf}) had the same fine-tuning performance as not including false segmentations (\textbf{NoFalseSegmented}), better than random initialization.
 % \textit{SingleCategory} was pre-trained on only one annotated category, either ``dog'' or ``cat'' depending on the fold, and the other categories were left unannotated;
 % \textit{BinaryLabels} was pre-trained with binary labels that any objects of the fifteen categories were annotated as one single category, namely ``dog'' or ``cat'' depending on fold;
 % \textit{TrueLabels} was pre-trained with all objects segmented and assigned to 15 categories correctly;
@@ -125,11 +127,11 @@ Including false segmentations had little influence on transferred models.
 \centering
    \includegraphics[width=1.\linewidth]{img/num_classes.eps}
 \caption{
-Test performance for models fine-tuned from pre-trained weights using data of categorized pre-training classes.
-Isolated error bars denote random categorizations (RC) of the 15 classes, while error bars located on lines denote the meaningful categorization.
+Test performance for fine-tuned models, varying categorization of pre-training classes to pre-train.
 Zero categorize means no pre-trained weights used and the model was random initialized.
+Error bars located on lines denote the meaningful categorization, and isolated error bars denote random categorizations (RC) of the 15 classes.
 The displayed mean IU/mean accuracies and standard deviations were averaged over four folds listed in Table \ref{tab:robustness}.
-The trend shows that binarizing and categorizing classes had little negative effect on feature transferability.
+The line shows that binarizing and categorizing classes meaningfully had little negative effect on feature transferability.
 }
 \label{fig:categories}
 \end{figure}
@@ -201,13 +203,14 @@ Note that there is no category overlap between CIFAR10 dataset and CIFAR100 data
 %%%%%%%% TABLE CIFAR10 50%
 
 Table \ref{tab:cifar} summarizes the test precisions and recalls of using different losses to learn with true positive labels and noisy negative labels, compared to training with the normal cross-entropy loss.
-With 50\% of the positive example correctly labeled and the rest assigned negative labels, the normal cross-entropy loss led to an imbalanced model with high precision but low recall, and therefore with a low f1-score.
-By reweighing the negative loss by a factor of 0.5, we were able to balance precision and recall and improve the resulting f1-score significantly.
-Sigmoidal negative loss and hard bootstrapping loss were able to achieve even slightly better f1-scores than the weighted negative loss, though not as good as training with clean labels with the same number of positive examples.
-It is noteworthy that the weighted negative loss and hard bootstrapping loss achieved more balanced precision and recall than the sigmoidal negative loss.
-That is because the two former losses were weighted by classes frequency of observed labels, around 0.67 for the negative class and 2 for positive classes, whereas the sigmoidal negative loss was not.
-Reweighing the sigmoidal negative loss by observed label frequencies would trade too much precision for recall (0.74 and 0.83 respectively), resulting in a worse f1-score than not reweighing losses.
-The sigmoidal negative loss seems to be easier over-balancing with the same choice of class weights.
+With 50\% of the positive example correctly labeled and the rest assigned negative labels, the normal cross-entropy loss leads to an imbalanced model with high precision but low recall, and therefore with a low f1-score.
+By reweighing the negative loss by a factor of 0.5, the model is balanced for precision and recall and the result f1-score is improved significantly.
+The sigmoidal loss and hard bootstrapping loss achieves significantly better recall without sacrificing precision.
+The f1-scores achieved by the simoidal loss and hard bootstrapping loss are slightly better than the weighted negative loss, though not as good as training with clean labels with the same number of positive examples.
+% It is noteworthy that the weighted negative loss and hard bootstrapping loss achieved more balanced precision and recall than the sigmoidal negative loss.
+% That is because the two former losses were weighted by classes frequency of observed labels, around 0.67 for the negative class and 2 for positive classes, whereas the sigmoidal negative loss was not.
+% Reweighing the sigmoidal negative loss by observed label frequencies would trade too much precision for recall (0.74 and 0.83 respectively), resulting in a worse f1-score than not reweighing losses.
+% The sigmoidal negative loss seems to be easier over-balancing with the same choice of class weights.
 % Besides, the optimal precision and recall for sigmoidal negative loss seem more unstable which may relate to the nonconvex class-dependent loss.
 
 
@@ -222,19 +225,22 @@ P+N         & CrossEntropyU.   & 0.87 & 0.88 & 0.82 & 0.85 \\
 50\%P+U     & CrossEntropyU.   & 0.66 & 0.94 & 0.38 & 0.49 \\
 \hline
 50\%P+U     & WeightedNeg.     & 0.78 & 0.75 & 0.75 & 0.76 \\
-50\%P+U     & SigmoidalNeg.    & \textbf{0.81} & \textbf{0.85$\pm0.03$} & 0.72$\pm0.03$ & 0.77 \\
-50\%P+U     & BootstrapHard    & 0.80 & 0.76 & \textbf{0.81} & \textbf{0.78} \\
+50\%P+U     & SigmoidalNeg.    & 0.79 & 0.74 & \textbf{0.83} & \textbf{0.78} \\
+50\%P+U     & BootstrapHard    & \textbf{0.80} & 0.76 & 0.81 & \textbf{0.78} \\
 \end{tabular}
 }
 \caption{
-Overall accuracy, the average of precision, recall, and f1-score over classes on a test set of the CIFAR dataset with true labels.
+Overall accuracy, mean precision, recall, and f1-score over classes on a test set of the CIFAR dataset with true labels.
+For each class, precision, recall and f1-score were measured by one-vs-all.
 CIFAR10 images were used as positive images (P), and CIFAR100 images were used as negative images (N).
 The \textbf{top three rows} summarize the upper baseline, middle baseline, and lower baseline for learning with positive and unlabeled examples.
 \textbf{Upper baseline} Model trained with the complete positive and negative labels;
 \textbf{Middle baseline} Model trained with 50\% of the positive and negative examples;
 \textbf{Lower baseline} Model trained with 50\% labeled positive examples and unlabeled examples;
 The proposed losses in the \textbf{bottom three rows} should achieve as high recall as possible while keeping the precision high as well.
-The modified hard bootstrap loss achieved the highest average f1-score with 50\% positive examples unlabeled.
+Both the sigmoidal loss and hard bootstrpping loss for the negative class perform better than simply weighing the classes.
+The sigmoidal loss for negative class achieves the highest mean recall, whereas the modified hard bootstraping loss has a higher accuracy with 50\% positive examples unlabeled.
+Experiments were repeated three times and the standard deviation of results is approximately 0.01.
 }
 \label{tab:cifar}
 \end{table}
@@ -258,9 +264,10 @@ Otherwise, training with true positive and negative labels, and potentially with
 \centering
    \includegraphics[width=1.05\linewidth]{img/pu_vs_pn}
 \caption{
-Comparing the f1-score achieved for weighted negative loss, sigmoidal loss and hard bootstrapping loss with varying percentage of labeled positive images
-\textbf{P+N} represents training with the percentage of images with reliable positive and negative labels, and \textbf{P+U} stands for training with the positive (P) and unlabeled (U) sets.
-The test performances of the three different losses did not show significant difference with the labeled positive percentage varying from 0\% to 100\%.
+Comparing f1-score achieved by the weighted cross-entropy loss and the sigmoidal loss for negative class by varying percentage of labeled positive images.
+\textbf{P+N} represents training with a percentage of reliable positives and the same percentage of negative labels, while \textbf{P+U} stands for training with a percentage of positives and all other images as unlabeled.
+The simoidal loss performs better than the weighted cross-entropy loss when the unlabeled positive samples dorminate.
+Training in the P+N settings is superior than training in the P+U settings with any percetage of positives labeled.
 }
 \label{fig:pct_annotating}
 \end{figure}
@@ -308,14 +315,14 @@ Complete       & CrossEntropy       &  0.90 & 0.85 & 0.82 & 0.75 \\
 \end{tabular}
 }
 \caption{
-The best foreground/background segmentation performance achieved on the test set of PASCAL VOC2011 segmentation dataset with the normal cross entropy loss, weighted negative loss, and sigmoidal negative loss in the presence of inexhaustive segmentation.
-A class weight of 0.7:1.75 was used to balance the sample frequency differences of the two classes.
-The negative loss was further weighted by a factor of 0.5 for the weighted negative loss.
+Foreground/background segmentation performance achieved on the test set of PASCAL VOC2011 segmentation dataset with the normal cross entropy loss, weighted negative loss, and sigmoidal negative loss in the presence of inexhaustive segmentation.
+% A class weight of 0.7:1.75 was used to balance the sample frequency differences of the two classes.
+% The negative loss was further weighted by a factor of 0.5 for the weighted negative loss.
 Mean accuracy is equivalent to the average recall over the two classes.
 Mean IU is the average intersection over union ratio (IU) over two classes and f.w. IU is the frequency weighted average of IU over the two classes.
-Experiments were repeated twice and standard deviations were approximately 0.02.
-The sigmoidal negative loss achieved a better mean accuracy than weighted negative loss and a similar mean IU as the weighted negative loss.
-Both losses performed better than the normal cross entropy loss in the presence of 50\% objects unsegmented.
+The sigmoidal loss has a better mean accuracy than, and a similar mean IU as, the weighted loss.
+Both losses perform better than the normal cross entropy loss when 50\% objects unsegmented.
+Experiments were repeated twice and the standard deviation of results is approximately 0.02.
 }
 \label{tab:pusegment}
 \end{table}
@@ -343,7 +350,7 @@ The third column shows predictions given by model trained with complete training
   \subsubfloat{\includegraphics[width=0.19\columnwidth]{img/2007_002618_low_pred}}{CrossEnt.}
   \end{minipage}
 \caption{
-Selective predictions made by models trained with the sigmoidal negative loss and the cross-entropy loss.
+Selective predictions made by models trained with the sigmoidal loss for negative class and the cross-entropy loss.
 This figure presented two selective images for which the model trained with the cross entropy loss failed to segment objects, and the one with sigmoidal negative loss succeed.
 }
 \label{fig:pusegment}

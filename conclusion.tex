@@ -1,11 +1,12 @@
 \section{Conclusion}
 \label{sec:conclusion}
 
-We studied how to pre-train transferable convolutional weights in the presence of inexhaustive segmentation, misclassification and false segmentation.
-We discovered that including false segmentations of meaningful objects for pre-training had little impact on the fine-tuning performance of transferred weights
-By contrast, misclassification noises can have negative impacts on feature transferability, but binarizing classes to foreground and background can produce accurate but not necessarily precise labels to train better transferable features.
-We presented that for a small pre-training set, binarizing classes can recover the negative influence of misclassification of object segments on the fine-tuning performance of the transferred models.
-Inexhaustive segmentation can also negatively affect feature transferability of the pre-trained model.
-The decrease of the fine-tuning performance due to the unsegmented objects in the pre-training set can be compensated by modifying the loss function for deep learning models.
-We then proposed a class-dependent loss to not over-punish the confident positive predictions for examples with negative labels.
-The proposed sigmoidal negative loss was demonstrated to improve both the pre-training and fine-tuning performance of models pre-trained in the presence of inexhaustive segmentations.
+We investigate in this paper to pre-train transferable convolutional weights in the presence of inexhaustive segmentation, misclassification and false segmentation.
+With a simulated experiment, we discover that mislabeling of objects have negative influences on feature transferability.
+In particular, when misclassification of segments or incomplete segmentations is dominant in the pre-training data, fine-tuning the transferred weights is no better than random weights initialization.
+On the other hand, including false segmentations of meaningful objects for pre-training has little impact on the weights transferability for the pre-trained model.
+We present that binarizing classes as foreground and background can recover the decrease of feature transferability due to the misclassifications of object segments.
+Incomplete segmentation causes the trained model to make predictions with a low recall.
+To overcome the influence of incomplete segmentations, we propose a class-dependent loss to not over-punish the confident, positive predictions for samples assigned negative labels.
+Compared to simply reweighing classes differently, the proposed sigmoidal loss for the negative class achieves higher recall while not sacrificing precision by much.
+Applying the sigmoidal loss to segmentation model pre-training improves both the pre-training and the fine-tuning performance for a pre-training dataset with simulated incomplete segmentations.
