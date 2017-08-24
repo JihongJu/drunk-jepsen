@@ -33,7 +33,7 @@
 \twocolumn
 \pagenumbering{arabic}
 \newpage
-\title{Learn transferable image representations with noisy labels for semantic image segmentation}
+\title{Learn transferable representations in the presence of noisy labels for segmentation}
 
 \author{Jihong Ju\\
 Faculty of Electrical Engineering, Mathematics and Computer Science \\
@@ -58,22 +58,30 @@ Mekelweg 4, 2628 CD Delft\\
 %%%%%%%%% ABSTRACT
 \begin{abstract}
 
-% Noisy data exists
-% Transfer learning
-% Noises affect feature transferability
-% Binarizing classes
-% Modify loss for incomplete segmentation
+Transferring pre-trained representations is widely adopted by convolutional neural networks for semantic segmentation because the training data is often available only on a small scale.
+In domains where adapting convolutional networks for object recognition is difficult, we propose to pre-train segmentation models with datasets containing mislabeled segmentations and unsegmented objects.
+Our experiments demonstrate that both mislabeled segments and incomplete segmentation lower the fine-tuning performance of the learned representations.
+To get rid of the negative effect of objects label noises, we propose to assign objects of any categories a foreground label instead of the specific object categories.
+Learning representations by segmenting foreground and background turns out to improve the fine-tuning performance significantly when label noises are dominant in the pre-training data.
+In the existence of unsegmented objects, a sigmoid loss for the background class is proposed to balance precision and recall more effectively than simply weighting classes.
+The proposed class dependent, sigmoid loss achieves both better pre-training and better fine-tuning performances than the class weighted loss in the presence of incomplete segmentation.
 
-In some domains of interest, there exist noisy segmentations in addition to a limited amount of perfect segmentations.
-Noisy segmentations can, for instance, come from crowdsourcing platforms.
-The existence of noisy datasets motivates us to consider if it is possible to utilize noisy segmentations in training better image segmentation models with limited training samples.
-We focus on to pre-train robustly transferable feature representations with potentially incomplete, mislabeled segmentations.
-In this paper, we investigate the influence of these segmentation noises on model transferability in an experimental setup with synthesized noises.
-With observing a negative impact of objects mislabeling on feature transferability, we discover that combining object categories as one foreground class improves feature transferability for a small training set corrupted heavily with random labels.
-Besides, a sigmoidal loss for the background class is proposed to balance precision and recall when training with incomplete segmentations.
-% Compared to simply changing class weights, the proposed sigmoidal loss down-weights the losses for confident predictions and unconfident predictions differently.
-Experiments demonstrate that replacing the cross-entropy loss with a sigmoidal loss for the background class achieves better pre-training and fine-tuning performances in the presence of incomplete segmentation.
-
+% % Noisy data exists
+% % Transfer learning
+% % Noises affect feature transferability
+% % Binarizing classes
+% % Modify loss for incomplete segmentation
+%
+% In some domains of interest, there exist noisy segmentations in addition to a limited amount of perfect segmentations.
+% Noisy segmentations can, for instance, come from crowdsourcing platforms.
+% The existence of noisy datasets motivates us to consider if it is possible to utilize noisy segmentations in training better image segmentation models with limited training samples.
+% We focus on to pre-train robustly transferable feature representations with potentially incomplete, mislabeled segmentations.
+% In this paper, we investigate the influence of these segmentation noises on model transferability in an experimental setup with synthesized noises.
+% With observing a negative impact of objects mislabeling on feature transferability, we discover that combining object categories as one foreground class improves feature transferability for a small training set corrupted heavily with random labels.
+% Besides, a sigmoid loss for the background class is proposed to balance precision and recall when training with incomplete segmentations.
+% % Compared to simply changing class weights, the proposed sigmoid loss down-weights the losses for confident predictions and unconfident predictions differently.
+% Experiments demonstrate that replacing the cross-entropy loss with a sigmoid loss for the background class achieves better pre-training and fine-tuning performances in the presence of incomplete segmentation.
+%
 
 \end{abstract}
 
