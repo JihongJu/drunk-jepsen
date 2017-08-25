@@ -59,12 +59,12 @@ Mekelweg 4, 2628 CD Delft\\
 \begin{abstract}
 
 Transferring pre-trained representations is widely adopted by convolutional neural networks for semantic segmentation because the training data is often available only on a small scale.
-In domains where adapting convolutional networks for object recognition is difficult, we propose to pre-train segmentation models with datasets containing mislabeled segmentations and unsegmented objects.
+In domains where directly adapting classification networks is challenging, we propose to train representations with segmentation datasets containing mislabeled objects and unsegmented objects.
 Our experiments demonstrate that both mislabeled segments and incomplete segmentation lower the fine-tuning performance of the learned representations.
-To get rid of the negative effect of objects label noises, we propose to assign objects of any categories a foreground label instead of the specific object categories.
+To get rid of the negative effect of objects label noises, we propose to assign objects of any categories a foreground label instead of the exact object categories.
 Learning representations by segmenting foreground and background turns out to improve the fine-tuning performance significantly when label noises are dominant in the pre-training data.
-In the existence of unsegmented objects, a sigmoid loss for the background class is proposed to balance precision and recall more effectively than simply weighting classes.
-The proposed class dependent, sigmoid loss achieves both better pre-training and better fine-tuning performances than the class weighted loss in the presence of incomplete segmentation.
+In the existence of unsegmented objects, a sigmoid loss for the background class is proposed to achieve high recall while keeping the precision better than simply weighting the classes.
+The proposed class dependent, sigmoid loss achieves both better pre-training performance and better fine-tuning performance than the class-weighted loss in the presence of incomplete segmentation.
 
 % % Noisy data exists
 % % Transfer learning
@@ -111,7 +111,7 @@ The proposed class dependent, sigmoid loss achieves both better pre-training and
 \appendix
 \input{appendix_a}
 \input{appendix_b}
-\input{appendix_c}
+% \input{appendix_c}
 \input{appendix_de}
 
 \end{document}

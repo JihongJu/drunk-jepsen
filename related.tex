@@ -17,10 +17,10 @@
 %%%%%%%% What Transfer Learning for?
 
 Weights of convolutional neural networks were proved ``transferable'' not only to another dataset \cite{shin2016deep,yosinski2014transferable} but also to other applications \cite{girshick2014rich,long2015fully}.
-Transferring weights of pre-trained CNN models allows to improve the model performance without engaging in much efforts spent for data-labeling. \cite{pan2010survey}
-Yosinski et al. \cite{yosinski2014transferable} reported that initializing a network with transferred features from almost any number of layers can produce a boost to the fine-tuning performance with better generalization.
-In other words, transferability is possible between completely dissimilar tasks, for example, from natural objects to human-made objects.
-If transferring features from dissimilar datasets is possible,  it could also be possible to transfer weights from a noisy dataset.
+Transferring weights of pre-trained CNN models allows improving the model performance without engaging in much efforts spent for data-labeling. \cite{pan2010survey}
+Yosinski et al. \cite{yosinski2014transferable} discovered that the transferability of features is correlated with feature generality, i.e., how much the feature depends on a particular category.
+They also reported the weights from low-level layers of CNN models are well transferable to even completely dissimilar categories, for example, from natural objects to human-made objects.
+Because features are transferable regardless the exact categories they are trained with, we argue that binarizing or categorizing the pre-training classes can be expected to have no significant influence to the transferability of the result pre-trained models.
 
 % Given the superiority of transferring pre-trained weights and the availability of larger but noisier dataset, we learn transferable features with the noisy dataset and fine-tune the model with small dataset.
 
@@ -97,7 +97,7 @@ But neither of the two losses are continuous, which is problematic for gradient 
 
 To avoid over-punish confident predictions unnecessarily, Tax \& Wang \cite{tax2016class} uses class-dependent, non-convex loss to train classifiers to retrieve small set of relevant objects from objects of a large, dominant class;
 Lin et al. \cite{lin2017focal} proposed a so-called Focal Loss to down-weight confident predictions and thus focus training on hard negatives for imbalanced learning.
-We proposed in Section \ref{sec:pulearning} to use a sigmoidal loss\cite{tax2016class} for the negative class to alleviate superfluous punishment for confident, positive predictions.
+We proposed in Section \ref{sec:pulearning} to use a sigmoid loss\cite{tax2016class} for the negative class to alleviate superfluous punishment for confident, positive predictions.
 Additionally, Reed \& Lee \cite{reed2014training} proposed a bootstrapping loss to emphasize \textit{perceptual consistency} in training when incomplete and noisy labels exist.
 It has a similar effect of reducing losses of confident predictions.
 We modified the hard bootstrapping loss to interpret the prior knowledge that positive labels are reliable.

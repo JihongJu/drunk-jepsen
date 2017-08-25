@@ -95,8 +95,14 @@ By combining them together, it becomes possible to create accurate and detailed 
 \begin{figure}[t]
 \centering
    \includegraphics[width=\linewidth]{img/fcn}
-\caption{Fully convolutional network (FCN) by Long et al. (2015)  \cite{long2015fully}.
-Each }
+\caption{
+Fully convolutional network (FCN) by Long et al. (2015)  \cite{long2015fully}.
+Features of different resolutions are stacked in a feature pyramid on the left-hand side, with the image at the bottom of the pyramid.
+Predictions of different resolutions are piled in a prediction pyramid on the right-hand side.
+Each solid arrow denotes a few convolutional layers followed by a max polling layer; Dotted arrow represents convolutional layers with kernel size one by one; Dashed arrows are up-sampling layers or transposed convolutional layers.
+From top to bottom, each level of prediction is upsampled and merged with the prediction under it.
+The bottom prediction is output as the final prediction, which has the same size as the image.
+}
 \label{fig:fcn}
 \end{figure}
 
