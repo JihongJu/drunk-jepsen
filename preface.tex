@@ -1,18 +1,14 @@
-Preface
+% \chapter{Preface}
 
-\noindent \textit{The thesis report contains a preface that explains the topic of the thesis, the context (institute or company), the main findings in a few lines and the names of the members of the thesis committee. The preface may end with a few acknowledgements, and completed with name and date.}
 
-The main goal of this thesis is to study if, in a transfer learning scenario, the transferability of pre-trained weights is affected by the existence of segmentation noises for training examples and to explore methods compensating the negative effects if exist.
-Transfer learning is relevant when segmentations in a domain of interest are difficult to obtain on a large scale.
-The transferred model is often a classification model trained with a selective subset of images from ImageNet.
-Another choice of transferred model is a segmentation model trained with another segmentation dataset to pursue more transferable weights.
-However, various noises may occur in segmentations if not enormous effects were made to correct them.
-Being able to learn comparable transferable weights even in the presence of these noises can be beneficial to save efforts made to correct every single segmenting error and create more segmentations using the saved efforts.
-This can be helpful in collecting segmentation datasets on a large scale with less effort and money cost when using the crowd-sourcing power.
+Transferring pre-trained representations is widely adopted by convolutional neural networks for semantic segmentation because the training data is often available only on a small scale.
+In domains where directly adapting classification networks is challenging, we propose to train representations with segmentation datasets containing mislabeled objects and unsegmented objects.
+Our experiments demonstrate that both mislabeled segments and incomplete segmentation lower the fine-tuning performance of the learned representations.
+To get rid of the negative effect of objects label noises, we propose to assign objects of any categories a foreground label instead of the exact object categories.
+Learning representations by segmenting foreground and background turns out to improve the fine-tuning performance significantly when label noises are dominant in the pre-training data.
+In the existence of unsegmented objects, a sigmoid loss for the background class is proposed to achieve high recall while keeping the precision better than simply weighting the classes.
+The proposed class dependent, sigmoid loss achieves both better pre-training performance and better fine-tuning performance than the class-weighted loss in the presence of incomplete segmentation.
 
-We found that mis-segmentation noises had less influence on weights transferability compared to misclassification noises and inexhaustive segmentations.
-We proposed to categorize or binarize classes so that misclassified labels would not have as much as effects on weights transferability as training with the exact classes.
-A modification to cross entropy loss was proposed to alleviate the negative influence of unlabeled positive examples.
 
 Members of the thesis committee include Prof. dr. A.Hanjalic (Multimedia Computing Group, TU Delft) as the chair, dr. J.C. van Gemert (Vision Lab, TU Delft) who was the daily supervisor of the student, and Prof.dr. M. Loog  (Pattern Recognition Laboratory, TU Delft) and dr. Z. Szlávik (CAS Benelux, IBM).
 
@@ -20,6 +16,8 @@ I sincerely appreciate the magnificent supports provided by dr. J.C. van Gemert,
 I would also like to thank dr. D.M.J. Tax for his expert knowledge in the domain.
 
 \begin{flushright}
-Jihong Ju\\
-\today
+{\makeatletter\itshape
+    Jihong Ju \\
+    Delft, \today
+\makeatother}
 \end{flushright}

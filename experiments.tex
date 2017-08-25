@@ -258,7 +258,7 @@ R+N         & CrossEntropy   & 0.87 & 0.88 & 0.82 & 0.85 \\
 \caption{
 Comparing different losses for training a 2-layer multilayer perception to classify ten elevant classes and one non-relevant class with partially labeled relevant classes and unlabeled non-relevant classes.
 The trained classifiers were evaluated on a test set with true labels.
-For each of relevant classes, precision, recall and f1-score were measured by one-vs-all.
+For each of relevant classes, precision, recall and f1-score were measured with the one-vs-all strategy.
 % The \textbf{top three rows} summarize the upper baseline, middle baseline, and lower baseline for learning with positive and unlabeled examples.
 \textbf{R+N} denotes model trained with the complete relevant labels (R set) and non-relevant labels (N set);
 \textbf{50\%(R+N)} represents model trained with the half of the relevant labels and non-relevant labels respectively;

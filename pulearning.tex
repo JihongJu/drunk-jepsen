@@ -13,7 +13,8 @@
 \caption{
 The differences in losses (top figure) and derivatives (bottom figure) with repect to logits between the weighted logistic negative loss and the sigmoid negative loss.
 The \textbf{+} sign represents the loss of positive samples and the \textbf{-} sign stands for the loss of negative samples.
-The sigmoid loss of negative examples reaches a plataeu and the derivative drops to zero in the very positive region, whereas the weighted logistic loss for negative is just a linearly scaled logistic loss.
+The sigmoid loss of negative examples reaches a plataeu and the derivative drops to zero in the very positive region.
+The weighted logistic loss for negative is a linearly scaled logistic loss.
 }
 \label{fig:losses}
 \end{figure}
@@ -73,8 +74,8 @@ The loss of positive examples is still a normal logistic loss and the loss of ne
 \[
   l(x, y; \theta) =
     \begin{cases}
-      - \alpha \log P(y=+1 \vert x; \theta), & y = +1 \\
-      - \beta (1 - P(y=-1 \vert x; \theta)), & y = -1
+      - \log P(y=+1 \vert x; \theta), & y = +1 \\
+      1 - P(y=-1 \vert x; \theta), & y = -1
     \end{cases}
 \]
 We called this class-dependent loss \textbf{sigmoid loss} in a sense it uses a sigmoid function as the loss of negative samples.
@@ -127,7 +128,7 @@ The sigmoid loss can be extended train deep learning models with unlabeled examp
       - \alpha_1 \log P(y=1 \vert x; \theta), & y = 1 \\
                                               & \vdots \\
       - \alpha_K \log P(y=K \vert x; \theta), & y = K \\
-      - \beta (1 - P(y=0 \vert x; \theta)), & y = 0
+      \beta (1 - P(y=0 \vert x; \theta)), & y = 0
     \end{cases}
 \]
 where $P(y \vert x; \theta)$ is the predictied probability for class $y$, i.e., classifer output activated by the softmax function.

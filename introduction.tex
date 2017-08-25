@@ -56,14 +56,13 @@ Transferring weights from the pre-trained ImageNet models can provide a segmenta
 % }
 
 However, it can be challenging to employ directly the ImageNet CNN models for semantic segmentation.
-Firstly, the first layer of ImageNet models is not compatible with RGB-D images and 3D images like CT scans and MRI scans in 3D.
-\cite{zheng2015conditional}.
-Secondly, ImageNet models were originally trained with natural images at relatively low resolution.
-In some domains of interest, images can be non-natural, such as aerial images, images from bird's eye view, and medical images;
-In some other domains, images may have different lighting conditions or have a high resolution than the ImageNet ones.
-Lastly, the object recognition models pursue features invariance to better capture semantics regardless the variations in objects.
+% Firstly, the first layer of ImageNet models is not compatible with RGB-D images and 3D images like CT scans and MRI scans in 3D.
+% \cite{zheng2015conditional}.
+For example, the object recognition models pursue features invariance to better capture semantics regardless the variations in objects.
 The result translation invariant and resolution-reduced features reduce the localization accuracy which is not essential for object recognition but is critical for object segmentation. \cite{zheng2015conditional,chen2016deeplab}
-In any cases, it can be beneficial to retrain the pre-trained ImageNet segmentation datasets for fine-grained cues about boundaries in the domain, i.e. generic knowledge about objects.
+Besides, the ImageNet models were originally trained with natural images at relatively low resolution.
+However, images in the domain of interest may be (1) non-natural, such as aerial images and medical images, or (2) have different lighting conditions, or (3) have a higher resolution than the ImageNet ones.
+Therefore, it can be beneficial to retrain the pre-trained ImageNet segmentation datasets for fine-grained cues about boundaries in the domain.
 
 % \footnote{The KITTI Vision Benchmark Suite http://www.cvlibs.net/datasets/kitti/}
 
@@ -137,7 +136,6 @@ With the simulated datasets described in Section \ref{subsec:robustness}, we rep
 % \noindent \textit{Why binarizing classes?}
 
 To overcome the negative influence of objects mislabelling, we propose to group all object categories into one foreground class and train representations by learning to segment foreground and background.
-% This can be especially beneficial when we want to combine multiple available segmentation datasets for pre-training but .
 Jain et al. \cite{jain2017pixel} demonstrated a fully convolutional network trained on over one million images to for binary segmentation generalizes well to thousands of unseen object categories.
 A convolutional network probably learns generic knowledge about object boundaries if it can segment foreground and background for a wide range of categories sufficiently well.
 The generic knowledge is likely to transfer well to other categories that are unseen.

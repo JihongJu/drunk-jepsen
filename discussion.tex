@@ -5,37 +5,50 @@
 %%%%%%%% Influence of label noises
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-We assumed incomplete segmentation, misclassification and false segmentation of objects had occurred independently to the exact shape and appearance of the objects when we synthesized the segmentation noises stochastically in our experiments.
-However, some categories can be more likely to be misclassified due to its ambiguity in shapes or appearances in practice, such as bear and teddy bear.
+
+In practice, noisy segmentation dataset may contains not only object label noises but also segmentation errors such as imprecise boundaries, oversegmenting and undersegmenting the objects.
+Our method is not able to handle these segmentation noises.
+Future investigations for influences of segmentation noises on the learned representation
+
+
+We assume unsegmented objects and mislabeled objects occur independently to the shape and appearance of objects when we simulate label noises in our experiments.
+However, some categories can be more likely to be mislabeled due to its ambiguity in shapes or appearances in practice, such as bear and teddy bear.
 Similarly,  ambiguous objects can have a higher probability of being missing than easily recognizable objects.
 A real dataset with both clean and noisy segmentation would be valuable to evaluate the influence of noises on feature transferability further.
-% In addtion, we exluded segmenting errors such as imprecise boundaries, oversegmenting or undersegmenting the objects from study because they are a bit more complex to synthesize than the three classification errors.
+
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%% Binarizing classes
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-We proposed to binarize or categorize classes to produce accurate but imprecise labels when misclassification of segments dominates a small pre-training dataset.
-The result feature transferability depends on whether the inaccurate labels or the imprecise labels is more severe in the decrease of feature transferability.
+We proposed to learn representations with binary segmentation when objects mislabelling dominates the pre-training dataset.
+Except to segmentation dataset with noisy labels, this method can be potentially helpful when multiple segmentation datasets with are available for pre-training.
 In our experiment, the limited amounts of training images, the low-resolution of images and the constraint capacity of the FCN-AlexNet model may explain that more precise labels cannot improve the fine-tuning performance for the pre-trained models.
 In general, a trade-off between precise but less ccurate labels and more accurate but less precise labels need to be made to train better transferable features, given a particular dataset.
 
 
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%%%%%%%% Sigmoidal loss
+%%%%%%%% sigmoid loss
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-We argued that not over-punishing confident, positive predictions for samples with negative labels can be beneficial by assuming the confident predictions are more likely to be mislabeled given a nonrandom model.
-However, there can also be disadvantageous for over-excusing losses for confident predictions.
-One typical problem is that a model made bad predictions with confidence will keep emphasizing its wrong predictions.
-Therefore, the threshold between punishing and excusing a certain model for make confident contrary predictions need to be tuned appropriately to achieve both high precision and high recall.
-Unfortunately, the sigmoidal negative loss has no such hyperparameter to tune, which can be a direction to improve it in the future.
-For example, the Focal Loss\cite{lin2017focal} could be a parametrizable alternative of the sigmoidal negative loss.
+We argued that not over-punishing confident, positive predictions for samples with negative labels is beneficial so that we come up with the sigmoid loss for negative examples.
+ % by assuming the confident predictions are more likely to be mislabeled given a nonrandom model.
+But with the sigmoid loss, we are not able to determine what is the threshold of confident predictions.
+A generalized logistic function may be used to replace the normal logistic function as the activation function to achieve a more flexible S-shape and the tuning where the loss saturates.
+For example, a parametrized sigmoid loss for the negative class could be $l_{-} = \alpha (\frac{1}{1+\exp{(\beta z_)}})^{\gamma}$, where $z$ is the model output for the negative class, $\alpha$ is the scale factor, $\gamma$ affects where the loss starts, $\beta$ determines where the loss saturates.
 
-Besides, applying the sigmoidal negative loss to segmentation assumes that the foreground-to-background mislabeling for each pixel occurred independently.
-This assumption made it possible to implement sigmoidal negative loss directly to classification for individual pixels.
-However, there is normally a spatial dependence for noises in pixel labels which may help improve the spatial consistency of predictions.
-Therefore, future works may be possible to make use of the spatial dependence of pixel label noises.
+
+Besides, saturating loss for confident predictions has an effect of encouraging confident predictions.
+This is intuitively similar to the minimum entropy regularzation for semi-supervised learning.
+Both the class-dependent sigmoid loss for PU learning and the minimum regularzation scheme favors low density sepration of input features.
+The hard bootstrapping loss by \cite{reed2014training} has a ``soft'' alternative which is equivalent to the minimum entropy regularization.
+This explains why the sigmoid loss has a similar performance as the hard bootstrapping loss.
+
+% The sum of sigmoid loss for multiple lacks the probabilistic ground as the sum of logistic loss which is equivalent to minimize the multiplication of independent probabilities $p(y_0 \vert x_0) \cdot p(y_1 \vert x_1) \dots p(y_n \vert x_n)$.
+Lastly, applying the sigmoid loss to segmentation data with incomplete segmentations assumes that the pixels for objects are unlabeled independently.
+In practice, there is often a spatial dependence for noises in pixel labels which can be valuable to improve performance.
+For example, if one or a few pixels have a high probability of being foreground, their neighboring pixels are probably also foreground.
 
 %%%%%%%% confidence
 % The problem of weighting negative examples is that it assumes the probability for a negative label being wrong is independent of the underlying distribution of inputs.
@@ -56,10 +69,10 @@ Therefore, future works may be possible to make use of the spatial dependence of
 %   \item Optimization diffilculty introduced as a result of non-convex objective
 % \end{itemize}
 
-% The sigmoidal loss was introduced in \cite{tax2016class} to get rid of the effect of outliers.
+% The sigmoid loss was introduced in \cite{tax2016class} to get rid of the effect of outliers.
 % In our case, the negative examples given confident predictions by classifier can be considered as outliers.
 
-% Another challenge of difficulty encountered in implementingin extending sigmoidal negative loss to multi-class scenario
+% Another challenge of difficulty encountered in implementingin extending sigmoid negative loss to multi-class scenario
 
 % \paragraph{The relationship between PU learning and Imbalanced learning}
 
