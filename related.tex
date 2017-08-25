@@ -96,7 +96,7 @@ The non-convex Ramp loss \cite{du2014analysis} and a convex double hinge-loss \c
 But neither of the two losses are continuous, which is problematic for gradient based optimization.
 
 To avoid over-punish confident predictions unnecessarily, Tax \& Wang \cite{tax2016class} uses class-dependent, non-convex loss to train classifiers to retrieve small set of relevant objects from objects of a large, dominant class;
-Lin et al. \cite{lin2017focal} proposed a so-called Focal Loss to down-weight confident predictions and thus focus training on hard negatives for imbalanced learning.
+% Lin et al. \cite{lin2017focal} proposed a so-called Focal Loss to down-weight confident predictions and thus focus training on hard negatives for imbalanced learning.
 We proposed in Section \ref{sec:pulearning} to use a sigmoid loss\cite{tax2016class} for the negative class to alleviate superfluous punishment for confident, positive predictions.
 Additionally, Reed \& Lee \cite{reed2014training} proposed a bootstrapping loss to emphasize \textit{perceptual consistency} in training when incomplete and noisy labels exist.
 It has a similar effect of reducing losses of confident predictions.
