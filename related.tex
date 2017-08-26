@@ -16,11 +16,11 @@
 
 %%%%%%%% What Transfer Learning for?
 
-Weights of convolutional neural networks were proved ``transferable'' not only to another dataset \cite{shin2016deep,yosinski2014transferable} but also to other applications \cite{girshick2014rich,long2015fully}.
-Transferring weights of pre-trained CNN models allows improving the model performance without engaging in much efforts spent for data-labeling. \cite{pan2010survey}
+Weights of convolutional neural networks were proved ``transferable'' not only to another dataset, for example, interstitial lung disease (ILD) classification \cite{shin2016deep}, but also to other applications like object detection  \cite{girshick2014rich}, and semantic segmentation\cite{long2015fully}.
+Transferable means initializing the model with weights from a pre-trained CNN model results in an improvement of the model performance compared to the random initialization. \cite{pan2010survey}
 Yosinski et al. \cite{yosinski2014transferable} discovered that the transferability of features is correlated with feature generality, i.e., how much the feature depends on a particular category.
-They also reported the weights from low-level layers of CNN models are well transferable to even completely dissimilar categories, for example, from natural objects to human-made objects.
-Because features are transferable regardless the exact categories they are trained with, we argue that binarizing or categorizing the pre-training classes can be expected to have no significant influence to the transferability of the result pre-trained models.
+They also reported the weights from low-level layers of CNN models are well transferable to dissimilar categories, for example, from natural objects to human-made objects.
+Because features are transferable regardless the exact categories they are trained with, we argue that binarizing or categorizing the pre-training classes is expected to have no significant influence to the transferability of the result pre-trained models.
 
 % Given the superiority of transferring pre-trained weights and the availability of larger but noisier dataset, we learn transferable features with the noisy dataset and fine-tune the model with small dataset.
 
@@ -29,7 +29,7 @@ Because features are transferable regardless the exact categories they are train
 %%%%%%%% TEXT Pre-training with weak supervision
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-Apart from supervised pre-training, one can also perform unsupervised learning to obtain pre-trained features typically with auto-encoders \cite{vincent2010stacked,masci2011stacked}, deep belief networks \cite{hinton2006fast,lee2009convolutional}.
+Apart from the supervised pre-training, one can also perform unsupervised learning to obtain pre-trained features in the absence of labeled training data, typically with auto-encoders \cite{vincent2010stacked,masci2011stacked}, deep belief networks \cite{hinton2006fast,lee2009convolutional}.
 %%%%%%%% Deprecated UL in details
 % The most common method is to train a generative model with either \textit{auto-encoder} variants or \textit{deep beilief networks}.
 % Vincent et al. \cite{vincent2010stacked} trained multiple levels of representation robust to the corrupted inputs with stacked denoising auto-encoders.
@@ -37,9 +37,9 @@ Apart from supervised pre-training, one can also perform unsupervised learning t
 % Hinton et al. \cite{hinton2006fast} proposed a greedy learning algorithm to train \textit{deep belief nets} one layer at a time to train hierarchical features.
 % Lee et al. \cite{lee2009convolutional} presented a \textit{convolutional deep belief network}, to learn hierachical convolutional representations.
 % A few studies \cite{erhan2009difficulty,erhan2010does,bengio2012deep} highlighted the advantage of unsupervised pre-training compared to the random initialization, connecting unsupervised pre-training to a norm of regularization and a method that help disentangle the sample variations.
-Though a few studies \cite{erhan2009difficulty,erhan2010does,bengio2012deep} discussed the advantage of unsupervised pre-trained features compared to random weights initialization, the distance between the two has been shortened ever since the arises of modern initialization strategies, namely Xavier initialization \cite{glorot2010understanding} and its variants.
+Though a few studies \cite{erhan2009difficulty,erhan2010does,bengio2012deep} discussed the advantage of unsupervised pre-trained features compared to random weights initialization, the difference between the two has been diminished ever since the arises of modern initialization strategies, namely Xavier initialization \cite{glorot2010understanding} and its variants.
 We used random weights initialization as the lower baseline for pre-training with noisy labels.
-Features learned with supervision in the presence of label noises should at least outperform random weights because noisy information should be still better than no information.
+Representations learned with supervision in the presence of label noises should at least outperform random weights because noisy information should be still better than no information.
 % A proper method to learn features in the presence of label noise should at least outperform unsupervised pre-training because noisy information is still better than no information.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -51,17 +51,22 @@ Features learned with supervision in the presence of label noises should at leas
 The impact of randomly flipped labels on classification performance has been investigated by \cite{sukhbaatar2014training,patrini2016making} for convolutional neural networks.
 They both reported decreases in classification performance as the proportion of flipped labels increases for a fixed number of training samples.
 On the other hand, Rolnick et al. \cite{rolnick2017deep} argued that deep neural networks can learn robustly from noisy datasets as long as appropriate choices of hyperparameters were made.
-They studied the effects of diluting instead of replacing correct labels with noisy labels and concluded that larger training set is of more importance than lower the level of noise.
+They studied the effect of label noise by diluting correct labels with errored labels instead of corrupting correct labels with errored ones and argued that collecting more labels is of more importance than correcting the obtained labels.
 None of these studies explored the influence of label noises on feature transferability.
-To the best of our knowledge, we are the first research to investigate feature robustness label noises.
+To the best of our knowledge, we are the first research to investigate representations robustness to label noises.
 
-Methods, including a linear noise layer on top of the model output \cite{sukhbaatar2014training}, loss correctness with an estimation of the noise transition matrix \cite{patrini2016making} were proposed to compensate the negative effect on classification performance introduced by flipped labels.
-To study if the proposed methods can alleviate the influence of noisy labels as expected, both works simulated the random flipped labels from clean labels.
-We also designed our experiments using stochastically simulated noisy segmentations from perfect segmentation.
+To alleviate the negative effects on classification performance introduced by errored labels, a few methods were proposed for deep neural network models.
+Sukhbaatar et al. \cite{sukhbaatar2014training} introduced a linear noise layer on top of the model output, and Patrini et al. \cite{patrini2016making} proposed two forms of loss correction concerning the label observation bias.
+Xiao et al. \cite{xiao2015learning} integrated a probabilistic graphic model to an end-to-end deep learning system to predict the observed labels and to correct the observed labels.
+Additionally, Reed \& Lee \cite{reed2014training} proposed a bootstrapping loss to emphasize \textit{perceptual consistency} when learning in the presence incomplete and errored labels.
+All these methods are proposed to solve label errors from any class to any class but often have the capability of solving specific errors from one class to another.
+In our problem of learning with only positive and unlabeled data, the unlabeled data can be treated as a set of examples assigned with correct negative labels and incorrect negative labels.
+The problem then converts to learning in the presence of label errors from positive to negative but not from negative to positive.
+We modified the bootstrapping loss to interpret the prior knowledge that positive labels are reliable, and set a benchmark in the experiments for the state-of-the-art methods.
 
 %%%%%%%% some more methods
-% Xiao et al. \cite{xiao2015learning} integrated a probabilistic graphic model to an end-to-end deep learning system to train predicting class labels, either correct or wrong, as well as to correct the wrong labels.
-%Pereyra et al. \cite{pereyra2017regularizing} argued that the maximum entropy principle can prevent the model to have high confident predictions and result in better genralization.
+% To study the effect of errored labels, we simulate datasets with random flipped labels from clean labels.
+% We also designed our experiments using stochastically simulated noisy segmentations from perfect segmentation.
 
 %%%%%%%% Irrelevant
 % Yosinski et al. discovered that feature transferability is negatively affected by the specialization of higher layer neurons and optimization difficulties caused by breaking co-adapted neurons.
@@ -80,25 +85,23 @@ We also designed our experiments using stochastically simulated noisy segmentati
 
 \paragraph{Positive and Unlabeled Learning}
 
-Traditional positive and unlabeled learning methods originally proposed for text classification \cite{liu2003building,li2005learning} do not extend well to deep learning models.
-These traditional methods often follow a two-step strategy: first identifying a set of reliable negative samples (RN set) from U set and then iteratively build a set of classifiers with RN set and P set, while updating the RN set with a selected classifier.
-It would take tremendously longer time to train a couple of deep learning models iteratively than to train a sequence of na\"ive Bayesian (NB) models or supported vector machines (SVMs).
-Therefore, it would be unrealistic to train CNN models in this manner.
+Traditional methods to learn with only positive samples and unlabeled samples for text classification \cite{liu2003building,li2005learning} often follow a two-step strategy: (1) first identifying a set of reliable negative samples (RN set) from U set and (2) then iteratively build a set of classifiers with RN set and P set, while updating the RN set with a selected classifier.
+Methods following this two step strategy do not extend well to deep learning models because it would take tremendously longer time to iteratively train a sequence of deep learning models than to train a sequence of na\"ive Bayesian (NB) models or supported vector machines (SVMs).
+For this reason, we do not consider training deep neural networks following this two-step strategy in this work.
 
-Alternatively, one can treat all unlabeled examples as negative and simply reweigh positive and negative examples. \cite{lee2003learning}
-Under the assumption of randomly labeled positive examples, Elkan \& Noto \cite{elkan2008learning} demonstrated that a classifier trained on positive and unlabeled examples predicts probabilities that differ by only a constant factor from the true conditional probabilities of being positive.
-These two works considered only binary classification but it is possible to extend the weighted logistic loss and train deep neural networks for multiple classes with only positive and unlabeled examples.
+Alternatively, one can treat all unlabeled examples as negative, and weight the losses for positive and negative examples differently \cite{lee2003learning}.
+Under the assumption that which positive examples are selected to be labeled is completely at random, i.e., independent of the input features, Elkan \& Noto \cite{elkan2008learning} proved that the probability for an object of being observed as positive differs from the probability of being truely positive by a constant factor.
+They also observed that a classifier trained on positive and unlabeled examples predicts probabilities that differ by only a constant factor from the true conditional probabilities of being positive.
+These two works considered only binary classification.
+We provide an extension of binary PU learning to multiclass PU learning where examples from multiple relevant classes are partially unlabeled and mixed with examples for the non-relevant class.
 
-The logistic loss grows to infinity as the confidence of wrong prediction increases to 1.
-This can be a problem of weighting the negative class: the superfluous penalty for confident, positive predictions, i.e., samples far from the decision boundary have a large influence on the final solution. \cite{tax2016class}
-Du et al. \cite{du2015convex} illustrated that logistic loss and hinge loss perform worse than ramp loss in the PU classification setting due to their superfluous penalty for confident predictions.
-se different losses for positive and negative data.
+The often used logistic loss for neural networks grows to infinity as the confidence of wrong prediction increases to one.
+This can be a problem for class-weighed loss: the superfluous penalty for confident, positive predictions, i.e., samples far from the decision boundary have a large influence on the final solution. \cite{tax2016class}
+Du et al. \cite{du2015convex} illustrated that the logistic loss and the hinge loss perform worse than the ramp loss in the PU classification setting due to their superfluous penalty for confident predictions.
 The non-convex Ramp loss \cite{du2014analysis} and a convex double hinge-loss \cite{du2015convex} were proposed separately to learn from positive and unlabeled data by Du et al.
-But neither of the two losses are continuous, which is problematic for gradient based optimization.
+But neither of the two losses are continuous, which is problematic for a gradient based optimization so that we turns to a continuous altenative of the ramp loss, the sigmoid loss.
 
-To avoid over-punish confident predictions unnecessarily, Tax \& Wang \cite{tax2016class} uses class-dependent, non-convex loss to train classifiers to retrieve small set of relevant objects from objects of a large, dominant class;
+Tax \& Wang \cite{tax2016class} proposed to use the sigmoid loss for the positive class to retrieve relevant objects from a large, non-relevant objects dominant dataset, with only poorly labeled relevant objects.
+PU learning is happening on an opposite side of this retrieving problem: the positive examples are labeled reliably and the unlabeled examples can be considered as poorly labeled negative examples.
 % Lin et al. \cite{lin2017focal} proposed a so-called Focal Loss to down-weight confident predictions and thus focus training on hard negatives for imbalanced learning.
-We proposed in Section \ref{sec:pulearning} to use a sigmoid loss\cite{tax2016class} for the negative class to alleviate superfluous punishment for confident, positive predictions.
-Additionally, Reed \& Lee \cite{reed2014training} proposed a bootstrapping loss to emphasize \textit{perceptual consistency} in training when incomplete and noisy labels exist.
-It has a similar effect of reducing losses of confident predictions.
-We modified the hard bootstrapping loss to interpret the prior knowledge that positive labels are reliable.
+So we proposed to use the sigmoid loss\cite{tax2016class} for the negative class to alleviate the superfluous punishment for confident, positive predictions.
