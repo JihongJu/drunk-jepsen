@@ -39,7 +39,7 @@ The often limited availability of training samples motivates most state-or-the-a
 % Compared to object recognition tasks, it is tougher to collect a dataset for semantic segmentation on a large scale.
 The difficulty of obtaining manual segmentations is natural because it costs much more efforts for people to segment than to classify an image.
 One of the largest segmentation datasets, Microsoft COCO2014 \cite{lin2014microsoft}, contains 123,287 images of 80 object categories.
-As a comparison, a well-known dataset for object recognition, the ILSRVC dataset\cite{russakovsky2015imagenet}, contains around 1.2 million images for  1000 categories.
+As a comparison, a well-known successful task for convolutional neural networks, object recognition on the ILSRVC dataset\cite{russakovsky2015imagenet}, has around 1.2 million images for 1000 categories to train.
 % the Pascal VOC2012 challenge \cite{everingham2015pascal} provides a segmentation dataset with only 9,993 segmented images for 20 object categories;
 % The PASCAL-context Dataset \cite{mottaghi2014role} enriches the PASCAL VOC dataset by segmenting all 11,530 training images for 540 categories;
 Transferring weights from the pre-trained ImageNet models can provide a segmentation performance boost in the limitation of lacking training samples, as reported in \cite{long2015fully} and adopted by \cite{chen2016deeplab,he2017mask}.
@@ -57,7 +57,7 @@ But the pre-trained ImageNet models are originally designed for object recogniti
 % \end{itemize}
 % }
 
-In some domain, it can be challenging to employ representations from the ImageNet CNN models directly for segmentation.
+In practice, it can be challenging to employ representations from the ImageNet CNN models directly for segmentation.
 Firstly, the object recognition models pursue features invariance to better capture semantics regardless the variations in objects.
 The result translation invariant and resolution-reduced features reduce the localization accuracy which is not essential for object recognition but is critical for object segmentation. \cite{zheng2015conditional,chen2016deeplab}
 Secondly, the ImageNet models were originally trained with natural images at relatively low resolution.
@@ -191,7 +191,7 @@ To summarize, the main contributions of this work are:
 The rest of this thesis is organized as follows:
 In the next section, we summarize related works.
  % in areas of transfer learning, deep learning with noisy labels and PU learning.
-In Section \ref{sec:robustness} we formulate the problem of transferring representations learned with segmentations containing label noises, and simulation of the three types label noises.
+In Section \ref{sec:formulation} we formulate the model for segmentation model and learning with positive and unlabeled data.
 We introduce the class-dependent, sigmoid loss for the negative class for deep learning with positive and unlabeled examples in Section \ref{sec:pulearning}.
 Experiments in Section \ref{subsec:robustness} are designed to investigate the influences of objects mislabeling, inexhaustive segmentations, and false positive segmentations independently, and validate whether our proposed methods can alleviate the negative influences.
 The proposed sigmoid loss is evaluated, compared to weighting classes, in simulated PU learning setups in Section \ref{subsec:pulearning}.
