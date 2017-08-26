@@ -55,7 +55,7 @@ Transferring weights from the pre-trained ImageNet models can provide a segmenta
 % \end{itemize}
 % }
 
-However, it can be challenging to employ directly the ImageNet CNN models for semantic segmentation.
+However, it can be challenging to employ the ImageNet CNN models directly for semantic segmentation.
 % Firstly, the first layer of ImageNet models is not compatible with RGB-D images and 3D images like CT scans and MRI scans in 3D.
 % \cite{zheng2015conditional}.
 For example, the object recognition models pursue features invariance to better capture semantics regardless the variations in objects.
@@ -93,7 +93,6 @@ Enormous efforts are required, according to  \cite{lin2014microsoft,everingham20
 %A slight decrease in the percentage of segmentation errors, such as from 1\% to 0\%, may require extraordinary extra efforts due to the difficulty of identifying errors.
 If not requiring ``gold standard'' segmentations for training, the efforts saved for correctness can be made to segment more images for a larger dataset.
 %In some domains, for example, medical imaging, the ``gold standard'' itself can be ambiguous and cause disagreements among experts.
-% \footnote{TODO M: But that's OK or not?  This is what probabilities solve...}
 Besides,  some labels other than the manual ones may be freely available for particular tasks.
 These labels often contain structural noises depending on the way they were created.
 For example, digital maps, like OpenStreetMap, can be used to segment aerial images.
@@ -177,7 +176,7 @@ In this work, we treat the unlabeled set as a set of examples with noisy negativ
 The main contributions of this work are:
 \begin{enumerate}
   \item We present that both objects mislabelling and incomplete segmentation have a negative influence on learning representations, while false positive segmentations do not.
-  \item We propose to learn representations by training foreground/background segmentations.
+  \item We propose to learn representations by training foreground/background segmentations if the segmentation labels are noisy.
   \item We employ a class-dependent sigmoid loss to balance precision and recall more effectively than weighting classes when training CNN models with positive and unlabeled examples.
 \end{enumerate}
 
@@ -190,7 +189,7 @@ In the next section, we summarize related works.
  % in areas of transfer learning, deep learning with noisy labels and PU learning.
 In Section \ref{sec:robustness} we formulate the problem of transferring representations learned with segmentations containing label noises, and simulation of the three types label noises.
 We introduce the class-dependent, sigmoid loss for the negative class for deep learning with positive and unlabeled examples in Section \ref{sec:pulearning}.
-Experiments in Section \ref{subsec:robustness} are designed to investigate the influences of inexhaustive segmentations, misclassification and false segmentation separately.
+Experiments in Section \ref{subsec:robustness} are designed to investigate the influences of objects mislabeling, inexhaustive segmentations, and false positive segmentations independently, and validate whether our proposed methods can alleviate the negative influences.
 The proposed sigmoid loss is evaluated, compared to weighting classes, in simulated PU learning setups in Section \ref{subsec:pulearning}.
 Discussions are presented in Section \ref{sec:discussion} and conclusions are summarized in Section \ref{sec:conclusion}.
 %Features learned by predicting the pixel objectness with inexaustive annotations were then validated with experiments described in Section \ref{sec:discussion}.

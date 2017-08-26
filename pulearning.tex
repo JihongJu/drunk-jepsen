@@ -11,7 +11,7 @@
 % \fbox{\rule{0pt}{2in} \rule{0.9\linewidth}{0pt}}
    \includegraphics[width=1.05\linewidth]{img/losses}
 \caption{
-The differences in losses (top figure) and derivatives (bottom figure) with repect to logits between the weighted logistic negative loss and the sigmoid negative loss.
+The differences in losses (top figure) and derivatives (bottom figure) with repect to the model output $f$ between the weighted logistic loss and the sigmoid loss for the negative class.
 The \textbf{+} sign represents the loss of positive samples and the \textbf{-} sign stands for the loss of negative samples.
 The sigmoid loss of negative examples reaches a plataeu and the derivative drops to zero in the very positive region.
 The weighted logistic loss for negative is a linearly scaled logistic loss.
@@ -67,7 +67,7 @@ Empirically, the choice of $p$, $q$ can be made based on the highest precision a
 
 
 %%%%%%%% TEXT sigmoid Negative loss
-\paragraph{Sigmoid Loss for negative class}
+\paragraph{Sigmoid Loss for the negative class}
 
 As motivated in Section \ref{sec:related}, we used a class-dependent loss to down-weight the loss contribution of very positive predictions negative labels and still making full use of the clean positive labels.
 The loss of positive examples is still a normal logistic loss and the loss of negative examples is replaced with a sigmoid loss \cite{tax2016class}:
@@ -79,6 +79,7 @@ The loss of positive examples is still a normal logistic loss and the loss of ne
     \end{cases}
 \]
 We called this class-dependent loss \textbf{sigmoid loss} in a sense it uses a sigmoid function as the loss of negative samples.
+Using the logistic loss for the positive class and the sigmoid loss for the negative class is an interpretation of the prior knowledge that the positive labels are reliable whereas the negative labels are not.
 
 Figure \ref{fig:losses} shows the differences in losses and derivatives with respect to model output between weighted logistic loss and sigmoid loss.
 The main feature of sigmoid loss for negative examples is its small changes in the region of confident positive, compared to the weighted loss with $\alpha=1$ and $\beta=0.5$.
@@ -86,7 +87,7 @@ As a consequence, the corresponding derivative decreases to zero as the model pr
 
 
 %%%%%%%% TEXT Bootstrapping
-\paragraph{Hard bootstrapping loss for negative class}
+\paragraph{Hard bootstrapping loss for the negative class}
 In addition to the proposed sigmoid loss, we also modify the hard bootstrapping loss by Reed et al. \cite{reed2014training} for PU learning to set a benchmark.
 The modified class-dependent hard bootstrapping loss a pair of inputs and label $(x,y)$ is:
 % $$l_- = - \beta \log p(y=-1 \vert x) - (1-\beta) \sum_{j\in \{-1, +1\}} p(y=j \vert x) \log p(y=j \vert x)$$
@@ -131,8 +132,8 @@ The sigmoid loss can be extended train deep learning models with unlabeled examp
       \beta (1 - P(y=0 \vert x; \theta)), & y = 0
     \end{cases}
 \]
-where $P(y \vert x; \theta)$ is the predictied probability for class $y$, i.e., classifer output activated by the softmax function.
-This loss is still referred to as the sigmoid loss in this work because the term softmax loss is saved for the cross-entropy cost function.
+where $\alpha_1, \dots, \alpha_K, \beta$ are weighting factors, and $P(y \vert x; \theta)$ is the predictied probability for class $y$, i.e., model output activated by the softmax function.
+This loss is referred to as the \textbf{softmax loss} because it uses a softmax activation for the model output.
 
 % Similar modifications can be made to the cross-entropy loss, namely, keeping the losses for classes $1$ to $K$ unchanged and applying the loss for negative class to the loss for class 0, supposing there are $K$ positive classes and one negative class.
 % Alternatively, one can apply a one-vs-all strategy, with which the normal logistic loss is used for positive classes while the weighted, sigmoid and bootstrapping loss can be used for the negative class.

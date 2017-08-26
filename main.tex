@@ -33,10 +33,10 @@
 \twocolumn
 \pagenumbering{arabic}
 \newpage
-\title{Learn transferable representations in the presence of noisy labels for segmentation}
+\title{Learn representations in the presence of segmentation label noises}
 
 \author{Jihong Ju\\
-Faculty of Electrical Engineering, Mathematics and Computer Science \\
+Computer Vision Lab, TU Delft \\
 Mekelweg 4, 2628 CD Delft\\
 {\tt\small j.ju@student.tudelft.nl}
 % For a paper whose authors are all at the same institution,
@@ -64,7 +64,7 @@ Our experiments demonstrate that both mislabeled segments and incomplete segment
 To get rid of the negative effect of objects label noises, we propose to assign objects of any categories a foreground label instead of the exact object categories.
 Learning representations by segmenting foreground and background turns out to improve the fine-tuning performance significantly when label noises are dominant in the pre-training data.
 In the existence of unsegmented objects, a sigmoid loss for the background class is proposed to achieve high recall while keeping the precision better than simply weighting the classes.
-The proposed class dependent, sigmoid loss achieves both better pre-training performance and better fine-tuning performance than the class-weighted loss in the presence of incomplete segmentation.
+The proposed class dependent, sigmoid (or softmax) loss achieves both better pre-training performance and better fine-tuning performance than the class-weighted loss in the presence of incomplete segmentation.
 
 % % Noisy data exists
 % % Transfer learning

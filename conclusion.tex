@@ -2,10 +2,10 @@
 \label{sec:conclusion}
 
 We investigate in this paper to learn representation by training with segmentation datasets containing label noises.
-Specifically, we discover that both objects mislabelling and inexhaustive segmentations negatively influence the transferability of learned representation.
-By contrast, false positive segmentation do not reduce the fine-tuned performance of learned representation as the other two types noises do.
-We present that binarizing classes as foreground and background can recover the decrease of feature transferability due to the misclassifications of object segments.
+Specifically, we report both objects mislabelling and inexhaustive segmentations negatively influence the transferability of learned representation.
+By contrast, false positive segmentations do not reduce the fine-tuned performance of learned representation as the other two types noises do.
+We present that binarizing classes as foreground and background slow the decrease of the fine-tuning performance of the learned representations due to the mislabeled objects.
 Incomplete segmentation causes the trained model to make predictions with a low recall.
 To overcome the influence of incomplete segmentations, we propose a class-dependent sigmoid loss to not over-punish the confident, positive predictions for samples assigned negative labels.
 Compared to simply reweighing classes differently, the proposed sigmoid loss for the negative class achieves higher recall while not sacrificing precision by much.
-Applying the sigmoid loss to segmentation model pre-training improves both the pre-training and the fine-tuning performance for a pre-training dataset with simulated incomplete segmentations.
+Applying the sigmoid loss to the segmentation model pre-training improves both the pre-training and the fine-tuning performance for a pre-training dataset with simulated incomplete segmentations.

@@ -56,8 +56,8 @@ None of these studies explored the influence of label noises on feature transfer
 To the best of our knowledge, we are the first research to investigate feature robustness label noises.
 
 Methods, including a linear noise layer on top of the model output \cite{sukhbaatar2014training}, loss correctness with an estimation of the noise transition matrix \cite{patrini2016making} were proposed to compensate the negative effect on classification performance introduced by flipped labels.
-To study if the proposed methods can alleviate the influence of noisy labels as expected, both works synthesized the random flipped labels from clean labels.
-We designed our experiments using stochastically synthesized noisy segmentations from perfect segmentation as well.
+To study if the proposed methods can alleviate the influence of noisy labels as expected, both works simulated the random flipped labels from clean labels.
+We also designed our experiments using stochastically simulated noisy segmentations from perfect segmentation.
 
 %%%%%%%% some more methods
 % Xiao et al. \cite{xiao2015learning} integrated a probabilistic graphic model to an end-to-end deep learning system to train predicting class labels, either correct or wrong, as well as to correct the wrong labels.
@@ -89,7 +89,8 @@ Alternatively, one can treat all unlabeled examples as negative and simply rewei
 Under the assumption of randomly labeled positive examples, Elkan \& Noto \cite{elkan2008learning} demonstrated that a classifier trained on positive and unlabeled examples predicts probabilities that differ by only a constant factor from the true conditional probabilities of being positive.
 These two works considered only binary classification but it is possible to extend the weighted logistic loss and train deep neural networks for multiple classes with only positive and unlabeled examples.
 
-The problem of weighting negative examples is the superfluous penalty for confident, positive predictions, i.e., samples far from the decision boundary have a large influence on the final solution. \cite{tax2016class}
+The logistic loss grows to infinity as the confidence of wrong prediction increases to 1.
+This can be a problem of weighting the negative class: the superfluous penalty for confident, positive predictions, i.e., samples far from the decision boundary have a large influence on the final solution. \cite{tax2016class}
 Du et al. \cite{du2015convex} illustrated that logistic loss and hinge loss perform worse than ramp loss in the PU classification setting due to their superfluous penalty for confident predictions.
 se different losses for positive and negative data.
 The non-convex Ramp loss \cite{du2014analysis} and a convex double hinge-loss \cite{du2015convex} were proposed separately to learn from positive and unlabeled data by Du et al.

@@ -33,7 +33,7 @@ The difference in the result fine-tuning performance improvement between the noi
 \subsection{Label noises simulation}
 \label{subsec:noises}
 
-It is challenging to find a dataset with both clean and noisy labels available, so we tried to synthesize segmentation noises with correct labels.
+It is challenging to find a dataset with both clean and noisy labels available, so we simulate segmentation noises with correct labels.
 A straightforward way to simulate noisy labels is to corrupt true labels stochastically for each segment with a corruption model.
 The corruption model simply describes the probability of the observed labels given the true labels.
 % $$p(\tilde{y_{ij}} \vert x, y_{ij}, e_{ij})$$
@@ -53,17 +53,17 @@ where $1 \leq i \leq h, 1 \leq j \leq w$ and $i,j,k \in \mathrm{Z}^+$.
 
 \textbf{Inexhaustive segmentation}
 Given the true labels, which pixels belong to the same object is known.
-Inexhaustive segmentation can be synthesized as flipping all pixels for an object of the $k$-th category from $k$ to $0$ with probability $p_{0k}$.
+Inexhaustive segmentation is simulated by flipping all pixels for an object of the $k$-th category from $k$ to $0$ with probability $p_{0k}$.
 The probability for these pixels to have correct labels is then: $1-p_{0k}$.
 
 % $$p(\tilde{y_{ij}}=0\vert y_{ij}=k) = p_{0k}$$
 % $$p(\tilde{y_{ij}}=k\vert y_{ij}=k) = 1-p_{0k}$$
 
-\textbf{Misclassification}
-To synthesize misclassification, we can stochastically convert pixel labels of segment for an object of the $k$-th category from $k$ to $j$ with probability $p_{jk}$, where $j, k \leq K$ and $j,k \in \mathrm{Z}^+$.
+\textbf{Objects Mislabelling}
+To simulate objects mislabelling, we stochastically convert pixel labels of segment for an object of the $k$-th category from $k$ to $j$ with probability $p_{jk}$, where $j, k \leq K$ and $j,k \in \mathrm{Z}^+$.
 Probabilities for all possible combinations of $j$ and $k$ form a \textit{confusion matrix} in which probabilities in each column sum up to 1.
 % $$p(\tilde{y_{ij}}=j \vert y_{ij}=k) = p_{jk}, ij \in S, k,j \in [1,K]$$
 % where $\sum_{j=1}^{K}p_{jk}=1$.
 
-\textbf{False segmentations}
-The presence of false segmentations can be synthesized in two steps: excluding classes except one from the foreground categories, forming the clean labels set, and assigning pixels of the excluded categories with foreground labels with a probability of $p_{11}$, constructing the noisy labels set.% $$p(\tilde{y_{ij}}=k \vert x, y_{ij}=0), ij \in S $$
+\textbf{False positive segmentations}
+The presence of false positive segmentations is in two steps: excluding classes except one from the foreground categories, forming the clean labels set, and assigning pixels of the excluded categories with foreground labels with a probability of $p_{11}$, constructing the noisy labels set.% $$p(\tilde{y_{ij}}=k \vert x, y_{ij}=0), ij \in S $$

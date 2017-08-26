@@ -5,47 +5,53 @@
 %%%%%%%% Influence of label noises
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
+We investigate in this work the influence of label noises but not segmentation noises for a noisy segmentation dataset.
+In practice, noisy segmentation dataset may also contain segmentation errors such as imprecise boundaries, over-segmenting and under segmenting the objects.
+Future studies are necessary to learn representations in the presence of segmentation noises.
 
-In practice, noisy segmentation dataset may contains not only object label noises but also segmentation errors such as imprecise boundaries, oversegmenting and undersegmenting the objects.
-Our method is not able to handle these segmentation noises.
-Future investigations for influences of segmentation noises on the learned representation
-
-
-We assume unsegmented objects and mislabeled objects occur independently to the shape and appearance of objects when we simulate label noises in our experiments.
-However, some categories can be more likely to be mislabeled due to its ambiguity in shapes or appearances in practice, such as bear and teddy bear.
-Similarly,  ambiguous objects can have a higher probability of being missing than easily recognizable objects.
-A real dataset with both clean and noisy segmentation would be valuable to evaluate the influence of noises on feature transferability further.
+When we simulate the label noises in our experiments, we assume unsegmented objects and mislabeled objects occur independently to the shape and appearance of objects.
+In practice, some categories may have a higher probability to be mislabeled due to its ambiguity in shapes or appearances, such as bear and teddy bear.
+Similarly, ambiguous objects are more likely to be missing than easily recognizable objects.
+Experiments on a real dataset with both clean and noisy segmentation are valuable to validate that our findings.
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%% Binarizing classes
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-We proposed to learn representations with binary segmentation when objects mislabelling dominates the pre-training dataset.
-Except to segmentation dataset with noisy labels, this method can be potentially helpful when multiple segmentation datasets with are available for pre-training.
-In our experiment, the limited amounts of training images, the low-resolution of images and the constraint capacity of the FCN-AlexNet model may explain that more precise labels cannot improve the fine-tuning performance for the pre-trained models.
-In general, a trade-off between precise but less ccurate labels and more accurate but less precise labels need to be made to train better transferable features, given a particular dataset.
 
+We proposed to learn representations with binary segmentation when objects mislabelling dominates the pre-training dataset.
+Training binary segmentations can also be relevant when there are multiple segmentation datasets for pre-training, and category overlappings and affinities prevent from combining multiple datasets into one.
+
+% In our experiment, the limited amounts of training images, the low-resolution of images and the constraint capacity of the FCN-AlexNet model may explain that more precise labels cannot improve the fine-tuning performance for the pre-trained models.
+% In general, a trade-off between precise but less ccurate labels and more accurate but less precise labels need to be made to train better transferable features, given a particular dataset.
+%
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%% sigmoid loss
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-We argued that not over-punishing confident, positive predictions for samples with negative labels is beneficial so that we come up with the sigmoid loss for negative examples.
+We argued to not over-punish confident, positive predictions when negative labels are noisy so that we come up with the sigmoid loss for negative examples.
  % by assuming the confident predictions are more likely to be mislabeled given a nonrandom model.
 But with the sigmoid loss, we are not able to determine what is the threshold of confident predictions.
 A generalized logistic function may be used to replace the normal logistic function as the activation function to achieve a more flexible S-shape and the tuning where the loss saturates.
 For example, a parametrized sigmoid loss for the negative class could be $l_{-} = \alpha (\frac{1}{1+\exp{(\beta z_)}})^{\gamma}$, where $z$ is the model output for the negative class, $\alpha$ is the scale factor, $\gamma$ affects where the loss starts, $\beta$ determines where the loss saturates.
 
-
 Besides, saturating loss for confident predictions has an effect of encouraging confident predictions.
-This is intuitively similar to the minimum entropy regularzation for semi-supervised learning.
-Both the class-dependent sigmoid loss for PU learning and the minimum regularzation scheme favors low density sepration of input features.
+It is intuitively similar to the minimum entropy regularization for semi-supervised learning, which also encourages confident predictions.
+Both the class-dependent sigmoid loss for PU learning and the minimum regularization scheme favors low-density separations of input features.
 The hard bootstrapping loss by \cite{reed2014training} has a ``soft'' alternative which is equivalent to the minimum entropy regularization.
-This explains why the sigmoid loss has a similar performance as the hard bootstrapping loss.
+This similar in the sigmoid loss and the bootstrapping loss explains why the sigmoid loss has a similar performance as the hard bootstrapping loss.
+
+Not over-punishing confident predictions have also it disadvantages:
+(1) If a classifier makes incorrect predictions with high confidence, it tends to keep being wrong for these examples and emphasize predictions by itself.
+(2) Punishing confident predictions more than uncertain predictions with the logistic loss is a design of choice for neural networks to optimize more effectively, whereas the sigmoid loss breaks it.
+These factors determine that the sigmoid loss often performs worse than the logistic loss when the dataset contains only correct labels or a few noisy labels.
+There is a trade-off to make between punishing and not punishing more for confident predictions, based on the prior knowledge: an estimation of the noisy negative labels percentage.
 
 % The sum of sigmoid loss for multiple lacks the probabilistic ground as the sum of logistic loss which is equivalent to minimize the multiplication of independent probabilities $p(y_0 \vert x_0) \cdot p(y_1 \vert x_1) \dots p(y_n \vert x_n)$.
+
 Lastly, applying the sigmoid loss to segmentation data with incomplete segmentations assumes that the pixels for objects are unlabeled independently.
 In practice, there is often a spatial dependence for noises in pixel labels which can be valuable to improve performance.
 For example, if one or a few pixels have a high probability of being foreground, their neighboring pixels are probably also foreground.

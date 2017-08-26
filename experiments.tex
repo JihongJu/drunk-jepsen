@@ -6,8 +6,9 @@
 
 %%%%%%%% TEXT Experiment setup
 
+To investigate the influence of the lablel noises, (1) inexhaustive segmentations, (2) objects mislabelling and (3) false positive segmentations, on the learned representations, we set up experiments with simulated label noises from a well-annotated dataset, the PASCAL VOC2011 segmentation dataset \cite{everingham2015pascal}.
+
 \paragraph{Dataset}
-To investigate the influence of inexhaustive segmentations, objects mislabelling and false positive segmentations on learned representations, we set up experiments with simulated label noises from a well-annotated dataset, the PASCAL VOC2011 segmentation dataset \cite{everingham2015pascal}.
 In this experiment, fifteen out of twenty categories of the VOC2011 dataset were selected to form a \textit{pre-training dataset} and the other categories formed a \textit{fine-tuning dataset}.
 The pre-training dataset was used to train a Fully Convolutional Network with AlexNet (FCN-AlexNet) model \cite{long2015fully} for segmentation in the presence or absence of simulated label noises.
 Inexhaustive segmentations, objects mislabelling, and false segmentations were simulated independently with stochastical corruptions to the well-annotated pre-training dataset, followed the descriptions in Section \ref{subsec:formulation}.
@@ -41,12 +42,13 @@ Each experiment was repeated three times, mean and standard deviation were compu
 The negative influence of random object labels on feature transferability is demonstrated in Table \ref{tab:robustness}.
 Compared to the model trained with true labels, both models trained with all random labels and half true half random labels are less transferable to the fine-tuning dataset.
 Transferring the AllRandomLabels model or the HalfRandomLabels model is no better than randomly initializing model weights.
-Mislabeled objects in segmentations negatively impacts the transferability of CNN models in this simulated experiment setup.
+The mislabeled objects in segmentations negatively impact the transferability of CNN models in this simulated experiment setup.
 
 We then binarize pre-training classes to foreground and background and achieve a fine-tuning performance better than training with the exact (half) randomized labels and equivalent to training with correct labels.
 Randomized object labels were mislabeled among foreground classes so that binarizing labels a foreground and background classes can in a sense correct the randomized labels.
 Compared to the precise but inaccurate noisy labels, binarized labels are accurate but imprecise.
-This observation indicates that inaccurate labels have a larger influence on feature transferability than imprecise labels.
+This observation indicates that inaccurate labels have a larger influence on the learned representations than imprecise labels.
+
 
 \paragraph{Precise labels vs. Accurate labels}
 To validate that accurate, imprecise labels have less negative effect on feature transferability than inaccurate, precise labels.
@@ -59,7 +61,7 @@ As a comparison, the fifteen classes were randomly categorized into 4, 7, 11 cat
 Figure \ref{fig:categories} reveals that reducing label preciseness by categorizing pre-training classes has little effect on the fine-tuning performance of transferred models.
 Even categorizing classes at random without explicit meaning can pre-train weights better than random initialization (shown as error bar at categories=0).
 
-In contrast to the significant influence of randomized precise labels, the imprecise binarized labels have little impact to the learned representations.
+In contrast to the significant influence of randomized precise labels, the imprecise binarized labels have little effect to the learned representations.
 Binarizing is helpful to learn better representations when mislabeled objects is dominant.
 
 \paragraph{Inexaustive segmentation}
@@ -75,14 +77,14 @@ Note that we train foreground/background segmentation instead of multi-class seg
 % The details of implementing sigmoid negative loss for the pre-training dataset will be discussed in Section \ref{subsec:pulearning}.
 
 
-\paragraph{False segmentations}
-We observe a little influence of incorrectly segmented objects from non-predefined but meaningful categories, i.e., the false positive segmentations, on feature transferability.
-To simulate false segmentations, we selected one category, either cat or dog depending on the folds, as the target category and all the other 14 categories in the pre-training dataset became non-target, as discussed in Section \ref{subsec:formulation}.
+\paragraph{False positive segmentations}
+We observe a little influence of the incorrectly segmented objects from the non-predefined but meaningful categories, i.e., the false positive segmentations, on the learned representations.
+To simulate the false positive segmentations errors, we selected one category, either cat or dog depending on the folds, as the target category and all the other 14 categories in the pre-training dataset became non-target, as discussed in Section \ref{subsec:formulation}.
 In the presence of false segmentations, instances from non-target categories can be misannotated as the target category with a probability of $p_{10}= 0.5$.
-The result pre-trained models is named as FalseSegmentHalf in Table \ref{tab:robustness}.
-The noise-free counterpart of is the model pre-trained with segmentations of the selected target category only, and the other 14 categories remained unsegmented, denoted as NoFalseSegmented.
+The result pre-trained models is named as the HalfFalsePositive model in Table \ref{tab:robustness}.
+The noise-free counterpart of is the model pre-trained with segmentations of the selected target category only, and the other 14 categories remained unsegmented, denoted as the NoFalsePositive model.
 
-We observe from Table \ref{tab:robustness} that transferring the HalfFalseSegmented model performs almost the same as the NoFalseSegmentated model.
+We observe from Table \ref{tab:robustness} that transferring the HalfFalsePositive model performs almost the same as the NoFalsePositive model.
 Therefore, false positive segmentation for objects from the 14 categories have a little negative impact on pre-training CNN models.
 % The exact influence of false segmentations in practice, however, may depend on how similar the target and non-target categories are, or whether false segmentations are consistent, which requires further investigation.
 
@@ -103,8 +105,8 @@ Therefore, false positive segmentation for objects from the 14 categories have a
 \multirow{3}{*}{\begin{tabular}[c]{@{}l@{}}Inexaustive \\ segmention\end{tabular}}    & CompleteLabels                                                      & $0.29\pm0.01$                                                                                           & $0.36\pm0.01$                                                                               & $0.29\pm0.01$                                                                                                  & $0.37\pm0.01$                                                                                           & $\mathbf{0.33\pm0.01}$                                                                                                 \\
                                                                                       & HalfUnsegmented                                                     & $0.26\pm0.01$                                                                                           & $0.30\pm0.03$                                                                               & $0.28\pm0.03$                                                                                                  & $0.32\pm0.02$                                                                                           & $0.29\pm0.02$                                                                                                          \\
                                                                                       & SigmoidLoss                                                       & \multicolumn{1}{l}{$0.30\pm0.01$}                                                                       & \multicolumn{1}{l}{$0.37\pm0.01$}                                                           & \multicolumn{1}{l}{$0.31\pm0.02$}                                                                              & \multicolumn{1}{l|}{$0.34\pm0.02$}                                                                      & $\mathbf{0.33\pm0.02}$                                                                                                 \\ \hline
-\multirow{2}{*}{\begin{tabular}[c]{@{}l@{}}False positive \\ segmentaion\end{tabular}}         & NoFalseSegmented                                                    & $0.26\pm0.01$                                                                                           & $0.37\pm0.03$                                                                               & $0.27\pm0.01$                                                                                                  & $0.33\pm0.04$                                                                                           & $\mathbf{0.31\pm0.02}$                                                                                                 \\
-                                                                                      & FalseSegmentedHalf                                                  & \multicolumn{1}{l}{$0.27\pm0.01$}                                                                       & \multicolumn{1}{l}{$0.34\pm0.01$}                                                           & \multicolumn{1}{l}{$0.30\pm0.01$}                                                                              & \multicolumn{1}{l|}{$0.32\pm0.01$}                                                                      & $\mathbf{0.31\pm0.01}$                                                                                                 \\ \hline
+\multirow{2}{*}{\begin{tabular}[c]{@{}l@{}}False positive \\ segmentaion\end{tabular}}         & NoFalsePositive                                                    & $0.26\pm0.01$                                                                                           & $0.37\pm0.03$                                                                               & $0.27\pm0.01$                                                                                                  & $0.33\pm0.04$                                                                                           & $\mathbf{0.31\pm0.02}$                                                                                                 \\
+                                                                                      & HalfFalsePositive                                                  & \multicolumn{1}{l}{$0.27\pm0.01$}                                                                       & \multicolumn{1}{l}{$0.34\pm0.01$}                                                           & \multicolumn{1}{l}{$0.30\pm0.01$}                                                                              & \multicolumn{1}{l|}{$0.32\pm0.01$}                                                                      & $\mathbf{0.31\pm0.01}$                                                                                                 \\ \hline
 
 \end{tabular}
 }
@@ -116,8 +118,9 @@ All the other extractors were pre-trained in the presence/absence of the corresp
 Half of the objects unsegmented (\textbf{HalfUnsegmented}) result in pre-trained models not better than random weight initialization.
 Introducing the sigmoid negative loss in the pre-training phase was able to improve the fine-tuning performance to be comparable to pre-trained model with complete segmentation (\textbf{CompleteLabels}).
 Using random labels (\textbf{RamdomLabels}) decreased the fine-tuning performance of transferred models, compared to using true labels (\textbf{TrueLabels}).
-Binarizing pre-training classes as foreground and background help overcome the negative effects of random labels.
-Including false segmentations in training (\textbf{FalseSegmentedHalf}) had the same fine-tuning performance as not including false segmentations (\textbf{NoFalseSegmented}), better than random initialization.
+Binarizing the pre-training classes as foreground and background help overcome the negative effects of random labels.
+Applying the sigmoid loss to the negative class when pre-trained with inexhaustive segmentations achieves a comparable fine-tuning performance to pre-training with the complete segmentations.
+Including the false positive segmentations in pre-training (\textbf{HalfFalsePositive}) achieves the same fine-tuning performance as not including the false positive segmentations (\textbf{NoFalsePositive}), better than random initialization.
 % \textit{SingleCategory} was pre-trained on only one annotated category, either ``dog'' or ``cat'' depending on the fold, and the other categories were left unannotated;
 % \textit{BinaryLabels} was pre-trained with binary labels that any objects of the fifteen categories were annotated as one single category, namely ``dog'' or ``cat'' depending on fold;
 % \textit{TrueLabels} was pre-trained with all objects segmented and assigned to 15 categories correctly;
@@ -134,7 +137,7 @@ Including false segmentations in training (\textbf{FalseSegmentedHalf}) had the 
 \centering
    \includegraphics[width=1.\linewidth]{img/num_classes.eps}
 \caption{
-Test performance for fine-tuned models, varying categorization of pre-training classes to pre-train.
+Test performance for the fine-tuned models pre-trained with varying categorization of pre-training classes.
 Zero categorize means no pre-trained weights used and the model was random initialized.
 Error bars located on lines denote the meaningful categorization, and isolated error bars denote random categorizations (RC) of the 15 classes.
 The displayed mean IU/mean accuracies and standard deviations were averaged over four folds listed in Table \ref{tab:robustness}.
@@ -154,7 +157,7 @@ The line shows that binarizing and categorizing classes meaningfully had little 
 
 \subsubsection{2D non-linear dataset}
 
-To investigate the sigmoid loss for negative class, we trained a two-layer multilayer perceptron, with six neurons per layer, using the normal logistic loss, the class-weighted logistic loss, and the class-dependent sigmoid loss respectively and visualize the optimal decision boundaries.
+To investigate the decision boundaries led by the sigmoid loss for the negative class, we trained a two-layer multilayer perceptron, with six neurons per layer, using the normal logistic loss, the class-weighted logistic loss, and the class-dependent sigmoid loss respectively and visualize the optimal decision boundaries.
 
 \paragraph{Experimental setup}
 The training data contains four hundred samples per class drawn randomly from two interleaving half circles with noises added with a minor standard deviation, as shown in Figure \ref{fig:moons}.
@@ -197,7 +200,7 @@ The emphasization of uncertain predictions by sigmoid loss leads to a margin fro
    \includegraphics[width=\linewidth]{img/moons_diff}
 \end{center}
    \caption{
-   Loss derivatives w.r.t the last layer output, normalized per class (marker size).
+   Derivatives w.r.t the last layer output for the two losses (normalized per class and shown as the marker size).
    The sigmoid loss has small derivatives for predictions farther from the decision boundary.
    (Best viewed with color)
    }
@@ -208,7 +211,7 @@ The emphasization of uncertain predictions by sigmoid loss leads to a margin fro
 
 \subsubsection{CIFAR dataset}
 
-To compare the precision and recall achieved by the class-dependent sigmoid loss and the class-weighted loss, we trained a classifier to distinguish images of multiple relevant categories from non-relevant images when relevant images are partially labeled.
+To compare the precision and recall achieved by the class-dependent softmax loss and the class-weighted cross entropy, we trained a CNN classifier to distinguish images of multiple relevant categories from non-relevant images when relevant images are partially labeled.
 
 \paragraph{Experimental setup}
 We trained an eight-layer CNN model to classify images into eleven classes: ten relevant classes from CIFAR10 and one non-relevant class for all categories from CIFAR100.
@@ -225,13 +228,13 @@ Experiments were repeated three times with random split of P set, and U set and 
 
 \paragraph{Results}
 
-Table \ref{tab:cifar} shows the sigmoid loss achieves better recall than the class-weighted cross-entropy loss without lowering precision significantly.
+Table \ref{tab:cifar} shows using the softmax loss for the non-relevant class achieves better recall than the class-weighted cross-entropy loss without lowering precision significantly.
 With 50\% of the relevant examples correctly labeled and the rest assigned non-relevant labels, the normal cross-entropy loss leads to an imbalanced model with high precision but low recall, and therefore with a low f1-score.
-By reweighing the loss for non-relevant class by a factor of 0.5, the model becomes balanced for precision and recall so that the result f1-score is improved significantly.
-Compared to the class-weighted loss, the class-dependent sigmoid loss improves recall by 0.08 while reduces precision only by 0.01.
-The f1-score achieved by the class-dependent sigmoid loss is slightly better than the class-weighted loss, though not as good as training with clean labels with either 50\% of the sample or the complete training set.
-The state-of-the-art benchmark method, the hard bootstrap loss, achieves the same f1-score as the sigmoid loss but not as high recall.
-This result is as expected because the sigmoid loss and the hard bootstrap loss share an idea of encouraging confident predictions.
+By reweighing the loss for the non-relevant class by a factor of 0.5, the model becomes balanced for precision and recall so that the result f1-score is improved significantly.
+Compared to the class-weighted cross entropy, the class-dependent softmax loss improves recall by 0.08 while reduces precision only by 0.01.
+The f1-score achieved by the class-dependent softmax loss is slightly better than the class-weighted loss, though not as good as training with clean labels with either 50\% of the sample or the complete training set.
+The state-of-the-art benchmark method, the hard bootstrap loss, achieves the same f1-score as the softmax loss but not as high recall.
+This result is as expected because the softmax loss and the hard bootstrap loss share an idea of encouraging confident predictions.
 
 % It is noteworthy that the weighted negative loss and hard bootstrapping loss achieved more balanced precision and recall than the sigmoid negative loss.
 % That is because the two former losses were weighted by classes frequency of observed labels, around 0.67 for the negative class and 2 for positive classes, whereas the sigmoid negative loss was not.
@@ -251,29 +254,27 @@ R+N         & CrossEntropy   & 0.87 & 0.88 & 0.82 & 0.85 \\
 50\%R+U     & CrossEntropy   & 0.66 & 0.94 & 0.38 & 0.49 \\
 \hline
 50\%R+U     & ClassWeighted     & 0.78 & 0.75 & 0.75 & 0.76 \\
-50\%R+U     & SigmoidLoss    & 0.79 & 0.74 & \textbf{0.83} & \textbf{0.78} \\
+50\%R+U     & SoftmaxLoss      & 0.79 & 0.74 & \textbf{0.83} & \textbf{0.78} \\
 50\%R+U     & BootstrapHard    & \textbf{0.80} & 0.76 & 0.81 & \textbf{0.78} \\
 \end{tabular}
 }
 \caption{
-Comparing different losses for training a 2-layer multilayer perception to classify ten elevant classes and one non-relevant class with partially labeled relevant classes and unlabeled non-relevant classes.
-The trained classifiers were evaluated on a test set with true labels.
-For each of relevant classes, precision, recall and f1-score were measured with the one-vs-all strategy.
-% The \textbf{top three rows} summarize the upper baseline, middle baseline, and lower baseline for learning with positive and unlabeled examples.
+Comparing different losses for training a 2-layer multilayer perception to classify ten relevant classes and one non-relevant class with partially labeled relevant examples and unlabeled non-relevant examples.
+The trained classifiers are evaluated on a test set of true labels.
+For each of the relevant classes, precision, recall, and f1-score are measured with the one-vs-all strategy and averaged.
 \textbf{R+N} denotes model trained with the complete relevant labels (R set) and non-relevant labels (N set);
 \textbf{50\%(R+N)} represents model trained with the half of the relevant labels and non-relevant labels respectively;
 \textbf{50\%R+U} means the model is trained with half of the relevant samples, and the rest relevant samples are mixed with non-relevant samples (U set).
-% \textbf{Middle baseline} Model trained with 50\% of the positive and negative examples;
-% \textbf{Lower baseline} Model trained with 50\% labeled positive examples and unlabeled examples;
-Both the class-dependent sigmoid loss and the hard bootstrpping loss perform better than simply weighing the classes.
-The sigmoid loss for negative class achieves the highest mean recall, whereas the modified hard bootstraping loss has a higher accuracy with 50\% positive examples unlabeled.
+Weighting the non-relevant class by a factor of 0.5 improves the mean f1-score from 0.49 to 0.76.
+Both the class-dependent softmax loss and the hard bootstrapping loss perform even better than simply weighing the classes, but not as good ass training with a set of labeled negative examples.
+Using the softmax loss for non-relevant class achieves the highest mean recall, whereas the modified hard bootstrapping loss has a higher accuracy with 50\% positive examples unlabeled.
 }
 \label{tab:cifar}
 \end{table}
 
 
 %%%%%%%% FIGURE Varying positive annotating percetage
-In addition, Figure \ref{fig:pct_annotating} demonstrates that the class-dependent sigmoid loss performs slightly better than the class weighted cross-entropy when the labeled percentage of relevant images is neither too high ($>0.8$) nor too low ($<0.2$).
+By varying the labeled percentage of the relevant images, Figure \ref{fig:pct_annotating} demonstrates that the class-dependent softmax loss performs slightly better than the class weighted cross-entropy when the labeled percentage of relevant images is neither too high ($>0.8$) nor too low ($<0.2$).
 % When the labeled percentage of relevant images is high, the difference in loss contributions of the unlabeled relevant images for the two losses is small.
 % When the percentage is low, the severe imbalance of classes introduced by unlabeled relevant images prevents the models from achieving good classification performance.
 
@@ -293,11 +294,11 @@ In addition, Figure \ref{fig:pct_annotating} demonstrates that the class-depende
 \centering
    \includegraphics[width=1.05\linewidth]{img/pu_vs_pn}
 \caption{
-Comparing f1-score for the the class-dependent sigmoid loss and the class-weighted cross entropy with varying percentage of relevant images labeled.
+Comparing f1-score for the class-dependent softmax loss and the class-weighted cross entropy with varying percentage of relevant images labeled.
 % \textbf{R+N} represents training with a percentage of reliable, relevant labels and non-relevant labels, while \textbf{R+U} stands for training with a percentage of relevant labels and all other images as unlabeled.
-The class-dependent sigmoid loss achieves better test f1-score than the class-weighted cross entropy when 20\% and 50\% percentage of relevant images are labeled and the others are mixed with non-relevant images.
+The class-dependent softmax loss achieves better test f1-score than the class-weighted cross entropy when 20\% and 50\% percentage of relevant images are labeled, and the others are mixed with non-relevant images.
 % The class-dependent sigmoid loss achieves slightly higher f1-score than the weighted cross-entropy loss at labeled relevant  20\% and 50\% of the relevant samples are labeled.
-% In general, training with explicitly labeled non-relevant examples (RN) is superior to training with unlabeled set of mixed relevant and non-relevant examples (RU).
+% In general, training with explicitly labeled non-relevant examples (RN) is superior to training with an unlabeled set of mixed relevant and non-relevant examples (RU).
 }
 \label{fig:pct_annotating}
 \end{figure}
@@ -342,13 +343,13 @@ Complete       & LogisticLoss       &  0.90 & 0.85 & 0.82 & 0.75 \\
 }
 \caption{
 Training foreground/background segmentation with different losses when 50\% of the objects are unsegmented.
-performance achieved on the test set of PASCAL VOC2011 segmentation dataset with the normal cross entropy loss, weighted negative loss, and sigmoid negative loss in the presence of inexhaustive segmentation.
+The performances are achieved on the test set of PASCAL VOC2011 segmentation dataset.
 % A class weight of 0.7:1.75 was used to balance the sample frequency differences of the two classes.
 % The negative loss was further weighted by a factor of 0.5 for the weighted negative loss.
 % Mean accuracy is equivalent to the average recall over the two classes.
 % Mean IU is the average intersection over union ratio (IU) over two classes and f.w. IU is the frequency weighted average of IU over the two classes.
-Both the class-dependen sigmoid loss and the class-weighted logistic loss perform better than the normal logistic loss when 50\% objects unsegmented but not as good as the model trained with complete segmentations.
-The class-dependent sigmoid loss has a better mean accuracy than the class-weighted logistic loss, and a similar mean IU as the class-weighted logistic loss.
+Both the class-dependent sigmoid loss and the class-weighted logistic loss perform better than the normal logistic loss when 50\% objects unsegmented but not as good as the model trained with complete segmentations.
+The class-dependent sigmoid loss has a better mean accuracy than the class-weighted logistic loss and a similar mean IU as the class-weighted logistic loss.
 }
 \label{tab:pusegment}
 \end{table}
