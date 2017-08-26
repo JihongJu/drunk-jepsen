@@ -1,0 +1,72 @@
+\section{Problem Formulation}
+\label{sec:formulation}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%% TEXT Formulation of segmentation, PU learning
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+In this section, we formulate the model for semantic segmentation and learning with positive and unlabeled data (PU Learning).
+
+\paragraph{Model for semantic segmentation}
+A deep learning model for semantic segmentation normally consists of two principal functions: a CNN feature extractor $g$ that extracts hierarchical feature maps $F$ from images $I$, followed by a classifier $h$ that generates pixel-by-pixel prediction to fit labels $S$.
+Together they form a segmentation model $f$ to predict class probabilities for each of the pixels in a given image $I$:
+\begin{equation}
+  f(I) = h(g(I)).
+\end{equation}
+Training is to find an optimal $f$ from the space of functions which minimizes a loss function $L$ that measures the distance between $S$ and $f(I)$:
+\begin{equation}
+  f^{\ast} = \argmin_{f}{L(S, f(I))}.
+\end{equation}
+The corresponding optimal feature extractor, a.k.a., representations, $g^{\ast}$ from $f^{\ast}(I)=h^{\ast}(g^{\ast}(I))$ can be used as the initialization of $g$ for another dataset.
+
+% $R^{h \times w \times c} \rightarrow R^{d}$
+% $H: R^{d} \rightarrow R^{h \times w \times k}$
+% $R^{h \times w \times c} \rightarrow R^{h \times w \times k}$,
+% where $h, w$ are image height and weight respectively; $c$ is the number of image channels and $k$ is the number of classes; $d$ is the total number of extracted features.
+% Prediction is then given by:
+% $$P(y \vert x) = \sigma(F(x))$$
+% where $\sigma$ is the sofmtax function.
+
+% \paragraph{Transferring representations}
+% The initialization of feature extractor, $g_0$, is transferr when optimizing $f$
+% The corresponding fine-tuning performance improvement indicates the transferability of the pre-trained feature extractor.
+% Ideally, a feature extractor pre-trained with noisy labels would result in a fine-tuned model with equivalent performance as one pre-trained with true labels.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%% TEXT PU Learning setup
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\paragraph{PU Learning}
+Consider a dataset containing $N$ training examples $(x_i,y_i,s_i), i \in \{1, 2, \dots, N\}$, where $x_i$ is the observed features for the $i$-th examples, and $y_i \in \{-1,+1\}$ is the label for the $i$-th example, and $s_i$ is a binary variable denoting whether the label for the $i$-th example is observed or not.
+
+
+
+In a normal binary classification setup, labels for all examples are observed:
+\begin{equation}
+  s_i=1, \forall i\in\{1,2,\dots,N\}
+\end{equation}
+However, in a PU learning setup, only a subset of the positive examples $P$ are observed while the rest are not:
+\begin{eqnarray}
+s_i =
+  \begin{cases}
+    1, & y_i = +1 \land i\in P\\
+    0, & \text{otherwise}.
+  \end{cases}
+\end{eqnarray}
+The set of labeled positive examples is called the positive $P$ set and the other examples form an unlabeled $U$ set.
+
+In this work, we train classifiers by assigning examples in the unlabeled set negative labels and covert PU learning to a learning problem with reliable positive labels and unreliable negative loss.
+The observed label for the $i$-th example is:
+\begin{eqnarray}
+\tilde{y_i} =
+  \begin{cases}
+    +1, & y_i = +1 \land i\in P\\
+    -1, & \text{otherwise}.
+  \end{cases}
+\end{eqnarray}
+
+%
+% A training set for the positive and negative (PU) learning problems contains only a set of positive examples (P set) and a set of unlabeled samples (U set).
+% Unlabeled examples can be either positive or negative, meaning that there is no reliable negative examples available
+% One straightforward way to generate negative examples for training is to treat all the unlabeled examples as a set of negative examples with noises.
+% The problem then converts to learning with clean positive labels and noisy negative labels.
+% The goal of solving a PU learning problem is to learn a classifier that predicts as many positives as possible while keeping the false positive rate low, regardless the influence of false negative labels.
+% In other words, the purpose is to achieve high recall without sacrificing too much precision.
