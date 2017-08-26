@@ -8,50 +8,44 @@
 
 \begin{figure}[t]
 \centering
+\textbf{Losses and derivatives}\par\medskip
 % \fbox{\rule{0pt}{2in} \rule{0.9\linewidth}{0pt}}
    \includegraphics[width=1.05\linewidth]{img/losses}
 \caption{
-The differences in losses (top figure) and derivatives (bottom figure) with repect to the model output $f$ between the weighted logistic loss and the sigmoid loss for the negative class.
-The \textbf{+} sign represents the loss of positive samples and the \textbf{-} sign stands for the loss of negative samples.
-The sigmoid loss of negative examples reaches a plataeu and the derivative drops to zero in the very positive region.
-The weighted logistic loss for negative is a linearly scaled logistic loss.
+The differences in losses (left figure) and derivatives (right figure) with respect to the model $f$ between the weighted logistic loss and the sigmoid loss for the negative class.
+The $x$-axis denotes the model output $f(x)$, varying from negative infinity to positive infinity.
+We present only $(-5,5)$ for compact figures.
+The \textbf{+} sign represents the loss of positive samples, and the \textbf{-} sign stands for the loss of negative samples.
+The sigmoid loss of negative examples reaches a plateau and the derivative drops to zero in the region of large $f(x)$, whereas the weighted logistic loss for negative is a linearly scaled logistic loss.
+The sigmoid loss fulfills the requirement of not punishing the model more for more positive output than less positive output.
 }
 \label{fig:losses}
 \end{figure}
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%%%%%%%% TEXT PU Learning setup
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-\paragraph{PU Learning}
-
-A training set for the positive and negative (PU) learning problems contains only a set of positive examples (P set) and a set of unlabeled samples (U set).
-Unlabeled examples can be either positive or negative, meaning that there is no reliable negative examples available
-One straightforward way to generate negative examples for training is to treat all the unlabeled examples as a set of negative examples with noises.
-The problem then converts to learning with clean positive labels and noisy negative labels.
-The goal of solving a PU learning problem is to learn a classifier that predicts as many positives as possible while keeping the false positive rate low, regardless the influence of false negative labels.
-In other words, the purpose is to achieve high recall without sacrificing too much precision.
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%% TEXT Weighted loss for negatives
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-\paragraph{Weighted logistic loss}
+In this section, we introduce losses for learning with positive and unlabeled examples.
 
-The mislabeled negative samples bias the classifier to have low recall.
-It is possible to balance precision and recall by simply weighing the positive and negative examples differently, namely, let the positive and negative examples have different rates of contribution to the total loss.
-Suppose a logistic loss is used, the corresponding weighted loss for a input-output pair $(x, y)$ for a classifier determined by parameters $\theta$ is:
-\[
-  l(x, y; \theta) =
-    \begin{cases}
-      - \alpha \log P(y=+1 \vert x; \theta), & y = +1 \\
-      - \beta \log P(y=-1 \vert x; \theta), & y = -1
-    \end{cases}
-\]
-where $\alpha$ and $\beta$ are weights for positive and negative class respectively, and $P(y\vert x; \theta)=\sigma(f(x; \theta))$ is the probablistic predictions by model $f(\cdot)$, activated by the sigmoid function $\sigma(\cdot)$.
-This loss is referred to as the \textbf{weighted loss} in the rest of paper.
-Empirically, the choice of $p$, $q$ can be made based on the highest precision and recall achieved on a validation set, or alternatively based on a class priors estimation\cite{du2014class}.
+\paragraph{Class-weighted loss}
+
+A class-weighted logistic loss $l_{weighted}(\cdot)$ for a pair of input feature and observed label $(x, y)$ with a model $f(\cdot)$ parametrized by $\theta$ is:
+\begin{eqnarray}
+\resizebox{0.9\columnwidth}{!}{$
+l_{weigted}(x, y; \theta) =
+  \begin{cases}
+    - \alpha \log (\sigma(f(x; \theta))) , & y = +1 \\
+    - \beta \log (1 - \sigma(f(x; \theta))), & y = -1,
+    % - \alpha \log P(y=+1 \vert x; \theta), & y = +1 \\
+    % - \beta \log P(y=-1 \vert x; \theta), & y = -1
+  \end{cases}
+$}
+\end{eqnarray}
+where $\alpha$ and $\beta$ are weights for positive and negative class respectively, and $\sigma(\cdot)$ is the sigmoid function.
+This loss is referred to as the \textbf{class-weighted loss} in the rest of paper.
+Empirically, the choice of $\alpha$, $\beta$ can be made based on the highest precision and recall achieved on a validation set, or based on a class priors estimation\cite{du2014class}.
 % Alternatively, one can also roughly assign $q=p(y=-1 \vert \tilde{y}=-1)$.
 % This turns out to be part of the backward corrected loss proposed in  \cite{patrini2016making}:
 % \begin{equation*}
@@ -65,44 +59,78 @@ Empirically, the choice of $p$, $q$ can be made based on the highest precision a
 % with $p(y_i=-1 \vert \tilde{y_i}=-1) = q$ and $p(y_i=+1 \vert \tilde{y_i}=-1) = 1-q$.
 
 
+We extend the class-weighted logistic loss to a class-weighted cross entropy for multiclass classification with $K$ relevant classes and one one-relevant class (class $0$).
+Suppose there are K relevant categories and one non-relevant categories, the corresponding class-weighted loss $l_{wtd}$ for a training sample $(x,y)$ with a model $f(\cdot)$ parametrized by $\theta$ is:
+\begin{eqnarray}
+\resizebox{0.9\columnwidth}{!}{$
+l_{weighted}(x, y; \theta) =
+  \begin{cases}
+    - \beta  \log (\sigma_0(f(x;\theta))), & y = 0 \\
+    - \alpha_1 \log (\sigma_1(f(x;\theta))), & y = 1 \\
+                                            & \vdots \\
+    - \alpha_K \log (\sigma_K(f(x;\theta))), & y = K,
+  \end{cases}
+$}
+\end{eqnarray}
+where $\alpha_1, \dots, \alpha_K, \beta$ are the weighting factors, $\sigma_0, \dots, \sigma_K$ are the softmax functions for class $0$ to $K$ respectively.
+This loss is referred to as the \textbf{class-weighted cross-entropy}.
+
 
 %%%%%%%% TEXT sigmoid Negative loss
-\paragraph{Sigmoid Loss for the negative class}
+\paragraph{Sigmoid/softmax Loss for the negative class}
 
-As motivated in Section \ref{sec:related}, we used a class-dependent loss to down-weight the loss contribution of very positive predictions negative labels and still making full use of the clean positive labels.
-The loss of positive examples is still a normal logistic loss and the loss of negative examples is replaced with a sigmoid loss \cite{tax2016class}:
-\[
-  l(x, y; \theta) =
-    \begin{cases}
-      - \log P(y=+1 \vert x; \theta), & y = +1 \\
-      1 - P(y=-1 \vert x; \theta), & y = -1
-    \end{cases}
-\]
-We called this class-dependent loss \textbf{sigmoid loss} in a sense it uses a sigmoid function as the loss of negative samples.
-Using the logistic loss for the positive class and the sigmoid loss for the negative class is an interpretation of the prior knowledge that the positive labels are reliable whereas the negative labels are not.
+The class-dependent sigmoid loss $l_{sigmoid}$ a sigmoid loss for the negative class and keep the loss for the positive class unchanged uses a logistic loss, for example, a logistic loss:
+\begin{eqnarray}
+\resizebox{0.9\columnwidth}{!}{$
+l_{sigmoid}(x, y; \theta) =
+  \begin{cases}
+    - \log (\sigma(f(x; \theta))) , & y = +1 \\
+    \sigma(f(x; \theta)), & y = -1,
+    % - \log P(y=+1 \vert x; \theta), & y = +1 \\
+    % 1 - P(y=-1 \vert x; \theta), & y = -1
+  \end{cases}
+$}
+\end{eqnarray}
+where $(x, y)$ is a pair of input feature and label, and $f(\cdot;\theta)$ is the model parametrized by $\theta$, and $\sigma(\cdot)$ is the sigmoid function.
+This loss is referred as the \textbf{class-dependent sigmoid loss} or the \textbf{sigmoid loss} in short, in a sense it uses a sigmoid function for the negative class only.
+
 
 Figure \ref{fig:losses} shows the differences in losses and derivatives with respect to model output between weighted logistic loss and sigmoid loss.
 The main feature of sigmoid loss for negative examples is its small changes in the region of confident positive, compared to the weighted loss with $\alpha=1$ and $\beta=0.5$.
 As a consequence, the corresponding derivative decreases to zero as the model prediction increases in the positive direction.
 
+The class-dependent sigmoid loss is extendable to a multiclass scenario where $K$ is the number of relevant classes and $0$ denotes the non-relevant class.
+The corresponding loss $l_{softmax}$ for an example, label pair $(x,y)$ with a model $f(\dot;\theta)$ is:
+\begin{eqnarray}
+\resizebox{0.9\columnwidth}{!}{$
+l_{softmax}(x, y; \theta) =
+  \begin{cases}
+    1 - \sigma_0(f(x;\theta))), & y = 0 \\
+    - \log (\sigma_1(f(x;\theta))), & y = 1 \\
+                                   & \vdots \\
+    - \log (\sigma_K(f(x;\theta))), & y = K,
+  \end{cases}
+  $}
+\end{eqnarray}
+where $\sigma_0, \dots, \sigma_K$ are the softmax functions for class $0$ to $K$ respectively.
+This loss is called the \textbf{class-dependent softmax loss} or the \textbf{softmax loss} for simplicity.
 
 %%%%%%%% TEXT Bootstrapping
 \paragraph{Hard bootstrapping loss for the negative class}
 In addition to the proposed sigmoid loss, we also modify the hard bootstrapping loss by Reed et al. \cite{reed2014training} for PU learning to set a benchmark.
-The modified class-dependent hard bootstrapping loss a pair of inputs and label $(x,y)$ is:
-% $$l_- = - \beta \log p(y=-1 \vert x) - (1-\beta) \sum_{j\in \{-1, +1\}} p(y=j \vert x) \log p(y=j \vert x)$$
-\begin{equation*}
-\resizebox{\columnwidth}{!}{$
-  l(x, y; \theta) =
+The modified class-dependent hard bootstrapping loss for a pair of inputs and label $(x,y)$ with a model $f(\cdot;\theta)$ is:
+\begin{eqnarray}
+\resizebox{0.9\columnwidth}{!}{$
+  l_{bootstrap}(x, y; \theta) =
     \begin{cases}
-      - \log P(y=+1 \vert x; \theta), & y = +1 \\
-      - \beta \log P(y=-1 \vert x;\theta) - (1-\beta) \log P(y=\hat{y} \vert x;\theta), & y = -1
+      - \log (\sigma_{+1}(f(x; \theta))) , & y = +1 \\
+      - \beta \log (\sigma_{-1}(f(x; \theta))) - (1-\beta) \log (\sigma_{\hat{y}}(f(x; \theta))), & y = -1,
     \end{cases}
 $}
-\end{equation*}
-where $\hat{y} = \argmax_{j\in\{-1,+1\}}{P(y=j \vert x)}$ is the class with the highest predicted probability and $0<\beta<1$.
-The first term of the objective is a weighted logistic loss and the second term can be considered as a regularization term to encourage consistent predictions.
-This loss is referred as \textbf{bootstrapping loss} for the rest of this paper.
+\end{eqnarray}
+where $\hat{y} = \argmax_{j\in\{-1,+1\}}{\sigma_{j}(f(x; \theta))}$ is the class with the highest predicted probability and $0<\beta<1$ is a hyperparameter to tune.
+The first term of the loss for the negative class is a weighted logistic loss and the second term can be considered as a regularization term to encourage consistent predictions.
+This loss is referred as the \textbf{bootstrapping loss} for the rest of this paper.
 % \begin{equation*}
 %   \begin{aligned}
 %     H = - \sum_{j\in\{-1,+1\}} p(y_i=j \vert x_i) \log p(y_i=j \vert x_i) \\
@@ -111,32 +139,20 @@ This loss is referred as \textbf{bootstrapping loss} for the rest of this paper.
 % \end{equation*}
 % which intuitively encourages the model to make confident predictions \cite{grandvalet2005semi}.
 
-%%%%%%%% TEXT Segmentation
-\paragraph{Extending PU learning from classification to segmentation}
-In Section \ref{introduction}, we argue that learning with unlabeled foreground pixels is similar to a PU learning setup.
-Howvever, there is still differences between learning with unlabeled foreground pixels and learning with positive and unlabeled examples.
+Similarly as the weighted loss and the sigmoid loss, this hard bootstrapping loss $l_{bootstrap}$ can be extended to multiclass:
+\begin{eqnarray}
+\resizebox{0.9\columnwidth}{!}{$
+l_{bootstrap}(x, y; \theta) =
+  \begin{cases}
+    - \beta \log (\sigma_{0}(f(x; \theta))) - (1-\beta) \log (\sigma_{\hat{y}}(f(x; \theta))), & y = 0 \\
+    - \log (\sigma_1(f(x;\theta))), & y = 1 \\
+                                   & \vdots \\
+    - \log (\sigma_K(f(x;\theta))), & y = K,
+  \end{cases}
+  $}
+\end{eqnarray}
+where $f(\cdot)$ is the model parametrized by $\theta$, and $\sigma_0, \dots, \sigma_K$ are the softmax functions for class $0$ to $K$ respectively, and $(x,y)$ is a pair of example and label, and $K$ is the number of relevant class while $0$ is the non-relevant class, and lastly $0<\beta<1$ is a hyperparameter.
 
-The first difference is that each example in the normal PU learning setup is independent of each other, whereas pixels in images are not.
-Assuming the probability of mislabeling foreground pixel as the background is independent of its neighbor pixels, the classification losses can be applied to segmentation problems by performing per-pixel classification problems.
-
-Another difference between incomplete segmentation and a normal positive and unlabeled learning problem is that pixels for objects of various categories can be unlabeled.
-Supposing there are $K$ categories of interest, varying from class $1$ to class $K$, the class $0$ is for unlabeled data which may or may not belong to the $K$ defined categories.
-The sigmoid loss can be extended train deep learning models with unlabeled examples from various categories:
-
-\[
-  l(x, y; \theta) =
-    \begin{cases}
-      - \alpha_1 \log P(y=1 \vert x; \theta), & y = 1 \\
-                                              & \vdots \\
-      - \alpha_K \log P(y=K \vert x; \theta), & y = K \\
-      \beta (1 - P(y=0 \vert x; \theta)), & y = 0
-    \end{cases}
-\]
-where $\alpha_1, \dots, \alpha_K, \beta$ are weighting factors, and $P(y \vert x; \theta)$ is the predictied probability for class $y$, i.e., model output activated by the softmax function.
-This loss is referred to as the \textbf{softmax loss} because it uses a softmax activation for the model output.
-
-% Similar modifications can be made to the cross-entropy loss, namely, keeping the losses for classes $1$ to $K$ unchanged and applying the loss for negative class to the loss for class 0, supposing there are $K$ positive classes and one negative class.
-% Alternatively, one can apply a one-vs-all strategy, with which the normal logistic loss is used for positive classes while the weighted, sigmoid and bootstrapping loss can be used for the negative class.
 
 %%%%%%%% TEXT Expontial loss FADE IN
 \paragraph{Implementation details}

@@ -1,12 +1,293 @@
 \section{Experiments}
 \label{sec:experiments}
 
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%% PU Learning
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\subsection{Learning with only positive and unlabeled samples}
+\label{subsec:pulearning}
+
+In this section, we apply the sigmoid/softmax class to the unlabeled examples as if they are negative examples and train classifers with only positive data and unlabeled data.
+
+\subsubsection{2D non-linear dataset}
+
+To investigate the decision boundaries led by the sigmoid loss for the negative class, we trained a two-layer multilayer perceptron, with six neurons per layer, using the normal logistic loss, the class-weighted logistic loss, and the class-dependent sigmoid loss respectively and visualize the optimal decision boundaries.
+
+\paragraph{Experimental setup}
+The training data contains four hundred samples per class drawn randomly from two interleaving half circles with noises added with a minor standard deviation, as shown in Figure \ref{fig:moons}.
+Half of the positive examples were assigned negative labels, resulting in a training data with reliable positive labels but noisy negative labels.
+The three different losses were trained with this noisy training data, and the result decision boundaries are drawn as white regions in Figure \ref{fig:moons}.
+The same multilayer perceptron classifier was also trained with true labels to present a baseline decision boundary.
+The weights for positive class and negative class in the weighted logistic loss were chose to be 1 and 0.5 respectively.
+
+% \paragraph{Weighted logistic loss vs. sigmoid loss for the negative class}
+\paragraph{Results}
+If trained with the sigmoid loss, the decision boundary is distant from the positive cluster with a relatively large margin as shown in Figure \ref{fig:moons}.
+By contrast, the weighted logistic loss results in a decision boundary still closed to the positive examples.
+For sigmoid loss, the mislabeled positive examples far away from the decision boundary do not contribute more loss than samples less distant from the decision boundary.
+As a consequence, the loss derivative with respect to the model weights is larger for uncertain predictions in overall than for confident predictions, illustrated by marker sizes in Figure \ref{fig:moonsdiff}.
+Therefore, training with the sigmoid loss emphasizes the positive predictions with low confidence instead of equally down-weighting all incorrect positive predictions.
+The emphasization of uncertain predictions by sigmoid loss leads to a margin from the decision boundary to both positive examples and negative examples.
+
+%%%%%%%% FIGURE MOONS
+
+\begin{figure*}
+\begin{center}
+% \fbox{\rule{0pt}{2in} \rule{.9\linewidth}{0pt}}
+   \includegraphics[width=0.95\linewidth]{img/moons.pdf}
+\end{center}
+   \caption{
+   Decision boundaries of a 2-layer multilayer perceptron trained with different losses on a 2D moons dataset with the unlabeled positive.
+  %%  The \textbf{leftmost} figures have complete positive labels, meaning the positive and negative labels are all correct, whereas, in \textbf{the other figures} only half of the positives were correctly labeled and the rest were mixed with the negative samples.
+   A \textbf{red circle} indicates an example labeled as positive and a \textbf{blue square} indicates the example has a negative label.
+   The \textbf{background colors} represent the classifier prediction in the corresponding area: \textbf{red} for negative class, \textbf{blue} for positive class and \textbf{white} for the class transition areas, i.e., decision boundaries.
+   The \textbf{markers sizes} demonstrates the training loss normalized per-class.
+   Compared to the normal logistic loss and weighted logistic loss (positive:negative=1:0.5), the decision boundary optimized with the sigmoid loss has a larger margin from the positive and negative clusters.
+   (Best viewed in color)
+   }
+\label{fig:moons}
+\end{figure*}
+
+
+\begin{figure}[t]
+\begin{center}
+   \includegraphics[width=\linewidth]{img/moons_diff}
+\end{center}
+   \caption{
+   Derivatives w.r.t the last layer output for the two losses (normalized per class and shown as the marker size).
+   The sigmoid loss has small derivatives for predictions farther from the decision boundary.
+   (Best viewed in color)
+   }
+\label{fig:moonsdiff}
+\end{figure}
+
+
+
+\subsubsection{CIFAR dataset}
+
+To compare the precision and recall achieved by the class-dependent softmax loss and the class-weighted cross entropy, we trained a CNN classifier to distinguish images of multiple relevant categories from non-relevant images when relevant images are partially labeled.
+
+\paragraph{Experimental setup}
+We trained an eight-layer CNN model to classify images into eleven classes: ten relevant classes from CIFAR10 and one non-relevant class for all categories from CIFAR100.
+Relevant images are partially labeled, and the rest forms an unlabeled (U) set together with the non-relevant images.
+An eight layer CNN model was trained with the cross-entropy loss, the class-weighted cross-entropy loss and the class-depend sigmoid loss respectively in the simulated PU learning setup, where 50\% of the positive examples were unlabeled.
+The CNN model was also trained with the modified hard bootstrapping loss introduced in Section \ref{sec:pulearning} to set a benchmark for the state-of-the-art method to learn in the presence of label noises.
+Model performances were evaluated on a separate test set with true labels.
+The architecture of the CNN model can be found in Appendix \ref{sec:support}.
+Each model was trained from scratch with Adam optimizer and base learning rate 0.0001.
+Experiments were repeated three times with random split of P set, and U set and standard deviations were around 0.01 if not explicitly mentioned.
+% Note that there is no category overlap between CIFAR10 dataset and CIFAR100 dataset.
+
+%%%%%%%% TABLE CIFAR10 50%
+
+\paragraph{Results}
+
+Table \ref{tab:cifar} shows using the softmax loss for the non-relevant class achieves better recall than the class-weighted cross-entropy loss without lowering precision significantly.
+With 50\% of the relevant examples correctly labeled and the rest assigned non-relevant labels, the normal cross-entropy loss leads to an imbalanced model with high precision but low recall, and therefore with a low f1-score.
+By reweighing the loss for the non-relevant class by a factor of 0.5, the model becomes balanced for precision and recall so that the result f1-score is improved significantly.
+Compared to the class-weighted cross entropy, the class-dependent softmax loss improves recall by 0.08 while reduces precision only by 0.01.
+The f1-score achieved by the class-dependent softmax loss is slightly better than the class-weighted loss, though not as good as training with clean labels with either 50\% of the sample or the complete training set.
+The state-of-the-art benchmark method, the hard bootstrap loss, achieves the same f1-score as the softmax loss but not as high recall.
+This result is as expected because the softmax loss and the hard bootstrap loss share an idea of encouraging confident predictions.
+
+% It is noteworthy that the weighted negative loss and hard bootstrapping loss achieved more balanced precision and recall than the sigmoid negative loss.
+% That is because the two former losses were weighted by classes frequency of observed labels, around 0.67 for the negative class and 2 for positive classes, whereas the sigmoid negative loss was not.
+% Reweighing the sigmoid negative loss by observed label frequencies would trade too much precision for recall (0.74 and 0.83 respectively), resulting in a worse f1-score than not reweighing losses.
+% The sigmoid negative loss seems to be easier over-balancing with the same choice of class weights.
+% Besides, the optimal precision and recall for sigmoid negative loss seem more unstable which may relate to the nonconvex class-dependent loss.
+
+
+\begin{table}[t]
+\resizebox{\columnwidth}{!}{
+\centering
+\begin{tabular}{ll|llll}
+Annotation  & Loss & acc. & mean prec. & mean rec. & mean $F_1$ \\
+\hline
+R+N         & CrossEntropy   & 0.87 & 0.88 & 0.82 & 0.85 \\
+50\%(R+N)   & CrossEntropy   & 0.83 & 0.84 & 0.78 & 0.80 \\
+50\%R+U     & CrossEntropy   & 0.66 & 0.94 & 0.38 & 0.49 \\
+\hline
+50\%R+U     & ClassWeighted     & 0.78 & 0.75 & 0.75 & 0.76 \\
+50\%R+U     & SoftmaxLoss      & 0.79 & 0.74 & \textbf{0.83} & \textbf{0.78} \\
+50\%R+U     & BootstrapHard    & \textbf{0.80} & 0.76 & 0.81 & \textbf{0.78} \\
+\end{tabular}
+}
+\caption{
+Comparing different losses for training a 2-layer multilayer perception to classify ten relevant classes and one non-relevant class with partially labeled relevant examples and unlabeled non-relevant examples.
+The trained classifiers are evaluated on a test set of true labels.
+For each of the relevant classes, precision, recall, and f1-score are measured with the one-vs-all strategy and averaged.
+\textbf{R+N} denotes model trained with the complete relevant labels (R set) and non-relevant labels (N set);
+\textbf{50\%(R+N)} represents model trained with the half of the relevant labels and non-relevant labels respectively;
+\textbf{50\%R+U} means the model is trained with half of the relevant samples, and the rest relevant samples are mixed with non-relevant samples (U set).
+Weighting the non-relevant class by a factor of 0.5 improves the mean f1-score from 0.49 to 0.76.
+Both the class-dependent softmax loss and the hard bootstrapping loss perform even better than simply weighing the classes, but not as good ass training with a set of labeled negative examples.
+Using the softmax loss for non-relevant class achieves the highest mean recall, whereas the modified hard bootstrapping loss has a higher accuracy with 50\% positive examples unlabeled.
+}
+\label{tab:cifar}
+\end{table}
+
+
+%%%%%%%% FIGURE Varying positive annotating percetage
+By varying the labeled percentage of the relevant images, Figure \ref{fig:pct_annotating} demonstrates that the class-dependent softmax loss performs slightly better than the class weighted cross-entropy when the labeled percentage of relevant images is neither too high ($>0.8$) nor too low ($<0.2$).
+% When the labeled percentage of relevant images is high, the difference in loss contributions of the unlabeled relevant images for the two losses is small.
+% When the percentage is low, the severe imbalance of classes introduced by unlabeled relevant images prevents the models from achieving good classification performance.
+
+% Similarly as the result at 50\% positive examples labeled, the sigmoid loss and the hard bootstrapping loss have only little improvement compared to the weighted negative loss.
+% The assumption we made for the sigmoid negative loss was that the probability of a negative example being wrong is dependent on the confidence.
+% However, the synthesized mislabeled positive examples were distributed at random when we synthesized them, meaning that the probability for a negative label being wrong is independent of the underlying distribution of the inputs.
+% No matter where the decision boundary is, such uniformly distributed incorrect negative labels are independent of the prediction confidence.
+% Therefore, it is expected for the sigmoid negative loss and bootstrapping loss to have similar performance as the weighted negative loss.
+
+% By varying the percentage of labeled relevant examples, the class-dependent sigmoid loss performs slightly better than the class weighted cross-entropy when the percentage of the labeled relevant images is neither too high (>0.8) nor too low (<0.2), as shown in Figure \ref{fig:pct_annotating}.
+% Besides, FIgure \ref{fig:pct_annotating} demonstrates that learning with a subset of explicitly labeled non-relevant examples (RN setup) outperforms learning with the mixed unlabeled examples (RU setup) for any percentage of labeled positives and any losses being used.
+% This result is expected because the explicitly labeled non-relevant examples deliver extra information about which images in the unlabeled set are non-relevant.
+% Therefore, learning with positive and unlabeled examples is only relevant when it is impossible to easily construct a subset of negative examples from the unlabeled data.
+% Otherwise, training with true positive and negative labels, and potentially with semi-supervised learning, would be superior to training with positive and unlabeled examples only.
+
+\begin{figure}[t]
+\centering
+   \includegraphics[width=1.05\linewidth]{img/pu_vs_pn}
+\caption{
+Comparing f1-score for the class-dependent softmax loss and the class-weighted cross entropy with varying percentage of relevant images labeled.
+% \textbf{R+N} represents training with a percentage of reliable, relevant labels and non-relevant labels, while \textbf{R+U} stands for training with a percentage of relevant labels and all other images as unlabeled.
+The class-dependent softmax loss achieves better test f1-score than the class-weighted cross entropy when 20\% and 50\% percentage of relevant images are labeled, and the others are mixed with non-relevant images.
+% The class-dependent sigmoid loss achieves slightly higher f1-score than the weighted cross-entropy loss at labeled relevant  20\% and 50\% of the relevant samples are labeled.
+% In general, training with explicitly labeled non-relevant examples (RN) is superior to training with an unlabeled set of mixed relevant and non-relevant examples (RU).
+}
+\label{fig:pct_annotating}
+\end{figure}
+
+
+%%%%%%%% Text Segmentation Pascal VOC2011
+\subsection{Learning with incomplete segmentations}
+To compare the class dependent sigmoid loss with the normal logistic loss, and class-weighted logistic loss for training foreground/background segmentation with incomplete segmentations, we used again the PASCAL VOC2011 dataset with extra segmentation \cite{hariharan2011semantic}.
+
+\paragraph{Dataset}
+PASCAL VOC2011
+
+\paragraph{Experimental setup}
+We simulated inexhaustive segmentations the same way as described in Section \ref{subsec:robustness}.
+The same AlexNet-FCN model was trained together with the different loss functions to predict binary segmentation, determining whether a pixel belongs to an object or not.
+% Only single-object images were used for training and testing to avoid the influence of two adjacent objects joining as one object because of binary segmentation.
+The same hyperparameters for optimization were used as in Section \ref{subsec:robustness}.
+The trained models were evaluated with the test set of PASCAL VOC2011 segmentation dataset with binary segmentations.
+
+
+\paragraph{Results}
+As shown in Table \ref{tab:pusegment}, the class dependent sigmoid loss achieves the highest mean accuracy, approximately 0.07 better than training with the normal logistic loss, and 0.04 better than the class-weighted loss.
+In contrast to the improvement of mean accuracy, improvement of mean IU for both the class-weigthed loss and the class-dependent logistic loss are insignificant.
+The increase in the mean accuracy is caused by an increase in foreground accuracy and a decrease in background accuracy.
+% The sigmoid loss increases precision for recall, similarly as observed in training the CIFAR dataset.
+The decrease in background accuracy interferes the improvement mean IU since the mean IU counts for both low false positive rate and low false negative rate.
+
+
+%%%%%%%% TABLE Segmentation Pascal VOC2011
+\begin{table}[t]
+\resizebox{\columnwidth}{!}{
+\centering
+\begin{tabular}{ll|llll}
+Annotation  & Loss & overall acc. & mean acc. & f.w. IU & mean IU \\
+\hline
+% Complete            & CrossEnt.U       &  0.88 & 0.60 & 0.48 & 0.80 \\
+% 50\%Unsegmented     & CrossEnt.U       &  0.83 & 0.31 & 0.27 & 0.70 \\
+% 50\%Unsegmented     & WeightedU        &  0.83 & 0.34 & 0.29 & 0.70 \\
+% 50\%Unsegmented     & ExponentialU     &  0.83 & 0.34 & 0.29 & 0.70 \\
+Complete       & LogisticLoss       &  0.90 & 0.85 & 0.82 & 0.75 \\
+50\%Unseg.     & LogisticLoss       &  0.85 & 0.68 & 0.73 & 0.60 \\
+50\%Unseg.     & ClassWeighted       &  0.84 & 0.71 & 0.73 & \textbf{0.62} \\
+50\%Unseg.     & SigmoidLoss      &  0.83 & \textbf{0.75} & 0.72 & \textbf{0.62} \\
+\end{tabular}
+}
+\caption{
+Training foreground/background segmentation with different losses when 50\% of the objects are unsegmented.
+The performances are achieved on the test set of PASCAL VOC2011 segmentation dataset.
+% A class weight of 0.7:1.75 was used to balance the sample frequency differences of the two classes.
+% The negative loss was further weighted by a factor of 0.5 for the weighted negative loss.
+% Mean accuracy is equivalent to the average recall over the two classes.
+% Mean IU is the average intersection over union ratio (IU) over two classes and f.w. IU is the frequency weighted average of IU over the two classes.
+Both the class-dependent sigmoid loss and the class-weighted logistic loss perform better than the normal logistic loss when 50\% objects unsegmented but not as good as the model trained with complete segmentations.
+The class-dependent sigmoid loss has a better mean accuracy than the class-weighted logistic loss and a similar mean IU as the class-weighted logistic loss.
+}
+\label{tab:pusegment}
+\end{table}
+
+
+%%%%%%%% Figure Segmentation Pascal VOC2011
+Selective predictions made by the models trained with the sigmoid negative loss and the cross entropy loss were presented in Figure \ref{fig:pusegment}.
+For the two example images shown, the model trained with the cross entropy loss failed to segment objects from images whereas sigmoid negative loss predicted segmentations on the position of the objects.
+The coarse outlines were mainly due to the limited compacity of the FCN-AlexNet model.
+The third column shows predictions given by model trained with complete training segmentation, and it did not produce more accurate outlines.
+There is no example observed correctly segmented by the model with the class-weighted logistic loss but not by the model with the class-dependent sigmoid loss.
+
+\begin{figure}
+\centering
+  \begin{minipage}{\columnwidth}\footnotesize
+  \centering
+  \subsubfloat{\includegraphics[width=0.19\columnwidth]{img/2007_002132}}{Raw}
+  \subsubfloat{\includegraphics[width=0.19\columnwidth]{img/2007_002132_label}}{Label}
+  \subsubfloat{\includegraphics[width=0.19\columnwidth]{img/2007_002132_up_pred}}{Complete}
+  \subsubfloat{\includegraphics[width=0.19\columnwidth]{img/2007_002132_exp_pred}}{SigmoidLoss}
+  \subsubfloat{\includegraphics[width=0.19\columnwidth]{img/2007_002132_low_pred}}{ClassWeight.}
+  \subsubfloat{\includegraphics[width=0.19\columnwidth]{img/2007_002618}}{Raw}%
+  \subsubfloat{\includegraphics[width=0.19\columnwidth]{img/2007_002618_label}}{Label}
+  \subsubfloat{\includegraphics[width=0.19\columnwidth]{img/2007_002618_up_pred}}{Complete}
+  \subsubfloat{\includegraphics[width=0.19\columnwidth]{img/2007_002618_exp_pred}}{SigmoidLoss}
+  \subsubfloat{\includegraphics[width=0.19\columnwidth]{img/2007_002618_low_pred}}{ClassWeight.}
+  \end{minipage}
+\caption{
+Example predictions made by models trained with the logistic loss and the class-dependent sigmoid loss.
+This figure presented two selective images for which the model trained with the logistic loss failed to segment objects, whereas the model trained with the class-dependent sigmoid negative loss succeed.
+}
+\label{fig:pusegment}
+\end{figure}
+
 \subsection{The influence of label noises in segmention}
 \label{subsec:robustness}
 
 %%%%%%%% TEXT Experiment setup
 
 To investigate the influence of the lablel noises, (1) inexhaustive segmentations, (2) objects mislabelling and (3) false positive segmentations, on the learned representations, we set up experiments with simulated label noises from a well-annotated dataset, the PASCAL VOC2011 segmentation dataset \cite{everingham2015pascal}.
+
+
+\subsection{Label noises simulation}
+\label{subsec:noises}
+
+It is challenging to find a dataset with both clean and noisy labels available, so we simulate segmentation noises with correct labels.
+A straightforward way to simulate noisy labels is to corrupt true labels stochastically for each segment with a corruption model.
+The corruption model simply describes the probability of the observed labels given the true labels.
+% $$p(\tilde{y_{ij}} \vert x, y_{ij}, e_{ij})$$
+% where the binary error occurence $e_{ij}$ depends on the inputs $x$ and true labels $y$.
+
+For segmentation problems, each pixel (or voxel for 3D segmentation) of a training image has a label assigned to one of the pre-defined categories.
+Supposing there are $K$ pre-defined categories, the label of a pixel in the $i$-th row and $j$-th column from an image of size $h \times w$:
+\[
+  y_{ij} =
+    \begin{cases}
+      1 \leq k \leq K, & \text{for foreground pixels} \\
+      0, & \text{for background pixels}
+    \end{cases}
+\]
+where $1 \leq i \leq h, 1 \leq j \leq w$ and $i,j,k \in \mathrm{Z}^+$.
+
+
+\textbf{Inexhaustive segmentation}
+Given the true labels, which pixels belong to the same object is known.
+Inexhaustive segmentation is simulated by flipping all pixels for an object of the $k$-th category from $k$ to $0$ with probability $p_{0k}$.
+The probability for these pixels to have correct labels is then: $1-p_{0k}$.
+
+% $$p(\tilde{y_{ij}}=0\vert y_{ij}=k) = p_{0k}$$
+% $$p(\tilde{y_{ij}}=k\vert y_{ij}=k) = 1-p_{0k}$$
+
+\textbf{Objects Mislabelling}
+To simulate objects mislabelling, we stochastically convert pixel labels of segment for an object of the $k$-th category from $k$ to $j$ with probability $p_{jk}$, where $j, k \leq K$ and $j,k \in \mathrm{Z}^+$.
+Probabilities for all possible combinations of $j$ and $k$ form a \textit{confusion matrix} in which probabilities in each column sum up to 1.
+% $$p(\tilde{y_{ij}}=j \vert y_{ij}=k) = p_{jk}, ij \in S, k,j \in [1,K]$$
+% where $\sum_{j=1}^{K}p_{jk}=1$.
+
+\textbf{False positive segmentations}
+The presence of false positive segmentations is in two steps: excluding classes except one from the foreground categories, forming the clean labels set, and assigning pixels of the excluded categories with foreground labels with a probability of $p_{11}$, constructing the noisy labels set.% $$p(\tilde{y_{ij}}=k \vert x, y_{ij}=0), ij \in S $$
 
 \paragraph{Dataset}
 In this experiment, fifteen out of twenty categories of the VOC2011 dataset were selected to form a \textit{pre-training dataset} and the other categories formed a \textit{fine-tuning dataset}.
@@ -144,242 +425,4 @@ The displayed mean IU/mean accuracies and standard deviations were averaged over
 The line shows that binarizing and categorizing classes meaningfully had little negative effect on feature transferability.
 }
 \label{fig:categories}
-\end{figure}
-
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%%%%%%%%%% PU Learning
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-\subsection{Learning with only positive and unlabeled samples}
-\label{subsec:pulearning}
-
-
-\subsubsection{2D non-linear dataset}
-
-To investigate the decision boundaries led by the sigmoid loss for the negative class, we trained a two-layer multilayer perceptron, with six neurons per layer, using the normal logistic loss, the class-weighted logistic loss, and the class-dependent sigmoid loss respectively and visualize the optimal decision boundaries.
-
-\paragraph{Experimental setup}
-The training data contains four hundred samples per class drawn randomly from two interleaving half circles with noises added with a minor standard deviation, as shown in Figure \ref{fig:moons}.
-Half of the positive examples were assigned negative labels, resulting in a training data with reliable positive labels but noisy negative labels.
-The three different losses were trained with this noisy training data, and the result decision boundaries are drawn as white regions in Figure \ref{fig:moons}.
-The same multilayer perceptron classifier was also trained with true labels to present a baseline decision boundary.
-The weights for positive class and negative class in the weighted logistic loss were chose to be 1 and 0.5 respectively.
-
-% \paragraph{Weighted logistic loss vs. sigmoid loss for the negative class}
-\paragraph{Results}
-If trained with the sigmoid loss, the decision boundary is distant from the positive cluster with a relatively large margin as shown in Figure \ref{fig:moons}.
-By contrast, the weighted logistic loss results in a decision boundary still closed to the positive examples.
-For sigmoid loss, the mislabeled positive examples far away from the decision boundary do not contribute more loss than samples less distant from the decision boundary.
-As a consequence, the loss derivative with respect to the model weights is larger for uncertain predictions in overall than for confident predictions, illustrated by marker sizes in Figure \ref{fig:moonsdiff}.
-Therefore, training with the sigmoid loss emphasizes the positive predictions with low confidence instead of equally down-weighting all incorrect positive predictions.
-The emphasization of uncertain predictions by sigmoid loss leads to a margin from the decision boundary to both positive examples and negative examples.
-
-%%%%%%%% FIGURE MOONS
-
-\begin{figure*}
-\begin{center}
-% \fbox{\rule{0pt}{2in} \rule{.9\linewidth}{0pt}}
-   \includegraphics[width=0.95\linewidth]{img/moons.pdf}
-\end{center}
-   \caption{
-   Decision boundaries of a 2-layer multilayer perceptron trained with different losses on a 2D moons dataset with the unlabeled positive.
-  %%  The \textbf{leftmost} figures have complete positive labels, meaning the positive and negative labels are all correct, whereas, in \textbf{the other figures} only half of the positives were correctly labeled and the rest were mixed with the negative samples.
-   A \textbf{red circle} indicates an example labeled as positive and a \textbf{blue square} indicates the example has a negative label.
-   The \textbf{background colors} represent the classifier prediction in the corresponding area: \textbf{red} for negative class, \textbf{blue} for positive class and \textbf{white} for the class transition areas, i.e., decision boundaries.
-   The \textbf{markers sizes} demonstrates the training loss normalized per-class.
-   Compared to the normal logistic loss and weighted logistic loss (positive:negative=1:0.5), the decision boundary optimized with the sigmoid loss has a larger margin from the positive and negative clusters.
-   (Best viewed with color)
-   }
-\label{fig:moons}
-\end{figure*}
-
-
-\begin{figure}[t]
-\begin{center}
-   \includegraphics[width=\linewidth]{img/moons_diff}
-\end{center}
-   \caption{
-   Derivatives w.r.t the last layer output for the two losses (normalized per class and shown as the marker size).
-   The sigmoid loss has small derivatives for predictions farther from the decision boundary.
-   (Best viewed with color)
-   }
-\label{fig:moonsdiff}
-\end{figure}
-
-
-
-\subsubsection{CIFAR dataset}
-
-To compare the precision and recall achieved by the class-dependent softmax loss and the class-weighted cross entropy, we trained a CNN classifier to distinguish images of multiple relevant categories from non-relevant images when relevant images are partially labeled.
-
-\paragraph{Experimental setup}
-We trained an eight-layer CNN model to classify images into eleven classes: ten relevant classes from CIFAR10 and one non-relevant class for all categories from CIFAR100.
-Relevant images are partially labeled, and the rest forms an unlabeled (U) set together with the non-relevant images.
-An eight layer CNN model was trained with the cross-entropy loss, the class-weighted cross-entropy loss and the class-depend sigmoid loss respectively in the simulated PU learning setup, where 50\% of the positive examples were unlabeled.
-The CNN model was also trained with the modified hard bootstrapping loss introduced in Section \ref{sec:pulearning} to set a benchmark for the state-of-the-art method to learn in the presence of label noises.
-Model performances were evaluated on a separate test set with true labels.
-The architecture of the CNN model can be found in Appendix \ref{sec:support}.
-Each model was trained from scratch with Adam optimizer and base learning rate 0.0001.
-Experiments were repeated three times with random split of P set, and U set and standard deviations were around 0.01 if not explicitly mentioned.
-% Note that there is no category overlap between CIFAR10 dataset and CIFAR100 dataset.
-
-%%%%%%%% TABLE CIFAR10 50%
-
-\paragraph{Results}
-
-Table \ref{tab:cifar} shows using the softmax loss for the non-relevant class achieves better recall than the class-weighted cross-entropy loss without lowering precision significantly.
-With 50\% of the relevant examples correctly labeled and the rest assigned non-relevant labels, the normal cross-entropy loss leads to an imbalanced model with high precision but low recall, and therefore with a low f1-score.
-By reweighing the loss for the non-relevant class by a factor of 0.5, the model becomes balanced for precision and recall so that the result f1-score is improved significantly.
-Compared to the class-weighted cross entropy, the class-dependent softmax loss improves recall by 0.08 while reduces precision only by 0.01.
-The f1-score achieved by the class-dependent softmax loss is slightly better than the class-weighted loss, though not as good as training with clean labels with either 50\% of the sample or the complete training set.
-The state-of-the-art benchmark method, the hard bootstrap loss, achieves the same f1-score as the softmax loss but not as high recall.
-This result is as expected because the softmax loss and the hard bootstrap loss share an idea of encouraging confident predictions.
-
-% It is noteworthy that the weighted negative loss and hard bootstrapping loss achieved more balanced precision and recall than the sigmoid negative loss.
-% That is because the two former losses were weighted by classes frequency of observed labels, around 0.67 for the negative class and 2 for positive classes, whereas the sigmoid negative loss was not.
-% Reweighing the sigmoid negative loss by observed label frequencies would trade too much precision for recall (0.74 and 0.83 respectively), resulting in a worse f1-score than not reweighing losses.
-% The sigmoid negative loss seems to be easier over-balancing with the same choice of class weights.
-% Besides, the optimal precision and recall for sigmoid negative loss seem more unstable which may relate to the nonconvex class-dependent loss.
-
-
-\begin{table}[t]
-\resizebox{\columnwidth}{!}{
-\centering
-\begin{tabular}{ll|llll}
-Annotation  & Loss & acc. & mean prec. & mean rec. & mean $F_1$ \\
-\hline
-R+N         & CrossEntropy   & 0.87 & 0.88 & 0.82 & 0.85 \\
-50\%(R+N)   & CrossEntropy   & 0.83 & 0.84 & 0.78 & 0.80 \\
-50\%R+U     & CrossEntropy   & 0.66 & 0.94 & 0.38 & 0.49 \\
-\hline
-50\%R+U     & ClassWeighted     & 0.78 & 0.75 & 0.75 & 0.76 \\
-50\%R+U     & SoftmaxLoss      & 0.79 & 0.74 & \textbf{0.83} & \textbf{0.78} \\
-50\%R+U     & BootstrapHard    & \textbf{0.80} & 0.76 & 0.81 & \textbf{0.78} \\
-\end{tabular}
-}
-\caption{
-Comparing different losses for training a 2-layer multilayer perception to classify ten relevant classes and one non-relevant class with partially labeled relevant examples and unlabeled non-relevant examples.
-The trained classifiers are evaluated on a test set of true labels.
-For each of the relevant classes, precision, recall, and f1-score are measured with the one-vs-all strategy and averaged.
-\textbf{R+N} denotes model trained with the complete relevant labels (R set) and non-relevant labels (N set);
-\textbf{50\%(R+N)} represents model trained with the half of the relevant labels and non-relevant labels respectively;
-\textbf{50\%R+U} means the model is trained with half of the relevant samples, and the rest relevant samples are mixed with non-relevant samples (U set).
-Weighting the non-relevant class by a factor of 0.5 improves the mean f1-score from 0.49 to 0.76.
-Both the class-dependent softmax loss and the hard bootstrapping loss perform even better than simply weighing the classes, but not as good ass training with a set of labeled negative examples.
-Using the softmax loss for non-relevant class achieves the highest mean recall, whereas the modified hard bootstrapping loss has a higher accuracy with 50\% positive examples unlabeled.
-}
-\label{tab:cifar}
-\end{table}
-
-
-%%%%%%%% FIGURE Varying positive annotating percetage
-By varying the labeled percentage of the relevant images, Figure \ref{fig:pct_annotating} demonstrates that the class-dependent softmax loss performs slightly better than the class weighted cross-entropy when the labeled percentage of relevant images is neither too high ($>0.8$) nor too low ($<0.2$).
-% When the labeled percentage of relevant images is high, the difference in loss contributions of the unlabeled relevant images for the two losses is small.
-% When the percentage is low, the severe imbalance of classes introduced by unlabeled relevant images prevents the models from achieving good classification performance.
-
-% Similarly as the result at 50\% positive examples labeled, the sigmoid loss and the hard bootstrapping loss have only little improvement compared to the weighted negative loss.
-% The assumption we made for the sigmoid negative loss was that the probability of a negative example being wrong is dependent on the confidence.
-% However, the synthesized mislabeled positive examples were distributed at random when we synthesized them, meaning that the probability for a negative label being wrong is independent of the underlying distribution of the inputs.
-% No matter where the decision boundary is, such uniformly distributed incorrect negative labels are independent of the prediction confidence.
-% Therefore, it is expected for the sigmoid negative loss and bootstrapping loss to have similar performance as the weighted negative loss.
-
-% By varying the percentage of labeled relevant examples, the class-dependent sigmoid loss performs slightly better than the class weighted cross-entropy when the percentage of the labeled relevant images is neither too high (>0.8) nor too low (<0.2), as shown in Figure \ref{fig:pct_annotating}.
-% Besides, FIgure \ref{fig:pct_annotating} demonstrates that learning with a subset of explicitly labeled non-relevant examples (RN setup) outperforms learning with the mixed unlabeled examples (RU setup) for any percentage of labeled positives and any losses being used.
-% This result is expected because the explicitly labeled non-relevant examples deliver extra information about which images in the unlabeled set are non-relevant.
-% Therefore, learning with positive and unlabeled examples is only relevant when it is impossible to easily construct a subset of negative examples from the unlabeled data.
-% Otherwise, training with true positive and negative labels, and potentially with semi-supervised learning, would be superior to training with positive and unlabeled examples only.
-
-\begin{figure}[t]
-\centering
-   \includegraphics[width=1.05\linewidth]{img/pu_vs_pn}
-\caption{
-Comparing f1-score for the class-dependent softmax loss and the class-weighted cross entropy with varying percentage of relevant images labeled.
-% \textbf{R+N} represents training with a percentage of reliable, relevant labels and non-relevant labels, while \textbf{R+U} stands for training with a percentage of relevant labels and all other images as unlabeled.
-The class-dependent softmax loss achieves better test f1-score than the class-weighted cross entropy when 20\% and 50\% percentage of relevant images are labeled, and the others are mixed with non-relevant images.
-% The class-dependent sigmoid loss achieves slightly higher f1-score than the weighted cross-entropy loss at labeled relevant  20\% and 50\% of the relevant samples are labeled.
-% In general, training with explicitly labeled non-relevant examples (RN) is superior to training with an unlabeled set of mixed relevant and non-relevant examples (RU).
-}
-\label{fig:pct_annotating}
-\end{figure}
-
-
-%%%%%%%% Text Segmentation Pascal VOC2011
-\subsubsection{PASCAL VOC2011 Segmentation}
-To compare the class dependent sigmoid loss with the normal logistic loss, and class-weighted logistic loss for training foreground/background segmentation with incomplete segmentations, we used again the PASCAL VOC2011 dataset with extra segmentation \cite{hariharan2011semantic}.
-
-\paragraph{Experimental setup}
-We simulated inexhaustive segmentations the same way as described in Section \ref{subsec:robustness}.
-The same AlexNet-FCN model was trained together with the different loss functions to predict binary segmentation, determining whether a pixel belongs to an object or not.
-% Only single-object images were used for training and testing to avoid the influence of two adjacent objects joining as one object because of binary segmentation.
-The same hyperparameters for optimization were used as in Section \ref{subsec:robustness}.
-The trained models were evaluated with the test set of PASCAL VOC2011 segmentation dataset with binary segmentations.
-
-
-\paragraph{Results}
-As shown in Table \ref{tab:pusegment}, the class dependent sigmoid loss achieves the highest mean accuracy, approximately 0.07 better than training with the normal logistic loss, and 0.04 better than the class-weighted loss.
-In contrast to the improvement of mean accuracy, improvement of mean IU for both the class-weigthed loss and the class-dependent logistic loss are insignificant.
-The increase in the mean accuracy is caused by an increase in foreground accuracy and a decrease in background accuracy.
-% The sigmoid loss increases precision for recall, similarly as observed in training the CIFAR dataset.
-The decrease in background accuracy interferes the improvement mean IU since the mean IU counts for both low false positive rate and low false negative rate.
-
-
-%%%%%%%% TABLE Segmentation Pascal VOC2011
-\begin{table}[t]
-\resizebox{\columnwidth}{!}{
-\centering
-\begin{tabular}{ll|llll}
-Annotation  & Loss & overall acc. & mean acc. & f.w. IU & mean IU \\
-\hline
-% Complete            & CrossEnt.U       &  0.88 & 0.60 & 0.48 & 0.80 \\
-% 50\%Unsegmented     & CrossEnt.U       &  0.83 & 0.31 & 0.27 & 0.70 \\
-% 50\%Unsegmented     & WeightedU        &  0.83 & 0.34 & 0.29 & 0.70 \\
-% 50\%Unsegmented     & ExponentialU     &  0.83 & 0.34 & 0.29 & 0.70 \\
-Complete       & LogisticLoss       &  0.90 & 0.85 & 0.82 & 0.75 \\
-50\%Unseg.     & LogisticLoss       &  0.85 & 0.68 & 0.73 & 0.60 \\
-50\%Unseg.     & ClassWeighted       &  0.84 & 0.71 & 0.73 & \textbf{0.62} \\
-50\%Unseg.     & SigmoidLoss      &  0.83 & \textbf{0.75} & 0.72 & \textbf{0.62} \\
-\end{tabular}
-}
-\caption{
-Training foreground/background segmentation with different losses when 50\% of the objects are unsegmented.
-The performances are achieved on the test set of PASCAL VOC2011 segmentation dataset.
-% A class weight of 0.7:1.75 was used to balance the sample frequency differences of the two classes.
-% The negative loss was further weighted by a factor of 0.5 for the weighted negative loss.
-% Mean accuracy is equivalent to the average recall over the two classes.
-% Mean IU is the average intersection over union ratio (IU) over two classes and f.w. IU is the frequency weighted average of IU over the two classes.
-Both the class-dependent sigmoid loss and the class-weighted logistic loss perform better than the normal logistic loss when 50\% objects unsegmented but not as good as the model trained with complete segmentations.
-The class-dependent sigmoid loss has a better mean accuracy than the class-weighted logistic loss and a similar mean IU as the class-weighted logistic loss.
-}
-\label{tab:pusegment}
-\end{table}
-
-
-%%%%%%%% Figure Segmentation Pascal VOC2011
-Selective predictions made by the models trained with the sigmoid negative loss and the cross entropy loss were presented in Figure \ref{fig:pusegment}.
-For the two example images shown, the model trained with the cross entropy loss failed to segment objects from images whereas sigmoid negative loss predicted segmentations on the position of the objects.
-The coarse outlines were mainly due to the limited compacity of the FCN-AlexNet model.
-The third column shows predictions given by model trained with complete training segmentation, and it did not produce more accurate outlines.
-There is no example observed correctly segmented by the model with the class-weighted logistic loss but not by the model with the class-dependent sigmoid loss.
-
-\begin{figure}
-\centering
-  \begin{minipage}{\columnwidth}\footnotesize
-  \centering
-  \subsubfloat{\includegraphics[width=0.19\columnwidth]{img/2007_002132}}{Raw}
-  \subsubfloat{\includegraphics[width=0.19\columnwidth]{img/2007_002132_label}}{Label}
-  \subsubfloat{\includegraphics[width=0.19\columnwidth]{img/2007_002132_up_pred}}{Complete}
-  \subsubfloat{\includegraphics[width=0.19\columnwidth]{img/2007_002132_exp_pred}}{SigmoidLoss}
-  \subsubfloat{\includegraphics[width=0.19\columnwidth]{img/2007_002132_low_pred}}{ClassWeight.}
-  \subsubfloat{\includegraphics[width=0.19\columnwidth]{img/2007_002618}}{Raw}%
-  \subsubfloat{\includegraphics[width=0.19\columnwidth]{img/2007_002618_label}}{Label}
-  \subsubfloat{\includegraphics[width=0.19\columnwidth]{img/2007_002618_up_pred}}{Complete}
-  \subsubfloat{\includegraphics[width=0.19\columnwidth]{img/2007_002618_exp_pred}}{SigmoidLoss}
-  \subsubfloat{\includegraphics[width=0.19\columnwidth]{img/2007_002618_low_pred}}{ClassWeight.}
-  \end{minipage}
-\caption{
-Example predictions made by models trained with the logistic loss and the class-dependent sigmoid loss.
-This figure presented two selective images for which the model trained with the logistic loss failed to segment objects, whereas the model trained with the class-dependent sigmoid negative loss succeed.
-}
-\label{fig:pusegment}
 \end{figure}

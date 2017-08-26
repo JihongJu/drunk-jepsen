@@ -56,6 +56,19 @@ Lastly, applying the sigmoid loss to segmentation data with incomplete segmentat
 In practice, there is often a spatial dependence for noises in pixel labels which can be valuable to improve performance.
 For example, if one or a few pixels have a high probability of being foreground, their neighboring pixels are probably also foreground.
 
+\paragraph{Extending PU learning from classification to segmentation}
+In Section \ref{introduction}, we argue that learning with unlabeled foreground pixels is similar to a PU learning setup.
+Howvever, there is still differences between learning with unlabeled foreground pixels and learning with positive and unlabeled examples.
+
+The first difference is that each example in the normal PU learning setup is independent of each other, whereas pixels in images are not.
+Assuming the probability of mislabeling foreground pixel as the background is independent of its neighbor pixels, the classification losses can be applied to segmentation problems by performing per-pixel classification problems.
+
+Another difference between incomplete segmentation and a normal positive and unlabeled learning problem is that pixels for objects of various categories can be unlabeled.
+Supposing there are $K$ categories of interest, varying from class $1$ to class $K$, the class $0$ is for unlabeled data which may or may not belong to the $K$ defined categories.
+The sigmoid loss can be extended train deep learning models with unlabeled examples from various categories:
+% Alternatively, one can apply a one-vs-all strategy, with which the normal logistic loss is used for positive classes while the weighted, sigmoid and bootstrapping loss can be used for the negative class.
+
+
 %%%%%%%% confidence
 % The problem of weighting negative examples is that it assumes the probability for a negative label being wrong is independent of the underlying distribution of inputs.
 % % However, perceptual similar examples are more likely to have the same label, and the negative label is probably wrong if they are assigned contrary labels, supposing the positive labels are always correct.
