@@ -34,7 +34,7 @@ The corresponding optimal feature extractor, a.k.a., representations, $g^{\ast}$
 %%%%%%%% TEXT PU Learning setup
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-\paragraph{PU Learning}
+\paragraph{Learning with only positive and unlabeled data}
 Consider a dataset containing $N$ training examples $(x_i,y_i,s_i), i \in \{1, 2, \dots, N\}$, where $x_i$ is the observed features for the $i$-th examples, and $y_i \in \{-1,+1\}$ is the label for the $i$-th example, and $s_i$ is a binary variable denoting whether the label for the $i$-th example is observed or not.
 
 
@@ -52,9 +52,10 @@ s_i =
   \end{cases}
 \end{eqnarray}
 The set of labeled positive examples is called the positive $P$ set and the other examples form an unlabeled $U$ set.
+The problem of training classifier with the P set and the U set only is referred to as \textbf{PU learning}.
 
 In this work, we train classifiers by assigning examples in the unlabeled set negative labels and covert PU learning to a learning problem with reliable positive labels and unreliable negative loss.
-The observed label for the $i$-th example is:
+The observed label $\tilde{y_i}$ for the $i$-th example is:
 \begin{eqnarray}
 \tilde{y_i} =
   \begin{cases}

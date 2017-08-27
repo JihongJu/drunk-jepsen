@@ -28,14 +28,17 @@ The same multilayer perceptron classifier was also trained with true labels to p
 The weights for the positive class and the negative class in the weighted logistic loss were 1 and 0.5 respectively.
 
 \paragraph{Decision boundary with large margin by the sigmoid loss}
-If trained with the sigmoid loss, the decision boundary is distant from the positive cluster with a relatively large margin as shown in Figure \ref{fig:moons}.
-By contrast, the weighted logistic loss results in a decision boundary still closed to the positive examples.
+If trained with the sigmoid loss, the decision boundary is distant from the positive cluster with a relatively large margin, whereas the decision boundary for the weighted logistic loss is still closed to the positive examples, as shown in Figure \ref{fig:moons}.
 For sigmoid loss, the mislabeled positive examples far away from the decision boundary do not contribute more loss than samples less distant from the decision boundary.
 As a consequence, the loss derivative with respect to the model weights is larger for examples near the decision boundary than examples far away, illustrated as marker sizes in Figure \ref{fig:moonsdiff}.
-Training with the sigmoid loss emphasizes the positive predictions with low confidence instead of emphasizing the positive predictions with high confident as the two logistic losses do.
+The derivative determines the update rate for the model weights.
+Higher derivative means a higher rate of update.
+Therefore, examples near the decision boundary have a higher contribution to the model updates for the sigmoid loss.
+In other words, the sigmoid loss emphasizes the positive predictions with low confidence.
 The emphasization of the uncertain predictions near the decision boundary for the sigmoid loss leads to a decision boundary converges to low-density regions for the inputs distribution.
-Therefore, the optimal decision boundary for the sigmoid loss has a larger margin from the positive cluster than the decision boundaries for the normal and the weighted logistic loss, while still keeps distant from the negative samples.
-The sigmoid loss is therefore expected to achieve high recall and not sacrifice precision.
+By contrast, the logistic loss has higher derivative for positive predictions with high confidence.
+It emphasizes the incorrect predictions with confidence so that the decision boundary is pulled toward the positive cluster by mislabeled positive samples.
+Since the sigmoid loss converges to an optimal decision boundary that has a relatively large margin from the positive cluster while still keeping distant from the negative samples, it is expected to achieve high recall and not sacrifice precision.
 
 
 %%%%%%%% FIGURE MOONS
@@ -53,7 +56,7 @@ The sigmoid loss is therefore expected to achieve high recall and not sacrifice 
    The \textbf{background colors} indicate the classifier prediction in the corresponding area: \textbf{red} for negative class, \textbf{blue} for positive class and \textbf{white} for the class transition areas, i.e., decision boundaries.
    The \textbf{markers sizes} demonstrates the training loss normalized per-class.
    Compared to the normal logistic loss and weighted logistic loss (positive:negative=1:0.5), the decision boundary optimized with the sigmoid loss has a large margin from the positive cluster as well as from the negative clusters.
-   It is thus expected to achieve both high recall and high precision.
+   It is expected to achieve both high recall and high precision.
    (Best viewed in color.)
    }
 \label{fig:moons}
@@ -139,7 +142,7 @@ For each of the relevant classes, precision, recall, and f1-score are measured w
 \textbf{50\%(R+N)} represents model trained with the half of the relevant labels and non-relevant labels respectively;
 \textbf{50\%R+U} means the model is trained with half of the relevant samples, and the rest relevant samples are mixed with non-relevant samples (U set).
 Weighting the non-relevant class for the cross-entropy loss by a factor of 0.5 improves the mean f1-score significantly.
-The class-dependent softmax loss achieves higher recall than weighting the classes without sacrificing precision, but not as good as training with a set of labeled negative examples (R+N and 50\%(R+N)).
+The class-dependent softmax loss achieves higher recall than the class-weighted loss without sacrificing precision, but not as good as training with a set of labeled negative examples (R+N and 50\%(R+N)).
 % The class-dependent softmax loss performs similar to the hard bootstrapping loss, with a higher recall but slightly lower accuracy.
 The class-dependent softmax loss achieves better f1-score than the class-weighted loss and is comparable to a state-of-the-art method, the hard bootstrapping loss.
 }
@@ -185,7 +188,8 @@ The class-dependent softmax loss achieves better test f1-score than the class-we
 
 %%%%%%%% Text Segmentation Pascal VOC2011
 \subsection{Learning with incomplete segmentations}
-To compare the class-dependent sigmoid loss with the normal logistic loss, and class-weighted logistic loss for training foreground/background segmentation with incomplete segmentations, we compiled a incompletely labeled dataset from the PASCAL VOC2011 dataset \cite{everingham2015pascal} with extra segmentations \cite{hariharan2011semantic}.
+\label{subsec:incomplete}
+To compare the class-dependent sigmoid loss with the class-weighted logistic loss for training foreground/background segmentation with incomplete segmentations, we constructed an incompletely labeled dataset from the PASCAL VOC2011 dataset \cite{everingham2015pascal} with extra segmentations \cite{hariharan2011semantic}.
 
 \paragraph{Dataset}
 Objects from the 20 foreground categories of the PASCAL VOC2011 dataset were labeled as foreground, constructing binary segmentations with the background pixels.
@@ -204,7 +208,7 @@ The other weights of the FCN-AlexNet model were randomly initialized with Xavier
 The default hyperparameters of FCN-AlexNet in \cite{long2015fully} were kept unchanged.
 The training process run 240,000 iterations for pre-training phase, and 12,000 iterations for fine-tuning phase.
 Snapshots for trained models were taken every 4,000 iterations.
-Each experiment was repeated three times, the highest mean IU achieved on the test set for the last five snapshots were summarized in Table \ref{tab:pusegment}.
+Each experiment was repeated three times, and the highest mean IU achieved on the test set for the last five snapshots were summarized in Table \ref{tab:pusegment}.
 
 
 \paragraph{Higher recall with the sigmoid loss}
@@ -241,8 +245,8 @@ The performances are achieved on the test set of PASCAL VOC2011 segmentation dat
 % The negative loss was further weighted by a factor of 0.5 for the weighted negative loss.
 % Mean accuracy is equivalent to the average recall over the two classes.
 % Mean IU is the average intersection over union ratio (IU) over two classes and f.w. IU is the frequency weighted average of IU over the two classes.
-Both the class-dependent sigmoid loss and the class-weighted logistic loss perform better than the normal logistic loss when 50\% objects unsegmented but not as good as the model trained with complete segmentations.
-The class-dependent sigmoid loss achieves higer recall than the class-weighted logistic loss and a similar mean IU as the class-weighted logistic loss.
+Both the class-dependent sigmoid loss and the class-weighted logistic loss perform better than the normal logistic loss when 50\% objects unsegmented, but not as good as the model trained with complete segmentations.
+The class-dependent sigmoid loss achieves higher recall than the class-weighted logistic loss and a similar mean IU as the class-weighted logistic loss.
 }
 \label{tab:pusegment}
 \end{table}
@@ -398,8 +402,8 @@ False positive segmentaion                                                      
 Segmentation performance for FCN-AlexNet models pre-trained on 15 categories from the PASCAL VOC2011 dataset and fine-tuned on the other five categories.
 The splits of pre-training and fine-tuning categories are organized in four folds.
 \textbf{RandomWeights} represents the randomly initialized weights;
-\textbf{NoFalsePositive} denotes the model pre-trained with no false positive segmentations from the categories not of interest;
-\textbf{HalfFalsePositive} represents the model pre-trained with half of the objects from the categories not of interest segmented;
+\textbf{NoFalsePositive} denotes the model pre-trained with no segmented object from the non-relevant categories;
+\textbf{HalfFalsePositive} represents the model pre-trained with segmented objects from the noninterested categories;
 Including the false positive segmentations in pre-training achieves no worse fine-tuning performance than not including the false positive segmentations, better than random initialization.
 }
 \label{tab:falsepos}
@@ -413,7 +417,7 @@ Including the false positive segmentations in pre-training achieves no worse fin
 
 %%%%%%%% TEXT Experiment setup
 
-To learn representations in the presence of lablel errors, we set up three experiments for each of the three types of label errors, (1) inexhaustive segmentations, (2) objects mislabelling and (3) false positive segmentations, independently with three datasets constructed from a well-annotated dataset, the PASCAL VOC2011 segmentation dataset \cite{everingham2015pascal}.
+To learn representations in the presence of lablel errors, we set up three experiments for three types of label errors, (1) inexhaustive segmentations, (2) objects mislabelling and (3) false positive segmentations, independently with three datasets constructed from a well-annotated dataset, the PASCAL VOC2011 segmentation dataset \cite{everingham2015pascal}.
 
 
 \subsubsection{Datasets}

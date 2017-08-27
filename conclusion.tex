@@ -1,11 +1,11 @@
 \section{Conclusion}
 \label{sec:conclusion}
 
-We investigate in this paper to learn representation by training with segmentation datasets containing label noises.
-Specifically, we report both objects mislabelling and inexhaustive segmentations negatively influence the transferability of learned representation.
-By contrast, false positive segmentations do not reduce the fine-tuned performance of learned representation as the other two types noises do.
-We present that binarizing classes as foreground and background slow the decrease of the fine-tuning performance of the learned representations due to the mislabeled objects.
-Incomplete segmentation causes the trained model to make predictions with a low recall.
-To overcome the influence of incomplete segmentations, we propose a class-dependent sigmoid loss to not over-punish the confident, positive predictions for samples assigned negative labels.
+We investigate in this paper to learn representations by training with segmentation datasets containing label noises.
+(1) We report both mislabeled objects and unsegmented objects in a segmentation dataset negatively influence the transferability of the learned representations, i.e., how well the representations transfer to another dataset.
+By contrast, false positive segmentations, i.e., segmented objects that are not supposed to be segmented, do not influence the learned representation as significant as the other two types noises do.
+(2) We present that training foreground/background segmentation can produce learned representations comparable to the representations trained with per-class segmentation.
+In addition, binarizing classes for segmentation alleviates the negative influence on the learned representations introduced by the mislabeled objects.
+(3) We propose a class-dependent sigmoid loss to not over-punish the confident, positive predictions for the negative class when there exist poorly labeled negative samples.
 Compared to simply reweighing classes differently, the proposed sigmoid loss for the negative class achieves higher recall while not sacrificing precision by much.
-Applying the sigmoid loss to the segmentation model pre-training improves both the pre-training and the fine-tuning performance for a pre-training dataset with simulated incomplete segmentations.
+Applying the sigmoid loss to the segmentation model pre-training improves both the segmentation performance and the transferability of the learned representations for a dataset with incomplete segmentations.

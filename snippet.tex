@@ -1,5 +1,23 @@
 \subsection{Examples}
 
+% It is challenging to find a dataset with both clean and noisy labels available, so we simulate segmentation noises with correct labels.
+% A straightforward way to simulate noisy labels is to corrupt true labels stochastically for each segment with a corruption model.
+% The corruption model simply describes the probability of the observed labels given the true labels.
+% % $$p(\tilde{y_{ij}} \vert x, y_{ij}, e_{ij})$$
+% % where the binary error occurence $e_{ij}$ depends on the inputs $x$ and true labels $y$.
+%
+% For segmentation problems, each pixel (or voxel for 3D segmentation) of a training image has a label assigned to one of the pre-defined categories.
+% Supposing there are $K$ pre-defined categories, the label of a pixel in the $i$-th row and $j$-th column from an image of size $h \times w$:
+% \[
+%   y_{ij} =
+%     \begin{cases}
+%       1 \leq k \leq K, & \text{for foreground pixels} \\
+%       0, & \text{for background pixels}
+%     \end{cases}
+% \]
+% where $1 \leq i \leq h, 1 \leq j \leq w$ and $i,j,k \in \mathrm{Z}^+$.
+
+
 \begin{figure}[t]
 \begin{center}
 \fbox{\rule{0pt}{2in} \rule{0.9\linewidth}{0pt}}

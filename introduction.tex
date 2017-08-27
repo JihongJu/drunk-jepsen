@@ -14,8 +14,9 @@
 \end{center}
    \caption{
    Learning representations with segmentation datasets that potentially contains mislabeled objects and missing segmentation.
-   We propose (1) to train with only segmentations instead of labeled segmentations, (2) to apply a sigmoid loss for the background class.
-   The learned representations are then used as weights initialization and fine-tuned with a small set of true labels in the domain of interest.
+   The observed segmentations may contain mislabeled segments and unsegmented objects.
+   We propose (1) to train foreground/background segmentation instead of per class segmentation, (2) to apply a sigmoid loss for the background class in the presence of unsegmented objects.
+   The learned representations can be used as weights initialization for another dataset of interest, e.g., traffic sign segmentation.
    }
 \label{fig:figure1}
 \end{figure}
@@ -179,9 +180,9 @@ In this work, we treat the unlabeled set as a set of examples with noisy negativ
 
 To summarize, the main contributions of this work are:
 \begin{enumerate}
-  \item Apart from the negative influence on classification accuracy, we present that label errors also have negative influences on learning representations.
-  \item Instead of by training per-class segmentation, we propose to learn representations by training foreground/background segmentations when the segmentation are heavily mislabeled.
-  \item When training CNN models with positive and unlabeled examples, we propose a class-dependent sigmoid loss to balance precision and recall more effectively than weighting losses for different classes.
+  \item Apart from the negative influence on classification accuracy, we present that label errors also have negative influences on the learned representations.
+  \item We propose to learn representations by training foreground/background segmentations instead of by training per-class segmentation.
+  \item We propose a class-dependent sigmoid loss to train deep neural networks with only positive and unlabeled data.
 \end{enumerate}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -191,9 +192,9 @@ To summarize, the main contributions of this work are:
 The rest of this thesis is organized as follows:
 In the next section, we summarize related works.
  % in areas of transfer learning, deep learning with noisy labels and PU learning.
-In Section \ref{sec:formulation} we formulate the model for segmentation model and learning with positive and unlabeled data.
+In Section \ref{sec:formulation}, we formulate the model for segmentation model and learning with positive and unlabeled data.
+The proposed sigmoid loss is evaluated, compared to the class-weighted loss, for classification with positive and unlabeled data and segmentation with positive and unlabeled data in Section \ref{subsec:pulearning} and Section \ref{subsec:incomplete} respectively.
 We introduce the class-dependent, sigmoid loss for the negative class for deep learning with positive and unlabeled examples in Section \ref{sec:pulearning}.
 Experiments in Section \ref{subsec:robustness} are designed to investigate the influences of objects mislabeling, inexhaustive segmentations, and false positive segmentations independently, and validate whether our proposed methods can alleviate the negative influences.
-The proposed sigmoid loss is evaluated, compared to weighting classes, in simulated PU learning setups in Section \ref{subsec:pulearning}.
 Discussions are presented in Section \ref{sec:discussion} and conclusions are summarized in Section \ref{sec:conclusion}.
 %Features learned by predicting the pixel objectness with inexaustive annotations were then validated with experiments described in Section \ref{sec:discussion}.
