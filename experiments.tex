@@ -335,11 +335,11 @@ Training foreground and background segmentation instead of per foreground class 
 \textbf{Fine-tuning performance of representations trained with categorized segmentation labels}\par\medskip
    \includegraphics[width=1.\linewidth]{img/num_classes.eps}
 \caption{
-Test performance for the fine-tuned models pre-trained with varying categorization of pre-training classes.
+Segmentation performance for the fine-tuned representations learned with various categorizations of the pre-training classes.
 Zero categorize means no pre-trained weights used and the model was random initialized.
 Error bars located on lines denote the meaningful categorization, and isolated error bars denote random categorizations (RC) of the 15 classes.
 The displayed mean IU/mean accuracies and standard deviations were averaged over four folds.
-The line shows that binarizing and categorizing classes meaningfully had little negative effect on feature transferability.
+The line shows that binarizing and categorizing classes meaningful had little negative effect on the learned representations.
 }
 \label{fig:categories}
 \end{figure}
