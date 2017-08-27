@@ -34,7 +34,7 @@ For sigmoid loss, the mislabeled positive examples far away from the decision bo
 As a consequence, the loss derivative with respect to the model weights is larger for examples near the decision boundary than examples far away, illustrated as marker sizes in Figure \ref{fig:moonsdiff}.
 Training with the sigmoid loss emphasizes the positive predictions with low confidence instead of emphasizing the positive predictions with high confident as the two logistic losses do.
 The emphasization of the uncertain predictions near the decision boundary for the sigmoid loss leads to a decision boundary converges to low-density regions for the inputs distribution.
-The optimal decision boundary for the sigmoid loss has a larger margin from the positive cluster than the decision boundaries for the normal and the weighted logistic loss, while still keeps distant from the negative samples.
+Therefore, the optimal decision boundary for the sigmoid loss has a larger margin from the positive cluster than the decision boundaries for the normal and the weighted logistic loss, while still keeps distant from the negative samples.
 The sigmoid loss is therefore expected to achieve high recall and not sacrifice precision.
 
 
@@ -105,7 +105,7 @@ By reweighing the loss for the non-relevant class by a factor of 0.5, the model 
 Compared to the class-weighted cross entropy, the class-dependent softmax loss improves recall by 0.08 while reduces precision only by 0.01.
 The f1-score achieved by the class-dependent softmax loss is slightly better than the class-weighted loss, though not as good as training with clean labels with either 50\% of the sample or the complete training set.
 The state-of-the-art benchmark method, the hard bootstrap loss, achieves the same f1-score as the softmax loss but not as high recall.
-This result is as expected because the softmax loss and the hard bootstrap loss share an idea of encouraging confident predictions, which will be discussed in more details in Section \ref{sec:discussion}.
+The softmax loss for the non-relevant class can achieve higher recall without sacrificing the precision by much, compared to the class-weighted loss.
 
 % It is noteworthy that the weighted negative loss and hard bootstrapping loss achieved more balanced precision and recall than the sigmoid negative loss.
 % That is because the two former losses were weighted by classes frequency of observed labels, around 0.67 for the negative class and 2 for positive classes, whereas the sigmoid negative loss was not.
@@ -148,7 +148,10 @@ The class-dependent softmax loss achieves better f1-score than the class-weighte
 
 
 %%%%%%%% FIGURE Varying positive annotating percetage
-By varying the labeled percentage of the relevant images, Figure \ref{fig:pct_annotating} demonstrates that the class-dependent softmax loss performs slightly better than the class weighted cross-entropy when the labeled percentage of relevant images is neither too high ($>0.8$) nor too low ($<0.2$).
+To compare the class-dependent softmax loss and the class-weighted cross entropy with varying percentage of labeled relevant images, we also trained models with datasets containing varing percentages of labeled relevant images.
+Figure \ref{fig:pct_annotating} demonstrates that the class-dependent softmax loss performs slightly better than the class-weighted cross-entropy when the percentage of labeled relevant images is neither too high ($>0.8$) nor too low ($<0.2$).
+When the percentage of labeled relevant images is high or low, the softmax loss behaves no worse than the class-weighted cross-entropy.
+Therefore, the sigmoid loss is in general better than weighting the losses for different classes.
 % When the labeled percentage of relevant images is high, the difference in loss contributions of the unlabeled relevant images for the two losses is small.
 % When the percentage is low, the severe imbalance of classes introduced by unlabeled relevant images prevents the models from achieving good classification performance.
 
@@ -420,7 +423,7 @@ In this experiment, fifteen out of twenty categories of the VOC2011 dataset were
 % The pre-training dataset was used to learn representations by training to segment objects.
 % The fine-tuning dataset was used to fine-tune the learned representations.
 Three types of label errors of interest were introduced independently with stochastical corruptions to the well-annotated pre-training dataset.
-To avoid that the choice of pre-training and fine-tuning splitting for categories influence the results, the 20 categories of VOC2011 were divided equally into four folds.
+To avoid the influence of the choice of the pre-training and fine-tuning splitting for categories, we divided the 20 categories of VOC2011 equally into four folds.
 The exact folds of categories are:
 \begin{description}
   \item [Fold 1] aeroplane, bicycle, bird, boat, bottle
@@ -438,7 +441,7 @@ The original images were subsampled by four times to accelerate the training pro
 \label{subsubsec:ptft}
 A Fully Convolutional Network with AlexNet (FCN-AlexNet) model \cite{long2015fully}, as shown in Table \ref{fig:fcn} in Appendix \ref{subsec:segmentation}, was used for segmentation.
 Models were first pre-trained with the pre-training datasets and then fine-tuned with the fine-tuning datasets.
-The fine-tuned models were evaluated by mean intersection over union ratio (mean IU) achieved on the fine-tuning test set, referring to as the \textit{fine-tuning performance}.
+The fine-tuned models were evaluated by mean intersection over union ratio (mean IU) on the fine-tuning test set, which is referred to as the \textit{fine-tuning performance}.
 Performance improvement of fine-tuning transferred models compared to a randomly initialized model indicates the transferability of pre-trained weights.
 The non-transferable layers of FCN-AlexNet were randomly initialized with Xavier Initialization.
 % The pre-trained AlexNet model was used to set a baseline of performance, denoted as the ImageNet model.
@@ -448,7 +451,6 @@ The default hyperparameters of FCN-AlexNet in  \cite{long2015fully} were kept un
 The training process run 240,000 iterations for pre-training phase, and 12,000 iterations for fine-tuning phase.
 Snapshots for trained models were taken every 4,000 iterations.
 Each experiment was repeated three times, mean and standard deviation were computed over the last five snapshots for all repetitions.
-
 
 % \noindent \textit{What Table \ref{tab:robustness} tell us.
 % How annotation errors were synthesized;
@@ -466,7 +468,7 @@ Each experiment was repeated three times, mean and standard deviation were compu
 
 \paragraph{Training binary segmentations in the presence of objects mislabelling}
 Objects Mislabelling denotes that a subset of segmented objects are mislabeled from one category to another in a training segmentation dataset.
-To validate that training binary segmentation can learn representations better than training per-category segmentation in the presence of objects mislabelling, we constructed three different datasets with: (1) all random labels for objects, (2) half random labels and half correct labels for objects, and (3) all correct labels for objects.
+To validate that training binary segmentation can learn representations better than training per-category segmentation in the presence of objects mislabelling, we constructed three different datasets with (1) all random labels for objects, (2) half random and half correct labels for objects, and (3) all correct labels for objects.
 The learned representations with these three datasets were fine-tuned to segment the five fine-tuning categories and evaluated by a test set for the five fine-tuning classes.
 
 Results in Table \ref{tab:random} suggests that pre-training with mislabeled foreground objects have a negative influence on the learned representations.
@@ -478,7 +480,6 @@ Randomized object labels were mislabeled among foreground classes so that binari
 % Compared to the precise but inaccurate noisy labels, binarized labels are accurate but imprecise.
 This observation indicates that binarizing segmentation labels into foreground and background have little influence on the learned representations.
 
-
 \paragraph{Categorizing the foreground classes}
 We then investigate the influence of categorizing the foreground classes instead of grouping all of them as one foreground class.
 We categorized the fifteen pre-training classes into four meaningful categories: person, animal, vehicle, indoor according to \cite{everingham2015pascal}, and trained segmentation models to transfer.
@@ -489,32 +490,32 @@ The line in Figure \ref{fig:categories} demonstrates that the segmentations labe
 All the three learned representations improve the fine-tuning performance compared to a random weights initialization show as the blue circle at categories=0.
 Additionally, the isolated error bars in figure \ref{fig:categories} reveal that even training by random categorization of the foreground classes has little effect on the fine-tuning performance for the learned representations.
 This observation indicates that it is not necessary to group the foreground classes into meaningful categories to reserve the class specific information.
-We therefore propose to train foreground/background segmentations when the purpose is to learn representations that can transfer to another dataset.
+Therefore, we propose to train foreground/background segmentations when the purpose is to learn representations that can transfer to another dataset.
 
 \paragraph{Training with the sigmoid loss applied to the background class in the presence of inexhaustive segmentation}
 Inexhaustive segmentation means that there exist unsegmented objects of interest in the training images.
-To validate the use of sigmoid loss for the background class can alleviate the negative effects of inexhaustive segmentation to the learned representation, we constructed a training dataset with only 50\% of the objects segmented, togehter with a training dataset with 100\% of the objects segmented.
+To validate the use of sigmoid loss for the background class can alleviate the negative effects of inexhaustive segmentation to the learned representation, we constructed a training dataset with only 50\% of the objects segmented, together with a training dataset with 100\% of the objects segmented.
 Segmented means the object is labeled as foreground, and unsegmented means the object is labeled as background.
 The class-dependent sigmoid loss and the normal logistic loss were applied to the dataset with 50\% of the objects unsegmented.
 The learned representations were evaluated by fine-tuned and validated with the five-categories fine-tuning dataset.
 
 The segmentation performance, mean IU, for the model pre-trained with incomplete segmentations is worse than the model pre-trained with complete segmentations by 0.04 when using the logistic loss to train, are demonstrated in Table \ref{tab:unseg}.
-By applying the class-dependent sigmoid loss to pre-train models with half of the objects unsegmented, the learned representations achieves a fine-tuning performance comparable to the model pre-trained with complete segmentation.
-The representations learned with the class-dependent sigmoid loss is demonstrated to ahieve better fine-tuning performance than the normal logistic loss.
+By applying the class-dependent sigmoid loss to pre-train models with half of the objects unsegmented, the learned representations achieve a fine-tuning performance comparable to the model pre-trained with complete segmentation.
+The representations learned with the class-dependent sigmoid loss is demonstrated to achieve better fine-tuning performance than the normal logistic loss.
 % The negative influence of inexhaustive segmentations on the fine-tuning performance of the pre-traine model is compensated.
 % The details of implementing sigmoid negative loss for the pre-training dataset will be discussed in Section \ref{subsec:pulearning}.
 
 
 
 \paragraph{Including false positive segmentations for training if they present}
-False positive segmentations represents those segmented objects that are semantically meaningful but not from an pre-defined category to segment.
+False positive segmentations represents those segmented objects that are semantically meaningful but not from a pre-defined category to segment.
 To investigate the influence of including false positive segmentations for training, we consider a dataset contains dogs as the only category to segment.
-Objects from the other fourteen categories are not supposed to be segmentated for a error-free dataset without false positive segmentations.
-Model trained with this correctly labeled dataset is named as the NoFalsePositive model in Table \ref{tab:falsepos}.
+Objects from the other fourteen categories are not supposed to be segmented for an error-free dataset without false positive segmentations.
+The model trained with this correctly labeled dataset is named as the NoFalsePositive model in Table \ref{tab:falsepos}.
 Another dataset, containing half of the objects from the other fourteen categories segmented, is referred to as the HalfFalsePositive model.
 
 We observe, as presented in Table \ref{tab:falsepos}, that transferring the HalfFalsePositive model performs almost the same as the NoFalsePositive model and better than the random weights initialization.
-Based on this observation, we conclude that including the false positive segmentations for training have a little negative effects on the learned CNN representations.
+Based on this observation, we conclude that including the false positive segmentations for training have little negative effects on the learned CNN representations.
 % The exact influence of false segmentations in practice, however, may depend on how similar the target and non-target categories are, or whether false segmentations are consistent, which requires further investigation.
 
 
