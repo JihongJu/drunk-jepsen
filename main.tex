@@ -65,7 +65,7 @@ Our experiments demonstrate that label errors, such as mislabeled segments and m
 To alleviate the negative effects of object mislabelling, we propose to discard the object labels and instead train foreground/background segmentation.
 The learned representations with binary segmentation achieve a fine-tuning performance comparable to the representations learned with ``gold'' standard segmentations.
 In the existence of missing segmentations, a sigmoid loss for the background class is proposed to achieve high recall while keeping the precision better than simply weighting the classes.
-The proposed class dependent, sigmoid loss achieves both better pre-training performance and better fine-tuning performance than the weighting the classes in the presence of missing segmentations.
+The proposed class dependent, sigmoid loss obtains better segmentation performance as well as better representations than the weighting the classes in the presence of missing segmentations.
 To summerize, we propose to learn representations with foreground/background segmentation and with a sigmoid loss for the background class when there exist missing segmentations for objects.
 
 % % Noisy data exists
@@ -104,16 +104,16 @@ To summerize, we propose to learn representations with foreground/background seg
 \input{conclusion}
 
 
-{\small
-\bibliographystyle{plain}
-\bibliography{references}
-}
-
 \clearpage
 \appendix
 \input{appendix_a}
 \input{appendix_b}
 % \input{appendix_c}
 \input{appendix_de}
+
+{\small
+\bibliographystyle{plain}
+\bibliography{references}
+}
 
 \end{document}

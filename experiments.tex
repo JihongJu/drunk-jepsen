@@ -9,43 +9,52 @@
 \subsection{Learning with only positive and unlabeled samples}
 \label{subsec:pulearning}
 
-In this section, we apply the sigmoid/softmax class to the unlabeled examples as if they are negative examples and train classifers with only positive data and unlabeled data.
+
+In this section, we apply the sigmoid/softmax loss for the negative class to train classifiers with only positive data and unlabeled data and compare with the class-weighted loss regarding the learned decision boundary, the achieved precision and recall.
 
 \subsubsection{2D non-linear dataset}
 
-To investigate the decision boundaries led by the sigmoid loss for the negative class, we trained a two-layer multilayer perceptron, with six neurons per layer, using the normal logistic loss, the class-weighted logistic loss, and the class-dependent sigmoid loss respectively and visualize the optimal decision boundaries.
+To investigate the decision boundaries led by the sigmoid loss for the negative class, we trained a multilayer perceptron with a two-dimensional, non-linear separable dataset.
 
-\paragraph{Experimental setup}
+\paragraph{Dataset}
 The training data contains four hundred samples per class drawn randomly from two interleaving half circles with noises added with a minor standard deviation, as shown in Figure \ref{fig:moons}.
 Half of the positive examples were assigned negative labels, resulting in a training data with reliable positive labels but noisy negative labels.
-The three different losses were trained with this noisy training data, and the result decision boundaries are drawn as white regions in Figure \ref{fig:moons}.
-The same multilayer perceptron classifier was also trained with true labels to present a baseline decision boundary.
-The weights for positive class and negative class in the weighted logistic loss were chose to be 1 and 0.5 respectively.
 
-% \paragraph{Weighted logistic loss vs. sigmoid loss for the negative class}
-\paragraph{Results}
+
+\paragraph{Experimental setup}
+The multilayer perceptron contains two layers, with six neurons per layer.
+The normal logistic loss, the class-weighted logistic loss, and the class-dependent sigmoid loss were trained independently, and the result optimal decision boundaries are drawn as white regions in Figure \ref{fig:moons}.
+The same multilayer perceptron classifier was also trained with true labels to present a baseline decision boundary.
+The weights for the positive class and the negative class in the weighted logistic loss were 1 and 0.5 respectively.
+
+\paragraph{Decision boundary with large margin by the sigmoid loss}
 If trained with the sigmoid loss, the decision boundary is distant from the positive cluster with a relatively large margin as shown in Figure \ref{fig:moons}.
 By contrast, the weighted logistic loss results in a decision boundary still closed to the positive examples.
 For sigmoid loss, the mislabeled positive examples far away from the decision boundary do not contribute more loss than samples less distant from the decision boundary.
-As a consequence, the loss derivative with respect to the model weights is larger for uncertain predictions in overall than for confident predictions, illustrated by marker sizes in Figure \ref{fig:moonsdiff}.
-Therefore, training with the sigmoid loss emphasizes the positive predictions with low confidence instead of equally down-weighting all incorrect positive predictions.
-The emphasization of uncertain predictions by sigmoid loss leads to a margin from the decision boundary to both positive examples and negative examples.
+As a consequence, the loss derivative with respect to the model weights is larger for examples near the decision boundary than examples far away, illustrated as marker sizes in Figure \ref{fig:moonsdiff}.
+Training with the sigmoid loss emphasizes the positive predictions with low confidence instead of emphasizing the positive predictions with high confident as the two logistic losses do.
+The emphasization of the uncertain predictions near the decision boundary for the sigmoid loss leads to a decision boundary converges to low-density regions for the inputs distribution.
+The optimal decision boundary for the sigmoid loss has a larger margin from the positive cluster than the decision boundaries for the normal and the weighted logistic loss, while still keeps distant from the negative samples.
+The sigmoid loss is therefore expected to achieve high recall and not sacrifice precision.
+
 
 %%%%%%%% FIGURE MOONS
 
 \begin{figure*}
 \begin{center}
+\textbf{Classifier decision boundaries with different losses}\par\medskip
 % \fbox{\rule{0pt}{2in} \rule{.9\linewidth}{0pt}}
    \includegraphics[width=0.95\linewidth]{img/moons.pdf}
 \end{center}
    \caption{
    Decision boundaries of a 2-layer multilayer perceptron trained with different losses on a 2D moons dataset with the unlabeled positive.
   %%  The \textbf{leftmost} figures have complete positive labels, meaning the positive and negative labels are all correct, whereas, in \textbf{the other figures} only half of the positives were correctly labeled and the rest were mixed with the negative samples.
-   A \textbf{red circle} indicates an example labeled as positive and a \textbf{blue square} indicates the example has a negative label.
-   The \textbf{background colors} represent the classifier prediction in the corresponding area: \textbf{red} for negative class, \textbf{blue} for positive class and \textbf{white} for the class transition areas, i.e., decision boundaries.
+   A \textbf{red circle} represents an example labeled as positive and a \textbf{blue square} represents the example has a negative label.
+   The \textbf{background colors} indicate the classifier prediction in the corresponding area: \textbf{red} for negative class, \textbf{blue} for positive class and \textbf{white} for the class transition areas, i.e., decision boundaries.
    The \textbf{markers sizes} demonstrates the training loss normalized per-class.
-   Compared to the normal logistic loss and weighted logistic loss (positive:negative=1:0.5), the decision boundary optimized with the sigmoid loss has a larger margin from the positive and negative clusters.
-   (Best viewed in color)
+   Compared to the normal logistic loss and weighted logistic loss (positive:negative=1:0.5), the decision boundary optimized with the sigmoid loss has a large margin from the positive cluster as well as from the negative clusters.
+   It is thus expected to achieve both high recall and high precision.
+   (Best viewed in color.)
    }
 \label{fig:moons}
 \end{figure*}
@@ -53,12 +62,15 @@ The emphasization of uncertain predictions by sigmoid loss leads to a margin fro
 
 \begin{figure}[t]
 \begin{center}
+\textbf{Derivatives of different losses and decision boundaries}\par\medskip
    \includegraphics[width=\linewidth]{img/moons_diff}
 \end{center}
    \caption{
    Derivatives w.r.t the last layer output for the two losses (normalized per class and shown as the marker size).
-   The sigmoid loss has small derivatives for predictions farther from the decision boundary.
-   (Best viewed in color)
+   The sigmoid loss has small derivatives for samples farther from the decision boundary and large derivatives for samples near the decision boundary, which is opposite to the weighted logistic loss.
+   Higher derivative means the example has a higher rate to update the model weights during optimization.
+   The sigmoid loss emphasizes the uncertain incorrect predictions (points near the decision boundary) in training, whereas the weighted logistic loss emphasizes the confident incorrect predictions (points distant from the decision boundary).
+   (Best viewed in color.)
    }
 \label{fig:moonsdiff}
 \end{figure}
@@ -67,22 +79,25 @@ The emphasization of uncertain predictions by sigmoid loss leads to a margin fro
 
 \subsubsection{CIFAR dataset}
 
-To compare the precision and recall achieved by the class-dependent softmax loss and the class-weighted cross entropy, we trained a CNN classifier to distinguish images of multiple relevant categories from non-relevant images when relevant images are partially labeled.
+To compare the precision and recall achieved by the class-dependent sigmoid/softmax loss and the class-weighted loss, we trained a CNN model to classify images of multiple relevant categories from non-relevant images with partially labeled relevant images.
+
+\paragraph{Dataset}
+We combined the CIFAR10 dataset and CIFAR100 dataset \cite{krizhevsky2009learning} to form a dataset with images for eleven classes: ten relevant classes from CIFAR10 and one non-relevant class for all categories from CIFAR100.
+Only part of the relevant images are labeled (with correct classes), and the rest of the relevant images forms an unlabeled (U) set together with the non-relevant images.
+Images from the unlabeled set were assigned negative labels.
 
 \paragraph{Experimental setup}
-We trained an eight-layer CNN model to classify images into eleven classes: ten relevant classes from CIFAR10 and one non-relevant class for all categories from CIFAR100.
-Relevant images are partially labeled, and the rest forms an unlabeled (U) set together with the non-relevant images.
 An eight layer CNN model was trained with the cross-entropy loss, the class-weighted cross-entropy loss and the class-depend sigmoid loss respectively in the simulated PU learning setup, where 50\% of the positive examples were unlabeled.
 The CNN model was also trained with the modified hard bootstrapping loss introduced in Section \ref{sec:pulearning} to set a benchmark for the state-of-the-art method to learn in the presence of label noises.
 Model performances were evaluated on a separate test set with true labels.
-The architecture of the CNN model can be found in Appendix \ref{sec:support}.
+The architecture of the CNN model can be found in Table \ref{tab:8layer} in Appendix \ref{subsec:8layer}.
 Each model was trained from scratch with Adam optimizer and base learning rate 0.0001.
 Experiments were repeated three times with random split of P set, and U set and standard deviations were around 0.01 if not explicitly mentioned.
 % Note that there is no category overlap between CIFAR10 dataset and CIFAR100 dataset.
 
 %%%%%%%% TABLE CIFAR10 50%
 
-\paragraph{Results}
+\paragraph{Higher recall and comparable precision with the softmax loss}
 
 Table \ref{tab:cifar} shows using the softmax loss for the non-relevant class achieves better recall than the class-weighted cross-entropy loss without lowering precision significantly.
 With 50\% of the relevant examples correctly labeled and the rest assigned non-relevant labels, the normal cross-entropy loss leads to an imbalanced model with high precision but low recall, and therefore with a low f1-score.
@@ -90,7 +105,7 @@ By reweighing the loss for the non-relevant class by a factor of 0.5, the model 
 Compared to the class-weighted cross entropy, the class-dependent softmax loss improves recall by 0.08 while reduces precision only by 0.01.
 The f1-score achieved by the class-dependent softmax loss is slightly better than the class-weighted loss, though not as good as training with clean labels with either 50\% of the sample or the complete training set.
 The state-of-the-art benchmark method, the hard bootstrap loss, achieves the same f1-score as the softmax loss but not as high recall.
-This result is as expected because the softmax loss and the hard bootstrap loss share an idea of encouraging confident predictions.
+This result is as expected because the softmax loss and the hard bootstrap loss share an idea of encouraging confident predictions, which will be discussed in more details in Section \ref{sec:discussion}.
 
 % It is noteworthy that the weighted negative loss and hard bootstrapping loss achieved more balanced precision and recall than the sigmoid negative loss.
 % That is because the two former losses were weighted by classes frequency of observed labels, around 0.67 for the negative class and 2 for positive classes, whereas the sigmoid negative loss was not.
@@ -100,6 +115,8 @@ This result is as expected because the softmax loss and the hard bootstrap loss 
 
 
 \begin{table}[t]
+\centering
+\textbf{Classification performance with partially labeled relevant data}\par\medskip
 \resizebox{\columnwidth}{!}{
 \centering
 \begin{tabular}{ll|llll}
@@ -121,9 +138,10 @@ For each of the relevant classes, precision, recall, and f1-score are measured w
 \textbf{R+N} denotes model trained with the complete relevant labels (R set) and non-relevant labels (N set);
 \textbf{50\%(R+N)} represents model trained with the half of the relevant labels and non-relevant labels respectively;
 \textbf{50\%R+U} means the model is trained with half of the relevant samples, and the rest relevant samples are mixed with non-relevant samples (U set).
-Weighting the non-relevant class by a factor of 0.5 improves the mean f1-score from 0.49 to 0.76.
-Both the class-dependent softmax loss and the hard bootstrapping loss perform even better than simply weighing the classes, but not as good ass training with a set of labeled negative examples.
-Using the softmax loss for non-relevant class achieves the highest mean recall, whereas the modified hard bootstrapping loss has a higher accuracy with 50\% positive examples unlabeled.
+Weighting the non-relevant class for the cross-entropy loss by a factor of 0.5 improves the mean f1-score significantly.
+The class-dependent softmax loss achieves higher recall than weighting the classes without sacrificing precision, but not as good as training with a set of labeled negative examples (R+N and 50\%(R+N)).
+% The class-dependent softmax loss performs similar to the hard bootstrapping loss, with a higher recall but slightly lower accuracy.
+The class-dependent softmax loss achieves better f1-score than the class-weighted loss and is comparable to a state-of-the-art method, the hard bootstrapping loss.
 }
 \label{tab:cifar}
 \end{table}
@@ -148,6 +166,8 @@ By varying the labeled percentage of the relevant images, Figure \ref{fig:pct_an
 
 \begin{figure}[t]
 \centering
+\textbf{Classification performance with varying percentage of labeled relevant images}\par\medskip
+\centering
    \includegraphics[width=1.05\linewidth]{img/pu_vs_pn}
 \caption{
 Comparing f1-score for the class-dependent softmax loss and the class-weighted cross entropy with varying percentage of relevant images labeled.
@@ -162,33 +182,44 @@ The class-dependent softmax loss achieves better test f1-score than the class-we
 
 %%%%%%%% Text Segmentation Pascal VOC2011
 \subsection{Learning with incomplete segmentations}
-To compare the class dependent sigmoid loss with the normal logistic loss, and class-weighted logistic loss for training foreground/background segmentation with incomplete segmentations, we used again the PASCAL VOC2011 dataset with extra segmentation \cite{hariharan2011semantic}.
+To compare the class-dependent sigmoid loss with the normal logistic loss, and class-weighted logistic loss for training foreground/background segmentation with incomplete segmentations, we compiled a incompletely labeled dataset from the PASCAL VOC2011 dataset \cite{everingham2015pascal} with extra segmentations \cite{hariharan2011semantic}.
 
 \paragraph{Dataset}
-PASCAL VOC2011
+Objects from the 20 foreground categories of the PASCAL VOC2011 dataset were labeled as foreground, constructing binary segmentations with the background pixels.
+We selected objects in the training images completed at random with a probability of 0.5 to be labeled.
+The other objects and the background pixels were left unlabeled.
+Only single-object images were used for training and testing to avoid the influence of two adjacent objects joining as one object because of binary segmentation, resulting in totally 4000 training images for 20 categories available for pre-training, fine-tuning and evaluation.
+We subsampled the original images by four times to accelerate the training process.
+
 
 \paragraph{Experimental setup}
-We simulated inexhaustive segmentations the same way as described in Section \ref{subsec:robustness}.
-The same AlexNet-FCN model was trained together with the different loss functions to predict binary segmentation, determining whether a pixel belongs to an object or not.
-% Only single-object images were used for training and testing to avoid the influence of two adjacent objects joining as one object because of binary segmentation.
-The same hyperparameters for optimization were used as in Section \ref{subsec:robustness}.
-The trained models were evaluated with the test set of PASCAL VOC2011 segmentation dataset with binary segmentations.
+A Fully Convolutional Networks with AlexNet model (FCN-AlexNet), as shown in Figure \ref{fig:fcn} in Appendix \ref{subsec:segmentation}, was used for experiments because of its relatively small capacity and thus short training time.
+The FCN-AlexNet model was trained together with the normal logistic loss, the class-weighted logistic loss, and the class-dependent sigmoid loss independently to predict binary segmentation, determining whether a pixel is a foreground or background.
+The learned models were evaluated with the test set of the PASCAL VOC2011 dataset with complete binary segmentations.
+Weights from the pre-trained AlexNet model \cite{krizhevsky2012imagenet} were used as initialization for compatible weights of the FCN-AlexNet model.
+The other weights of the FCN-AlexNet model were randomly initialized with Xavier initialization \cite{glorot2010understanding}.
+The default hyperparameters of FCN-AlexNet in \cite{long2015fully} were kept unchanged.
+The training process run 240,000 iterations for pre-training phase, and 12,000 iterations for fine-tuning phase.
+Snapshots for trained models were taken every 4,000 iterations.
+Each experiment was repeated three times, the highest mean IU achieved on the test set for the last five snapshots were summarized in Table \ref{tab:pusegment}.
 
 
-\paragraph{Results}
-As shown in Table \ref{tab:pusegment}, the class dependent sigmoid loss achieves the highest mean accuracy, approximately 0.07 better than training with the normal logistic loss, and 0.04 better than the class-weighted loss.
-In contrast to the improvement of mean accuracy, improvement of mean IU for both the class-weigthed loss and the class-dependent logistic loss are insignificant.
-The increase in the mean accuracy is caused by an increase in foreground accuracy and a decrease in background accuracy.
+\paragraph{Higher recall with the sigmoid loss}
+As shown in Table \ref{tab:pusegment}, the class dependent sigmoid loss achieves the higher mean recall by approximately 0.07 than training with the normal logistic loss, and by 0.04 than the class-weighted loss.
+% The performance of training with sigmoid loss and 50\% objects unsegmented is still not comparable to training with complete segmentations.
+Specifically for the two classes, the foregorund recall class increases whereas the background recall decreases for the sigmoid loss.
+This difference in classes lead to a mean IU for the class-dependent sigmoid loss no better than the class-weigthed loss because the mean IU counts for both low false positive rate and low false negative rate.
 % The sigmoid loss increases precision for recall, similarly as observed in training the CIFAR dataset.
-The decrease in background accuracy interferes the improvement mean IU since the mean IU counts for both low false positive rate and low false negative rate.
-
+The class-dependent sigmoid loss improves the recall averaged for the foreground class and background class when training with incomplete segmentations.
 
 %%%%%%%% TABLE Segmentation Pascal VOC2011
 \begin{table}[t]
+\centering
+\textbf{Segmentation performance}\par\medskip
 \resizebox{\columnwidth}{!}{
 \centering
 \begin{tabular}{ll|llll}
-Annotation  & Loss & overall acc. & mean acc. & f.w. IU & mean IU \\
+Annotation  & Loss & overall acc. & mean rec. & f.w. IU & mean IU \\
 \hline
 % Complete            & CrossEnt.U       &  0.88 & 0.60 & 0.48 & 0.80 \\
 % 50\%Unsegmented     & CrossEnt.U       &  0.83 & 0.31 & 0.27 & 0.70 \\
@@ -208,21 +239,23 @@ The performances are achieved on the test set of PASCAL VOC2011 segmentation dat
 % Mean accuracy is equivalent to the average recall over the two classes.
 % Mean IU is the average intersection over union ratio (IU) over two classes and f.w. IU is the frequency weighted average of IU over the two classes.
 Both the class-dependent sigmoid loss and the class-weighted logistic loss perform better than the normal logistic loss when 50\% objects unsegmented but not as good as the model trained with complete segmentations.
-The class-dependent sigmoid loss has a better mean accuracy than the class-weighted logistic loss and a similar mean IU as the class-weighted logistic loss.
+The class-dependent sigmoid loss achieves higer recall than the class-weighted logistic loss and a similar mean IU as the class-weighted logistic loss.
 }
 \label{tab:pusegment}
 \end{table}
 
 
 %%%%%%%% Figure Segmentation Pascal VOC2011
-Selective predictions made by the models trained with the sigmoid negative loss and the cross entropy loss were presented in Figure \ref{fig:pusegment}.
-For the two example images shown, the model trained with the cross entropy loss failed to segment objects from images whereas sigmoid negative loss predicted segmentations on the position of the objects.
+Selective predictions made by the models trained with the sigmoid loss and the cross entropy loss were presented in Figure \ref{fig:pusegment}.
+For the two example images shown, the model trained with the cross entropy loss failed to segment objects from images whereas the sigmoid loss predicted segmentations on the position of the objects.
 The coarse outlines were mainly due to the limited compacity of the FCN-AlexNet model.
-The third column shows predictions given by model trained with complete training segmentation, and it did not produce more accurate outlines.
+The third column shows predictions given by model trained with complete training segmentation, and it did not produce more accurate outlines than training with the sigmoid loss and incomplete segmentations.
 There is no example observed correctly segmented by the model with the class-weighted logistic loss but not by the model with the class-dependent sigmoid loss.
+These two examples show that the sigmoid loss improves the segmentation performance by segment a few more objects than the weighted logistic loss.
 
-\begin{figure}
+\begin{figure}[t]
 \centering
+\textbf{Example predictions}\par\medskip
   \begin{minipage}{\columnwidth}\footnotesize
   \centering
   \subsubfloat{\includegraphics[width=0.19\columnwidth]{img/2007_002132}}{Raw}
@@ -238,75 +271,179 @@ There is no example observed correctly segmented by the model with the class-wei
   \end{minipage}
 \caption{
 Example predictions made by models trained with the logistic loss and the class-dependent sigmoid loss.
-This figure presented two selective images for which the model trained with the logistic loss failed to segment objects, whereas the model trained with the class-dependent sigmoid negative loss succeed.
+This figure presents two selective images for which the model trained with the logistic loss failed to segment objects, whereas the model trained with the class-dependent sigmoid negative loss succeed.
 }
 \label{fig:pusegment}
 \end{figure}
 
-\subsection{The influence of label noises in segmention}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%% Label noises
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%% Table Objects mislabelling
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{table*}[t]
+\centering
+\textbf{Fine-tuning performance of representations trained in the presence of random labels}\par\medskip
+\resizebox{\textwidth}{!}{
+\centering
+\begin{tabular}{l|c|cccc|c}
+
+\hline
+\multirow{2}{*}{}                                                               & \multirow{2}{*}{\begin{tabular}[c]{@{}c@{}}Pre-trained\\ Models\end{tabular}} & \multicolumn{4}{c|}{Fine-tuning mean IU per pretraining-finetuning fold}                                                                       & \multirow{2}{*}{\begin{tabular}[c]{@{}l@{}}Average \\ mean IU\end{tabular}} \\ \cline{3-6}
+                                                                                &                                                                               & Fold1                             & Fold2                             & Fold3                             & Fold4                              &                                                                             \\ \hline
+\multirow{2}{*}{Baseline}                                                       & RandomWeights                                                                 & \multicolumn{1}{c}{$0.29\pm0.01$} & \multicolumn{1}{c}{$0.29\pm0.03$} & \multicolumn{1}{c}{$0.27\pm0.01$} & \multicolumn{1}{c|}{$0.30\pm0.02$} & \multicolumn{1}{c}{$0.29\pm0.02$}                                           \\
+                                                                                & TrueLabels                                                                    & \multicolumn{1}{c}{$0.29\pm0.01$} & \multicolumn{1}{c}{$0.36\pm0.01$} & \multicolumn{1}{c}{$0.29\pm0.01$} & \multicolumn{1}{c|}{$0.37\pm0.01$} & \multicolumn{1}{c}{$\mathbf{0.33\pm0.01}$}                                  \\ \hline
+\multirow{3}{*}{\begin{tabular}[c]{@{}l@{}}Objects \\ Mislabelling\end{tabular}}      & AllRandomLabels                                                     & $0.29\pm0.01$                                                                                           & $0.33\pm0.03$                                                                               & $0.26\pm0.01$                                                                                                  & $0.28\pm0.01$                                                                                           & $0.29\pm0.01$                                                                                                          \\
+                                                                                      & HalfRandomLabels                                                    & $0.27\pm0.01$                                                                                           & $0.33\pm0.02$                                                                               & $0.25\pm0.01$                                                                                                  & $0.29\pm0.01$                                                                                           & $0.29\pm0.01$                                                                                                          \\
+                                                                                      & BinarizedLabels                                                     & $0.30\pm0.02$                                                                                           & $0.35\pm0.01$                                                                               & $0.29\pm0.02$                                                                                                  & $0.35\pm0.03$                                                                                           & $\mathbf{0.32\pm0.02}$                                                                                                 \\ \hline
+
+\end{tabular}
+}
+\caption{
+Segmentation performance for FCN-AlexNet models pre-trained on 15 categories from the PASCAL VOC2011 dataset and fine-tuned on the other five categories.
+The splits of pre-training and fine-tuning categories are organized in four folds.
+\textbf{RandomWeights} represents the randomly initialized weights;
+\textbf{TrueLabels} stands for the model pre-trained with true labels;
+\textbf{AllRandomLabels} denotes the model pre-trained with all random foreground labels;
+\textbf{HalfRandomLabels} is the model pre-trained with half random and half correct foreground labels;
+\textbf{BinaryLabels} demonstrates that the model is pre-trained with binary (foreground and background) segmentations;
+Random foreground labels for segmentations in the training set decreased the fine-tuning performance for the learned representations, compared to the true foreground labels.
+Training foreground and background segmentation instead of per foreground class segmentation improves the fine-tuning performance when the pre-training dataset contains mislabeled objects from one foreground class to another.
+}
+\label{tab:random}
+\end{table*}
+
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%% Figure categorizing classes
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{figure}[t]
+\centering
+\textbf{Fine-tuning performance of representations trained with categorized segmentation labels}\par\medskip
+   \includegraphics[width=1.\linewidth]{img/num_classes.eps}
+\caption{
+Test performance for the fine-tuned models pre-trained with varying categorization of pre-training classes.
+Zero categorize means no pre-trained weights used and the model was random initialized.
+Error bars located on lines denote the meaningful categorization, and isolated error bars denote random categorizations (RC) of the 15 classes.
+The displayed mean IU/mean accuracies and standard deviations were averaged over four folds.
+The line shows that binarizing and categorizing classes meaningfully had little negative effect on feature transferability.
+}
+\label{fig:categories}
+\end{figure}
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%% Table incomplete segmetation
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{table*}[t]
+\centering
+\textbf{Fine-tuning performance of representations trained in the presence of incomplete segmentations}\par\medskip
+\resizebox{\textwidth}{!}{
+\centering
+\begin{tabular}{l|c|cccc|c}
+
+\hline
+\multirow{2}{*}{}                                                                 & \multirow{2}{*}{\begin{tabular}[c]{@{}c@{}}Pre-trained\\ Models\end{tabular}} & \multicolumn{4}{c|}{Fine-tuning mean IU per pretraining-finetuning fold}                                                                       & \multicolumn{1}{l}{\multirow{2}{*}{\begin{tabular}[c]{@{}l@{}}Average \\ mean IU\end{tabular}}} \\ \cline{3-6}
+                                                                                  &                                                                               & \multicolumn{1}{l}{Fold1}         & \multicolumn{1}{l}{Fold2}         & \multicolumn{1}{l}{Fold3}         & \multicolumn{1}{l|}{Fold4}         & \multicolumn{1}{l}{}                                                                            \\ \hline
+\multirow{2}{*}{Baseline}                                                         & RandomWeights                                                                 & $0.29\pm0.01$                     & $0.29\pm0.03$                     & $0.27\pm0.01$                     & $0.30\pm0.02$                      & $0.29\pm0.02$                                                                                   \\
+                                                                                  & CompleteLabels                                                                    & \multicolumn{1}{c}{$0.29\pm0.01$} & \multicolumn{1}{c}{$0.36\pm0.01$} & \multicolumn{1}{c}{$0.29\pm0.01$} & \multicolumn{1}{c|}{$0.37\pm0.01$} & \multicolumn{1}{c}{$\mathbf{0.33\pm0.01}$}                                  \\ \hline
+\multirow{2}{*}{\begin{tabular}[c]{@{}l@{}}Inexaustive\\ Segmention\end{tabular}} & HalfUnsegmented                                                               & $0.26\pm0.01$                     & $0.30\pm0.03$                     & $0.28\pm0.03$                     & $0.32\pm0.02$                      & $0.29\pm0.02$                                                                                   \\
+                                                                                  & SigmoidalLoss                                                                 & \multicolumn{1}{l}{$0.30\pm0.01$} & \multicolumn{1}{l}{$0.37\pm0.01$} & \multicolumn{1}{l}{$0.31\pm0.02$} & \multicolumn{1}{l|}{$0.34\pm0.02$} & $\mathbf{0.33\pm0.02}$                                                                          \\ \hline
+
+\end{tabular}
+}
+\caption{
+Segmentation performance for FCN-AlexNet models pre-trained on 15 categories from the PASCAL VOC2011 dataset and fine-tuned on the other five categories.
+The splits of pre-training and fine-tuning categories are organized in four folds.
+\textbf{RandomWeights} represents the randomly initialized weights;
+\textbf{CompleteLabels} stands for the model pre-trained with complete segmentations;
+\textbf{HalfUnsegmented} denotes the model pre-trained with half of the objects unsegmented;
+\textbf{SigmoidLoss} means that the model pre-trained with half of the objects unsegmented and with the sigmoid loss applied to the background class.
+Applying the sigmoid loss to the negative class when pre-trained with inexhaustive segmentations achieves a fine-tuning performance comparable to pre-training with the complete segmentations, better than training with the normal logistic loss.
+}
+\label{tab:unseg}
+\end{table*}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%% Table False positive segmentations
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{table*}[t]
+\centering
+\textbf{Fine-tuning performance of representations trained in the presence of false positive segmentations}\par\medskip
+\resizebox{\textwidth}{!}{
+\centering
+\begin{tabular}{l|c|cccc|c}
+
+\hline
+\multirow{2}{*}{}                                                               & \multirow{2}{*}{\begin{tabular}[c]{@{}c@{}}Pre-trained\\ Models\end{tabular}} & \multicolumn{4}{c|}{Fine-tuning mean IU per pretraining-finetuning fold}                                                                       & \multirow{2}{*}{\begin{tabular}[c]{@{}l@{}}Average \\ mean IU\end{tabular}} \\ \cline{3-6}
+                                                                                &                                                                               & Fold1                             & Fold2                             & Fold3                             & Fold4                              &                                                                             \\ \hline
+\multirow{2}{*}{Baseline}                                                       & RandomWeights                                                                 & \multicolumn{1}{c}{$0.29\pm0.01$} & \multicolumn{1}{c}{$0.29\pm0.03$} & \multicolumn{1}{c}{$0.27\pm0.01$} & \multicolumn{1}{c|}{$0.30\pm0.02$} & \multicolumn{1}{c}{$0.29\pm0.02$}                                           \\
+                                                                                & NoFalsePositive                                                    & $0.26\pm0.01$                                                                                           & $0.37\pm0.03$                                                                               & $0.27\pm0.01$                                                                                                  & $0.33\pm0.04$                                                                                           & $\mathbf{0.31\pm0.02}$                                                                                                 \\ \hline
+False positive segmentaion                                                      & HalfFalsePositive                                                  & \multicolumn{1}{l}{$0.27\pm0.01$}                                                                       & \multicolumn{1}{l}{$0.34\pm0.01$}                                                           & \multicolumn{1}{l}{$0.30\pm0.01$}                                                                              & \multicolumn{1}{l|}{$0.32\pm0.01$}                                                                      & $\mathbf{0.31\pm0.01}$                                                                                                 \\ \hline
+
+\end{tabular}
+}
+\caption{
+Segmentation performance for FCN-AlexNet models pre-trained on 15 categories from the PASCAL VOC2011 dataset and fine-tuned on the other five categories.
+The splits of pre-training and fine-tuning categories are organized in four folds.
+\textbf{RandomWeights} represents the randomly initialized weights;
+\textbf{NoFalsePositive} denotes the model pre-trained with no false positive segmentations from the categories not of interest;
+\textbf{HalfFalsePositive} represents the model pre-trained with half of the objects from the categories not of interest segmented;
+Including the false positive segmentations in pre-training achieves no worse fine-tuning performance than not including the false positive segmentations, better than random initialization.
+}
+\label{tab:falsepos}
+\end{table*}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Learning representaions in the presence of mislabeled segmentations}
 \label{subsec:robustness}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 %%%%%%%% TEXT Experiment setup
 
-To investigate the influence of the lablel noises, (1) inexhaustive segmentations, (2) objects mislabelling and (3) false positive segmentations, on the learned representations, we set up experiments with simulated label noises from a well-annotated dataset, the PASCAL VOC2011 segmentation dataset \cite{everingham2015pascal}.
+To learn representations in the presence of lablel errors, we set up three experiments for each of the three types of label errors, (1) inexhaustive segmentations, (2) objects mislabelling and (3) false positive segmentations, independently with three datasets constructed from a well-annotated dataset, the PASCAL VOC2011 segmentation dataset \cite{everingham2015pascal}.
 
 
-\subsection{Label noises simulation}
-\label{subsec:noises}
+\subsubsection{Datasets}
+\label{subsubsec:noises}
 
-It is challenging to find a dataset with both clean and noisy labels available, so we simulate segmentation noises with correct labels.
-A straightforward way to simulate noisy labels is to corrupt true labels stochastically for each segment with a corruption model.
-The corruption model simply describes the probability of the observed labels given the true labels.
-% $$p(\tilde{y_{ij}} \vert x, y_{ij}, e_{ij})$$
-% where the binary error occurence $e_{ij}$ depends on the inputs $x$ and true labels $y$.
-
-For segmentation problems, each pixel (or voxel for 3D segmentation) of a training image has a label assigned to one of the pre-defined categories.
-Supposing there are $K$ pre-defined categories, the label of a pixel in the $i$-th row and $j$-th column from an image of size $h \times w$:
-\[
-  y_{ij} =
-    \begin{cases}
-      1 \leq k \leq K, & \text{for foreground pixels} \\
-      0, & \text{for background pixels}
-    \end{cases}
-\]
-where $1 \leq i \leq h, 1 \leq j \leq w$ and $i,j,k \in \mathrm{Z}^+$.
-
-
-\textbf{Inexhaustive segmentation}
-Given the true labels, which pixels belong to the same object is known.
-Inexhaustive segmentation is simulated by flipping all pixels for an object of the $k$-th category from $k$ to $0$ with probability $p_{0k}$.
-The probability for these pixels to have correct labels is then: $1-p_{0k}$.
-
-% $$p(\tilde{y_{ij}}=0\vert y_{ij}=k) = p_{0k}$$
-% $$p(\tilde{y_{ij}}=k\vert y_{ij}=k) = 1-p_{0k}$$
-
-\textbf{Objects Mislabelling}
-To simulate objects mislabelling, we stochastically convert pixel labels of segment for an object of the $k$-th category from $k$ to $j$ with probability $p_{jk}$, where $j, k \leq K$ and $j,k \in \mathrm{Z}^+$.
-Probabilities for all possible combinations of $j$ and $k$ form a \textit{confusion matrix} in which probabilities in each column sum up to 1.
-% $$p(\tilde{y_{ij}}=j \vert y_{ij}=k) = p_{jk}, ij \in S, k,j \in [1,K]$$
-% where $\sum_{j=1}^{K}p_{jk}=1$.
-
-\textbf{False positive segmentations}
-The presence of false positive segmentations is in two steps: excluding classes except one from the foreground categories, forming the clean labels set, and assigning pixels of the excluded categories with foreground labels with a probability of $p_{11}$, constructing the noisy labels set.% $$p(\tilde{y_{ij}}=k \vert x, y_{ij}=0), ij \in S $$
-
-\paragraph{Dataset}
 In this experiment, fifteen out of twenty categories of the VOC2011 dataset were selected to form a \textit{pre-training dataset} and the other categories formed a \textit{fine-tuning dataset}.
-The pre-training dataset was used to train a Fully Convolutional Network with AlexNet (FCN-AlexNet) model \cite{long2015fully} for segmentation in the presence or absence of simulated label noises.
-Inexhaustive segmentations, objects mislabelling, and false segmentations were simulated independently with stochastical corruptions to the well-annotated pre-training dataset, followed the descriptions in Section \ref{subsec:formulation}.
-The fine-tuning dataset was used to fine-tune the weights of convolutional layers from the pre-trained FCN-AlexNet models.
+% The pre-training dataset was used to learn representations by training to segment objects.
+% The fine-tuning dataset was used to fine-tune the learned representations.
+Three types of label errors of interest were introduced independently with stochastical corruptions to the well-annotated pre-training dataset.
 To avoid that the choice of pre-training and fine-tuning splitting for categories influence the results, the 20 categories of VOC2011 were divided equally into four folds.
+The exact folds of categories are:
+\begin{description}
+  \item [Fold 1] aeroplane, bicycle, bird, boat, bottle
+  \item [Fold 2] bus, car, cat, chair, cow
+  \item [Fold 3] dining table, dog, horse, motorbike, person
+  \item [Fold 4] potted plant, sheep. sofa, train, TV
+\end{description}
 The training dataset was enriched with extra segmentations by Hariharan et al. \cite{hariharan2011semantic}
 To keep the segmentation task simple, we used only single-object images, resulting in totally 4000 training images for 20 categories available for pre-training, fine-tuning and evaluation.
-We subsampled the original images by four times to accelerate the training process.
+The original images were subsampled by four times to accelerate the training process.
 
-\paragraph{Experimental setup}
+
+
+\subsubsection{Experimental setup}
+\label{subsubsec:ptft}
+A Fully Convolutional Network with AlexNet (FCN-AlexNet) model \cite{long2015fully}, as shown in Table \ref{fig:fcn} in Appendix \ref{subsec:segmentation}, was used for segmentation.
+Models were first pre-trained with the pre-training datasets and then fine-tuned with the fine-tuning datasets.
 The fine-tuned models were evaluated by mean intersection over union ratio (mean IU) achieved on the fine-tuning test set, referring to as the \textit{fine-tuning performance}.
 Performance improvement of fine-tuning transferred models compared to a randomly initialized model indicates the transferability of pre-trained weights.
 The non-transferable layers of FCN-AlexNet were randomly initialized with Xavier Initialization.
-Experiments run for each fold independently, and the exact partitions of each fold are listed in Table \ref{tab:robustness}.
-Fully Convolutional Networks with AlexNet was used for experiments because of its relatively small capacity and thus short training time.
-The pre-trained AlexNet model was used to set a baseline of performance, denoted as the ImageNet model.
-The ImageNet model and completely random weight initialization were considered as the upper baseline and lower baseline, respectively, for various pre-trained weights summarized in Table \ref{tab:robustness}.
+% The pre-trained AlexNet model was used to set a baseline of performance, denoted as the ImageNet model.
+Random weights initialization were considered as the baseline.
+A well pre-trained model should at least outperform random weights initialization.
 The default hyperparameters of FCN-AlexNet in  \cite{long2015fully} were kept unchanged.
 The training process run 240,000 iterations for pre-training phase, and 12,000 iterations for fine-tuning phase.
 Snapshots for trained models were taken every 4,000 iterations.
@@ -319,110 +456,112 @@ Each experiment was repeated three times, mean and standard deviation were compu
 % Transferability of noisy models compared to clean models.
 % }
 
-\paragraph{Objects mislabelling}
-The negative influence of random object labels on feature transferability is demonstrated in Table \ref{tab:robustness}.
-Compared to the model trained with true labels, both models trained with all random labels and half true half random labels are less transferable to the fine-tuning dataset.
-Transferring the AllRandomLabels model or the HalfRandomLabels model is no better than randomly initializing model weights.
-The mislabeled objects in segmentations negatively impact the transferability of CNN models in this simulated experiment setup.
 
-We then binarize pre-training classes to foreground and background and achieve a fine-tuning performance better than training with the exact (half) randomized labels and equivalent to training with correct labels.
+\subsubsection{Results}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%% Objects mislabeling
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\paragraph{Training binary segmentations in the presence of objects mislabelling}
+Objects Mislabelling denotes that a subset of segmented objects are mislabeled from one category to another in a training segmentation dataset.
+To validate that training binary segmentation can learn representations better than training per-category segmentation in the presence of objects mislabelling, we constructed three different datasets with: (1) all random labels for objects, (2) half random labels and half correct labels for objects, and (3) all correct labels for objects.
+The learned representations with these three datasets were fine-tuned to segment the five fine-tuning categories and evaluated by a test set for the five fine-tuning classes.
+
+Results in Table \ref{tab:random} suggests that pre-training with mislabeled foreground objects have a negative influence on the learned representations.
+Compared to the model trained with true labels, both models trained with all random labels and half-true half-random foreground labels do not present improvement of segmentation performance to the random weights initialization on the test set of the fine-tuning dataset.
+
+We instead discard the labels for the objects and train binary (foreground/background) segmentation.
+The result representations achieve a fine-tuning performance better than training with the mislabeled objects and equivalent to the model pre-trained with correct labels.
 Randomized object labels were mislabeled among foreground classes so that binarizing labels a foreground and background classes can in a sense correct the randomized labels.
-Compared to the precise but inaccurate noisy labels, binarized labels are accurate but imprecise.
-This observation indicates that inaccurate labels have a larger influence on the learned representations than imprecise labels.
+% Compared to the precise but inaccurate noisy labels, binarized labels are accurate but imprecise.
+This observation indicates that binarizing segmentation labels into foreground and background have little influence on the learned representations.
 
 
-\paragraph{Precise labels vs. Accurate labels}
-To validate that accurate, imprecise labels have less negative effect on feature transferability than inaccurate, precise labels.
-In figure \ref{fig:categories}, we decrease the preciseness of pre-training labels by grouping the pre-training classes into a various number of categories to demonstrate the corresponding change of feature transferability.
-Addition to the binary categorization, we also categorized the fifteen pre-training classes into four meaningful categories: person, animal, vehicle, indoor according to \cite{everingham2015pascal}.
-The result transferred and fine-tuned model is shown as the error bars on the solid line at categories=4.
-It has almost the same fine-tuning performance as the model trained with binarized labels and the model trained with precision labels (shown as error bar at categories=15).
+\paragraph{Categorizing the foreground classes}
+We then investigate the influence of categorizing the foreground classes instead of grouping all of them as one foreground class.
+We categorized the fifteen pre-training classes into four meaningful categories: person, animal, vehicle, indoor according to \cite{everingham2015pascal}, and trained segmentation models to transfer.
+The fifteen pre-training classes were also randomly categorized into 4, 7, 11 categories, respectively, to pre-train segmentation models.
+The learned multi-categories segmentation models are then fine-tuned with the 5-categories fine-tuning dataset and shown as the error bars in Figure \ref{fig:categories}.
 
-As a comparison, the fifteen classes were randomly categorized into 4, 7, 11 categories and shown as isolated error bars in figure \ref{fig:categories} at categories=4, 7, 11 respectively.
-Figure \ref{fig:categories} reveals that reducing label preciseness by categorizing pre-training classes has little effect on the fine-tuning performance of transferred models.
-Even categorizing classes at random without explicit meaning can pre-train weights better than random initialization (shown as error bar at categories=0).
+The line in Figure \ref{fig:categories} demonstrates that the segmentations labeled in one category, in four categories, and in fifteen categories have no significant influence on the learned representations.
+All the three learned representations improve the fine-tuning performance compared to a random weights initialization show as the blue circle at categories=0.
+Additionally, the isolated error bars in figure \ref{fig:categories} reveal that even training by random categorization of the foreground classes has little effect on the fine-tuning performance for the learned representations.
+This observation indicates that it is not necessary to group the foreground classes into meaningful categories to reserve the class specific information.
+We therefore propose to train foreground/background segmentations when the purpose is to learn representations that can transfer to another dataset.
 
-In contrast to the significant influence of randomized precise labels, the imprecise binarized labels have little effect to the learned representations.
-Binarizing is helpful to learn better representations when mislabeled objects is dominant.
+\paragraph{Training with the sigmoid loss applied to the background class in the presence of inexhaustive segmentation}
+Inexhaustive segmentation means that there exist unsegmented objects of interest in the training images.
+To validate the use of sigmoid loss for the background class can alleviate the negative effects of inexhaustive segmentation to the learned representation, we constructed a training dataset with only 50\% of the objects segmented, togehter with a training dataset with 100\% of the objects segmented.
+Segmented means the object is labeled as foreground, and unsegmented means the object is labeled as background.
+The class-dependent sigmoid loss and the normal logistic loss were applied to the dataset with 50\% of the objects unsegmented.
+The learned representations were evaluated by fine-tuned and validated with the five-categories fine-tuning dataset.
 
-\paragraph{Inexaustive segmentation}
-Fine-tuning performance for pre-trained models with complete segmentations and incomplete segmentations are summarized in Table \ref{tab:robustness}.
-Pre-training data with half of the objects unsegmented results in fine-tuned models with a worse mean IU (average across four folds) than pre-training with complete labels by 0.04, the same as no pre-training.
-This observation demonstrates that inexhaustive segmentations have a negative impact on representations transferability.
-% In a positive and unlabeled (PU) learning setting, not only the classification performance but also the transferability of learned weights decreases due to the noises in negative labels.
-
-By applying the class-dependent sigmoid loss to pre-train models with half of the objects segmented, a fine-tuning performance comparable to the model pre-trained with complete segmentation is achieved.
-The class-dependent sigmoid loss compensates the negative influence of inexhaustive segmentations on the fine-tuning performance of the pre-trained model.
+The segmentation performance, mean IU, for the model pre-trained with incomplete segmentations is worse than the model pre-trained with complete segmentations by 0.04 when using the logistic loss to train, are demonstrated in Table \ref{tab:unseg}.
+By applying the class-dependent sigmoid loss to pre-train models with half of the objects unsegmented, the learned representations achieves a fine-tuning performance comparable to the model pre-trained with complete segmentation.
+The representations learned with the class-dependent sigmoid loss is demonstrated to ahieve better fine-tuning performance than the normal logistic loss.
 % The negative influence of inexhaustive segmentations on the fine-tuning performance of the pre-traine model is compensated.
-Note that we train foreground/background segmentation instead of multi-class segmentation when applied the class-dependent sigmoid loss because binary segmentation can produce as good representation as multi-class segmentation.
 % The details of implementing sigmoid negative loss for the pre-training dataset will be discussed in Section \ref{subsec:pulearning}.
 
 
-\paragraph{False positive segmentations}
-We observe a little influence of the incorrectly segmented objects from the non-predefined but meaningful categories, i.e., the false positive segmentations, on the learned representations.
-To simulate the false positive segmentations errors, we selected one category, either cat or dog depending on the folds, as the target category and all the other 14 categories in the pre-training dataset became non-target, as discussed in Section \ref{subsec:formulation}.
-In the presence of false segmentations, instances from non-target categories can be misannotated as the target category with a probability of $p_{10}= 0.5$.
-The result pre-trained models is named as the HalfFalsePositive model in Table \ref{tab:robustness}.
-The noise-free counterpart of is the model pre-trained with segmentations of the selected target category only, and the other 14 categories remained unsegmented, denoted as the NoFalsePositive model.
 
-We observe from Table \ref{tab:robustness} that transferring the HalfFalsePositive model performs almost the same as the NoFalsePositive model.
-Therefore, false positive segmentation for objects from the 14 categories have a little negative impact on pre-training CNN models.
+\paragraph{Including false positive segmentations for training if they present}
+False positive segmentations represents those segmented objects that are semantically meaningful but not from an pre-defined category to segment.
+To investigate the influence of including false positive segmentations for training, we consider a dataset contains dogs as the only category to segment.
+Objects from the other fourteen categories are not supposed to be segmentated for a error-free dataset without false positive segmentations.
+Model trained with this correctly labeled dataset is named as the NoFalsePositive model in Table \ref{tab:falsepos}.
+Another dataset, containing half of the objects from the other fourteen categories segmented, is referred to as the HalfFalsePositive model.
+
+We observe, as presented in Table \ref{tab:falsepos}, that transferring the HalfFalsePositive model performs almost the same as the NoFalsePositive model and better than the random weights initialization.
+Based on this observation, we conclude that including the false positive segmentations for training have a little negative effects on the learned CNN representations.
 % The exact influence of false segmentations in practice, however, may depend on how similar the target and non-target categories are, or whether false segmentations are consistent, which requires further investigation.
 
-\begin{table*}[t]
-\resizebox{\textwidth}{!}{
-\centering
-\begin{tabular}{l|l|llll|l}
 
-\hline
-                                                                                      & \begin{tabular}[c]{@{}c@{}}Initial Feature\\ Extractor\end{tabular} & \multicolumn{4}{c|}{Fine-tuning mean IU per pretraining-finetuning fold}                                                                                                                                                                                                                                                                                                                                                                     & \multicolumn{1}{l}{\multirow{2}{*}{\begin{tabular}[c]{@{}l@{}}Average \\ mean IU\\ across \\ four folds\end{tabular}}} \\ \cline{1-6}
-\begin{tabular}[c]{@{}l@{}}Fine-tuning\\ categories\end{tabular}                      &                                                                     & \multicolumn{1}{l}{\begin{tabular}[c]{@{}l@{}}aeroplane, \\ bicycle, bird,\\ boat, bottle\end{tabular}} & \multicolumn{1}{l}{\begin{tabular}[c]{@{}l@{}}bus, car, \\ cat, \\ chair, cow\end{tabular}} & \multicolumn{1}{l}{\begin{tabular}[c]{@{}l@{}}dining table,\\ dog, horse, \\ motorbike,\\ person\end{tabular}} & \multicolumn{1}{l|}{\begin{tabular}[c]{@{}l@{}}potted plant, \\ sheep, sofa, \\ train, TV\end{tabular}} & \multicolumn{1}{l}{}                                                                                                   \\ \hline
-\multirow{2}{*}{\begin{tabular}[c]{@{}l@{}}Baseline\end{tabular}} & ImageNetModel                                                       & $0.42\pm0.01$                                                                                           & $0.51\pm0.01$                                                                               & $0.49\pm0.01$                                                                                                  & $0.47\pm0.01$                                                                                           & $0.47\pm0.01$                                                                                                          \\
-                                                                                      & RandomWeights                                                       & $0.29\pm0.01$                                                                                           & $0.29\pm0.03$                                                                               & $0.27\pm0.01$                                                                                                  & $0.30\pm0.02$                                                                                           & $0.29\pm0.02$                                                                                                          \\ \hline
-\multirow{4}{*}{\begin{tabular}[c]{@{}l@{}}Objects \\ Mislabelling\end{tabular}}       & TrueLabels                                                      & $0.29\pm0.01$                                                                                           & $0.36\pm0.01$                                                                               & $0.29\pm0.01$                                                                                                  & $0.37\pm0.01$                                                                                           & $\mathbf{0.33\pm0.01}$                                                                                                 \\
-                                                                                      & AllRandomLabels                                                     & $0.29\pm0.01$                                                                                           & $0.33\pm0.03$                                                                               & $0.26\pm0.01$                                                                                                  & $0.28\pm0.01$                                                                                           & $0.29\pm0.01$                                                                                                          \\
-                                                                                      & HalfRandomLabels                                                    & $0.27\pm0.01$                                                                                           & $0.33\pm0.02$                                                                               & $0.25\pm0.01$                                                                                                  & $0.29\pm0.01$                                                                                           & $0.29\pm0.01$                                                                                                          \\
-                                                                                      & BinarizedLabels                                                     & $0.30\pm0.02$                                                                                           & $0.35\pm0.01$                                                                               & $0.29\pm0.02$                                                                                                  & $0.35\pm0.03$                                                                                           & $\mathbf{0.32\pm0.02}$                                                                                                 \\ \hline
-\multirow{3}{*}{\begin{tabular}[c]{@{}l@{}}Inexaustive \\ segmention\end{tabular}}    & CompleteLabels                                                      & $0.29\pm0.01$                                                                                           & $0.36\pm0.01$                                                                               & $0.29\pm0.01$                                                                                                  & $0.37\pm0.01$                                                                                           & $\mathbf{0.33\pm0.01}$                                                                                                 \\
-                                                                                      & HalfUnsegmented                                                     & $0.26\pm0.01$                                                                                           & $0.30\pm0.03$                                                                               & $0.28\pm0.03$                                                                                                  & $0.32\pm0.02$                                                                                           & $0.29\pm0.02$                                                                                                          \\
-                                                                                      & SigmoidLoss                                                       & \multicolumn{1}{l}{$0.30\pm0.01$}                                                                       & \multicolumn{1}{l}{$0.37\pm0.01$}                                                           & \multicolumn{1}{l}{$0.31\pm0.02$}                                                                              & \multicolumn{1}{l|}{$0.34\pm0.02$}                                                                      & $\mathbf{0.33\pm0.02}$                                                                                                 \\ \hline
-\multirow{2}{*}{\begin{tabular}[c]{@{}l@{}}False positive \\ segmentaion\end{tabular}}         & NoFalsePositive                                                    & $0.26\pm0.01$                                                                                           & $0.37\pm0.03$                                                                               & $0.27\pm0.01$                                                                                                  & $0.33\pm0.04$                                                                                           & $\mathbf{0.31\pm0.02}$                                                                                                 \\
-                                                                                      & HalfFalsePositive                                                  & \multicolumn{1}{l}{$0.27\pm0.01$}                                                                       & \multicolumn{1}{l}{$0.34\pm0.01$}                                                           & \multicolumn{1}{l}{$0.30\pm0.01$}                                                                              & \multicolumn{1}{l|}{$0.32\pm0.01$}                                                                      & $\mathbf{0.31\pm0.01}$                                                                                                 \\ \hline
-
-\end{tabular}
-}
-\caption{
-Segmentation performance for fine-tuned FCN-AlexNet models pre-trained on 15 categories from the PASCAL VOC2011 dataset and fine-tuned on the other 5 categories.
-\textbf{ImageNetModel} represents the pre-trained ImageNet model;
-\textbf{RandomWeights} indicates that the randomly initialized weights;
-All the other extractors were pre-trained in the presence/absence of the corresponding label noises listed in the leftmost column.
-Half of the objects unsegmented (\textbf{HalfUnsegmented}) result in pre-trained models not better than random weight initialization.
-Introducing the sigmoid negative loss in the pre-training phase was able to improve the fine-tuning performance to be comparable to pre-trained model with complete segmentation (\textbf{CompleteLabels}).
-Using random labels (\textbf{RamdomLabels}) decreased the fine-tuning performance of transferred models, compared to using true labels (\textbf{TrueLabels}).
-Binarizing the pre-training classes as foreground and background help overcome the negative effects of random labels.
-Applying the sigmoid loss to the negative class when pre-trained with inexhaustive segmentations achieves a comparable fine-tuning performance to pre-training with the complete segmentations.
-Including the false positive segmentations in pre-training (\textbf{HalfFalsePositive}) achieves the same fine-tuning performance as not including the false positive segmentations (\textbf{NoFalsePositive}), better than random initialization.
-% \textit{SingleCategory} was pre-trained on only one annotated category, either ``dog'' or ``cat'' depending on the fold, and the other categories were left unannotated;
-% \textit{BinaryLabels} was pre-trained with binary labels that any objects of the fifteen categories were annotated as one single category, namely ``dog'' or ``cat'' depending on fold;
-% \textit{TrueLabels} was pre-trained with all objects segmented and assigned to 15 categories correctly;
-% \textit{AllRandomLabels} was pre-trained with all objects correctly segmented but assigned random labels;
-% \textit{HalfRandomLabels} was pre-trained with all objects correctly segmented and half of them randomly assigned labels;
-% \textit{IncompleteLabels} was trained with datasets that objects were annotated correctly with a probability of 0.5;
-}
-\label{tab:robustness}
-\end{table*}
-
-
-%%%%%%%% Figure categorizing classes
-\begin{figure}[t]
-\centering
-   \includegraphics[width=1.\linewidth]{img/num_classes.eps}
-\caption{
-Test performance for the fine-tuned models pre-trained with varying categorization of pre-training classes.
-Zero categorize means no pre-trained weights used and the model was random initialized.
-Error bars located on lines denote the meaningful categorization, and isolated error bars denote random categorizations (RC) of the 15 classes.
-The displayed mean IU/mean accuracies and standard deviations were averaged over four folds listed in Table \ref{tab:robustness}.
-The line shows that binarizing and categorizing classes meaningfully had little negative effect on feature transferability.
-}
-\label{fig:categories}
-\end{figure}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%% Deprecated big table.
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%
+% \begin{table*}[t]
+% \resizebox{\textwidth}{!}{
+% \centering
+% \begin{tabular}{l|l|llll|l}
+%
+% \hline
+%                                                                                       & \begin{tabular}[c]{@{}c@{}}Initial Feature\\ Extractor\end{tabular} & \multicolumn{4}{c|}{Fine-tuning mean IU per pretraining-finetuning fold}                                                                                                                                                                                                                                                                                                                                                                     & \multicolumn{1}{l}{\multirow{2}{*}{\begin{tabular}[c]{@{}l@{}}Average \\ mean IU\\ across \\ four folds\end{tabular}}} \\ \cline{1-6}
+% \begin{tabular}[c]{@{}l@{}}Fine-tuning\\ categories\end{tabular}                      &                                                                     & \multicolumn{1}{l}{\begin{tabular}[c]{@{}l@{}}aeroplane, \\ bicycle, bird,\\ boat, bottle\end{tabular}} & \multicolumn{1}{l}{\begin{tabular}[c]{@{}l@{}}bus, car, \\ cat, \\ chair, cow\end{tabular}} & \multicolumn{1}{l}{\begin{tabular}[c]{@{}l@{}}dining table,\\ dog, horse, \\ motorbike,\\ person\end{tabular}} & \multicolumn{1}{l|}{\begin{tabular}[c]{@{}l@{}}potted plant, \\ sheep, sofa, \\ train, TV\end{tabular}} & \multicolumn{1}{l}{}                                                                                                   \\ \hline
+% \multirow{2}{*}{\begin{tabular}[c]{@{}l@{}}Baseline\end{tabular}} & ImageNetModel                                                       & $0.42\pm0.01$                                                                                           & $0.51\pm0.01$                                                                               & $0.49\pm0.01$                                                                                                  & $0.47\pm0.01$                                                                                           & $0.47\pm0.01$                                                                                                          \\
+%                                                                                       & RandomWeights                                                       & $0.29\pm0.01$                                                                                           & $0.29\pm0.03$                                                                               & $0.27\pm0.01$                                                                                                  & $0.30\pm0.02$                                                                                           & $0.29\pm0.02$                                                                                                          \\ \hline
+% \multirow{4}{*}{\begin{tabular}[c]{@{}l@{}}Objects \\ Mislabelling\end{tabular}}       & TrueLabels                                                      & $0.29\pm0.01$                                                                                           & $0.36\pm0.01$                                                                               & $0.29\pm0.01$                                                                                                  & $0.37\pm0.01$                                                                                           & $\mathbf{0.33\pm0.01}$                                                                                                 \\
+%                                                                                       & AllRandomLabels                                                     & $0.29\pm0.01$                                                                                           & $0.33\pm0.03$                                                                               & $0.26\pm0.01$                                                                                                  & $0.28\pm0.01$                                                                                           & $0.29\pm0.01$                                                                                                          \\
+%                                                                                       & HalfRandomLabels                                                    & $0.27\pm0.01$                                                                                           & $0.33\pm0.02$                                                                               & $0.25\pm0.01$                                                                                                  & $0.29\pm0.01$                                                                                           & $0.29\pm0.01$                                                                                                          \\
+%                                                                                       & BinarizedLabels                                                     & $0.30\pm0.02$                                                                                           & $0.35\pm0.01$                                                                               & $0.29\pm0.02$                                                                                                  & $0.35\pm0.03$                                                                                           & $\mathbf{0.32\pm0.02}$                                                                                                 \\ \hline
+% \multirow{3}{*}{\begin{tabular}[c]{@{}l@{}}Inexaustive \\ segmention\end{tabular}}    & CompleteLabels                                                      & $0.29\pm0.01$                                                                                           & $0.36\pm0.01$                                                                               & $0.29\pm0.01$                                                                                                  & $0.37\pm0.01$                                                                                           & $\mathbf{0.33\pm0.01}$                                                                                                 \\
+%                                                                                       & HalfUnsegmented                                                     & $0.26\pm0.01$                                                                                           & $0.30\pm0.03$                                                                               & $0.28\pm0.03$                                                                                                  & $0.32\pm0.02$                                                                                           & $0.29\pm0.02$                                                                                                          \\
+%                                                                                       & SigmoidLoss                                                       & \multicolumn{1}{l}{$0.30\pm0.01$}                                                                       & \multicolumn{1}{l}{$0.37\pm0.01$}                                                           & \multicolumn{1}{l}{$0.31\pm0.02$}                                                                              & \multicolumn{1}{l|}{$0.34\pm0.02$}                                                                      & $\mathbf{0.33\pm0.02}$                                                                                                 \\ \hline
+% \multirow{2}{*}{\begin{tabular}[c]{@{}l@{}}False positive \\ segmentaion\end{tabular}}         & NoFalsePositive                                                    & $0.26\pm0.01$                                                                                           & $0.37\pm0.03$                                                                               & $0.27\pm0.01$                                                                                                  & $0.33\pm0.04$                                                                                           & $\mathbf{0.31\pm0.02}$                                                                                                 \\
+%                                                                                       & HalfFalsePositive                                                  & \multicolumn{1}{l}{$0.27\pm0.01$}                                                                       & \multicolumn{1}{l}{$0.34\pm0.01$}                                                           & \multicolumn{1}{l}{$0.30\pm0.01$}                                                                              & \multicolumn{1}{l|}{$0.32\pm0.01$}                                                                      & $\mathbf{0.31\pm0.01}$                                                                                                 \\ \hline
+%
+% \end{tabular}
+% }
+% \caption{
+% Segmentation performance for fine-tuned FCN-AlexNet models pre-trained on 15 categories from the PASCAL VOC2011 dataset and fine-tuned on the other 5 categories.
+% \textbf{ImageNetModel} represents the pre-trained ImageNet model;
+% \textbf{RandomWeights} indicates that the randomly initialized weights;
+% All the other extractors were pre-trained in the presence/absence of the corresponding label noises listed in the leftmost column.
+% Half of the objects unsegmented (\textbf{HalfUnsegmented}) result in pre-trained models not better than random weight initialization.
+% Introducing the sigmoid negative loss in the pre-training phase was able to improve the fine-tuning performance to be comparable to pre-trained model with complete segmentation (\textbf{CompleteLabels}).
+% Using random labels (\textbf{RamdomLabels}) decreased the fine-tuning performance of transferred models, compared to using true labels (\textbf{TrueLabels}).
+% Binarizing the pre-training classes as foreground and background help overcome the negative effects of random labels.
+% Applying the sigmoid loss to the negative class when pre-trained with inexhaustive segmentations achieves a comparable fine-tuning performance to pre-training with the complete segmentations.
+% Including the false positive segmentations in pre-training (\textbf{HalfFalsePositive}) achieves the same fine-tuning performance as not including the false positive segmentations (\textbf{NoFalsePositive}), better than random initialization.
+% % \textit{SingleCategory} was pre-trained on only one annotated category, either ``dog'' or ``cat'' depending on the fold, and the other categories were left unannotated;
+% % \textit{BinaryLabels} was pre-trained with binary labels that any objects of the fifteen categories were annotated as one single category, namely ``dog'' or ``cat'' depending on fold;
+% % \textit{TrueLabels} was pre-trained with all objects segmented and assigned to 15 categories correctly;
+% % \textit{AllRandomLabels} was pre-trained with all objects correctly segmented but assigned random labels;
+% % \textit{HalfRandomLabels} was pre-trained with all objects correctly segmented and half of them randomly assigned labels;
+% % \textit{IncompleteLabels} was trained with datasets that objects were annotated correctly with a probability of 0.5;
+% }
+% \label{tab:robustness}
+% \end{table*}
+%
