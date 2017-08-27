@@ -94,10 +94,11 @@ $}
 where $(x, y)$ is a pair of input feature and label, and $f(\cdot;\theta)$ is the model parametrized by $\theta$, and $\sigma(\cdot)$ is the sigmoid function.
 This loss is referred as the \textbf{class-dependent sigmoid loss} or the \textbf{sigmoid loss} in short, in a sense it uses a sigmoid function for the negative class only.
 
-
-Figure \ref{fig:losses} shows the differences in losses and derivatives with respect to model output between weighted logistic loss and sigmoid loss.
-The main feature of sigmoid loss for negative examples is its small changes in the region of confident positive, compared to the weighted loss with $\alpha=1$ and $\beta=0.5$.
-As a consequence, the corresponding derivative decreases to zero as the model prediction increases in the positive direction.
+Figure \ref{fig:losses} shows the sigmoid loss reaches a plaetau when the model output $f(x)$ grows above $2$, and its derivatives with respect to the model $f$ drops zero.
+By contrast, the weighted logistic loss, with $\alpha=1$ and $\beta=0.5$, for the negative class is scaled by a factor of $0.5$ compared to the normal logistic loss for the negative class.
+It keeps growing with a rate of $0.5$ as $f(x)$ grows in the large $f(x)$ area.
+A large output $f(x)$ represents that the model is more confident for the corresponding example being positive.
+The sigmoid loss follows our idea of not punishing highly confident positive predictions more than positive predictions with less confidence, whereas the weighted loss does not.
 
 The class-dependent sigmoid loss is extendable to a multiclass scenario where $K$ is the number of relevant classes and $0$ denotes the non-relevant class.
 The corresponding loss $l_{softmax}$ for an example, label pair $(x,y)$ with a model $f(\dot;\theta)$ is:
@@ -156,16 +157,18 @@ where $f(\cdot)$ is the model parametrized by $\theta$, and $\sigma_0, \dots, \s
 
 %%%%%%%% TEXT Expontial loss FADE IN
 \paragraph{Implementation details}
-We introduced the sigmoid loss only after training with a class-weighted cross entropy loss for a few epochs.
-The sigmoid loss of negative examples saturates for very positive outputs, meaning that the confident, positive prediction has little contribution to the weights update.
-The wrong confident predictions can introduce problems at the beginning of the training procedure when the confident predictions are likely to be made at random.
-Otimization would reach the plateau when the model made all positive predictions with high confidence.
-Besides, we also introduce the modified hard bootstrapping loss only after a few epochs trained with class-weighted loss because it also relies on a nonrandom model for sufficiently reliable prediction $\hat{y}$.
+For all losses being used to learning with positive and unlabeled data, we reweighed the positive and negative class based on their occurrences in the observed labels to alleviate the influence of imbalance introduced by the unlabeled positive examples.
+We introduced the hard bootstrapping loss only after training with a class-weighted cross entropy loss for a few epochs because it relies on a nonrandom model for sufficiently reliable prediction $\hat{y}$.
+
+%%%%%%%% Move to discussion
+% The sigmoid loss of negative examples saturates for very positive outputs, meaning that the confident, positive prediction has little contribution to the weights update.
+% The wrong confident predictions can introduce problems at the beginning of the training procedure when the confident predictions are likely to be made at random.
+% Otimization would reach the plateau when the model made all positive predictions with high confidence.
+% Besides, we also introduce the modified hard bootstrapping loss only after a few epochs trained with class-weighted loss because it also relies on a nonrandom model for sufficiently reliable prediction $\hat{y}$.
 
 
 %%%%%%%% TEXT Imbalanced
 
-Another problem encountered in the PU learning setup is the class imbalance introduced by negatively labeled positive samples.
-A balanced dataset can become imbalanced in the presence of false negative labels, especially if only a small portion of positive samples are correctly labeled.
-We reweighed positive and negative samples based on their occurrences of the observed labels to alleviate the influence of imbalance for training.
+% Another problem encountered in the PU learning setup is the class imbalance introduced by negatively labeled positive samples.
+% A balanced dataset can become imbalanced in the presence of false negative labels, especially if only a small portion of positive samples are correctly labeled.
 Note that the class-weighted logistic loss reweighed the classes in addition to this frequency balancing class weight.
