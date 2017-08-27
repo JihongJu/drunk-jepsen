@@ -13,6 +13,8 @@
 %%%%%%%% CNN in one sentence
 
 The main components of a typical convolutional neural network (CNN) are several layers of convolutions and sub-sampling, followed by a few fully-connected layers.
+For example, LeNet-5 (1998) \cite{lecun1998gradient}, a simple CNN model for handwritten digit recognition, is shown in Figure \ref{fig:lenet}.
+
 
 
 %%%%%%%% FIGURE LeNet
@@ -30,13 +32,6 @@ This figure was drawn by Dumoulin and Visin \cite{dumoulin2016guide}
 
 %%%%%%%% LeNet
 
-An example CNN model, LeNet-5 (1998) \cite{lecun1998gradient}, is shown in Figure \ref{fig:lenet}.
-The first convolutional layer of LeNet contains 6 convolutional kernels of size 5x5 and each convolutional kernels convolve with small windows sliding over the images and produce a feature map of size 28x28.
-Each output in the produced feature map is corresponding to a small sub-region of the visual field (the image), called a \textit{receptive field}.
-A following max pooling layer subsamples the feature maps by a factor of two by extracting the maximum values for every two adjacent pixels literally and vertically.
-The result feature map S2 has a shape of 14 by 14 and a receptive field of 6 by 6.
-Another sequence of convolutional and pooling layers generate feature maps of size 5x5 with receptive field 16x16.
-Neurons in the last three layers of LeNet are fully connected to the layer before and the layer after if exists, creating the final prediction for 10 classes.
 
 %%%%%%%% Feature Hierarchy
 Features produced by CNN models have a rich hierarchy varying from local to global, from simple to complex.
@@ -52,8 +47,17 @@ The shallower convolutional layers play a similar functionlity as simple cells w
 %%%%%%%% FIGURE LeNet
 \begin{figure}[t]
 \centering
+\textbf{Example classification model: FCN-AlexNet}\par\medskip
    \includegraphics[width=\linewidth]{img/lenet}
-\caption{An example convolutional neural network, LeNet-5 \cite{lecun1998gradient}}
+\caption{
+An example convolutional neural network, LeNet-5 \cite{lecun1998gradient}.
+The first convolutional layer of LeNet contains 6 convolutional kernels of size 5x5 and each convolutional kernels convolve with small windows sliding over the images and produce a feature map of size 28x28.
+Each output in the produced feature map is corresponding to a small sub-region of the visual field (the image), called a \textit{receptive field}.
+A following max pooling layer subsamples the feature maps by a factor of two by extracting the maximum values for every two adjacent pixels literally and vertically.
+The result feature map S2 has a shape of 14 by 14 and a receptive field of 6 by 6.
+Another sequence of convolutional and pooling layers generate feature maps of size 5x5 with receptive field 16x16.
+Neurons in the last three layers of LeNet are fully connected to the layer before and the layer after if exists, creating the final prediction for 10 classes.
+}
 \label{fig:lenet}
 \end{figure}
 
@@ -94,9 +98,10 @@ By combining them together, it becomes possible to create accurate and detailed 
 
 \begin{figure}[t]
 \centering
+\textbf{Example segmentation model: FCN-AlexNet}\par\medskip
    \includegraphics[width=\linewidth]{img/fcn}
 \caption{
-Fully convolutional network (FCN) by Long et al. (2015)  \cite{long2015fully}.
+Fully convolutional network with AlexNet (FCN-AlexNet) by Long et al. (2015)  \cite{long2015fully}.
 Features of different resolutions are stacked in a feature pyramid on the left-hand side, with the image at the bottom of the pyramid.
 Predictions of different resolutions are piled in a prediction pyramid on the right-hand side.
 Each solid arrow denotes a few convolutional layers followed by a max polling layer; Dotted arrow represents convolutional layers with kernel size one by one; Dashed arrows are up-sampling layers or transposed convolutional layers.
