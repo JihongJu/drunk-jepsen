@@ -63,11 +63,3 @@ The observed label $\tilde{y_i}$ for the $i$-th example is:
     -1, & \text{otherwise}.
   \end{cases}
 \end{eqnarray}
-
-%
-% A training set for the positive and negative (PU) learning problems contains only a set of positive examples (P set) and a set of unlabeled samples (U set).
-% Unlabeled examples can be either positive or negative, meaning that there is no reliable negative examples available
-% One straightforward way to generate negative examples for training is to treat all the unlabeled examples as a set of negative examples with noises.
-% The problem then converts to learning with clean positive labels and noisy negative labels.
-% The goal of solving a PU learning problem is to learn a classifier that predicts as many positives as possible while keeping the false positive rate low, regardless the influence of false negative labels.
-% In other words, the purpose is to achieve high recall without sacrificing too much precision.

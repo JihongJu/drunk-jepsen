@@ -91,7 +91,7 @@ Images from the unlabeled set were assigned negative labels.
 
 \paragraph{Experimental setup}
 An eight layer CNN model was trained with the cross-entropy loss, the class-weighted cross-entropy loss and the class-depend sigmoid loss respectively in the simulated PU learning setup, where 50\% of the positive examples were unlabeled.
-The CNN model was also trained with the modified hard bootstrapping loss introduced in Section \ref{sec:pulearning} to set a benchmark for the state-of-the-art method to learn in the presence of label noises.
+The CNN model was also trained with the modified hard bootstrapping loss introduced in Section \ref{sec:pulearning} to set a benchmark for the state-of-the-art method to learn in the presence of label errors.
 Model performances were evaluated on a separate test set with true labels.
 The architecture of the CNN model can be found in Table \ref{tab:8layer} in Appendix \ref{subsec:8layer}.
 Each model was trained from scratch with Adam optimizer and base learning rate 0.0001.

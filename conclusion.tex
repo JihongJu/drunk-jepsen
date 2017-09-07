@@ -1,9 +1,9 @@
 \section{Conclusion}
 \label{sec:conclusion}
 
-We investigate in this paper to learn representations by training with segmentation datasets containing label noises.
+We investigate in this paper to learn representations by training with segmentation datasets containing label errors.
 (1) We report both mislabeled objects and unsegmented objects in a segmentation dataset negatively influence the transferability of the learned representations, i.e., how well the representations transfer to another dataset.
-By contrast, false positive segmentations, i.e., segmented objects that are not supposed to be segmented, do not influence the learned representation as significant as the other two types noises do.
+By contrast, false positive segmentations, i.e., segmented objects that are not supposed to be segmented, do not influence the learned representation as significant as the other two types of errors do.
 (2) We present that training foreground/background segmentation can produce learned representations comparable to the representations trained with per-class segmentation.
 In addition, binarizing classes for segmentation alleviates the negative influence on the learned representations introduced by the mislabeled objects.
 (3) We propose a class-dependent sigmoid loss to not over-punish the confident, positive predictions for the negative class when there exist poorly labeled negative samples.

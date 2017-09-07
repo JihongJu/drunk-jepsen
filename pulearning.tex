@@ -101,7 +101,7 @@ A large output $f(x)$ represents that the model is more confident for the corres
 The sigmoid loss follows our idea of not punishing highly confident positive predictions more than positive predictions with less confidence, whereas the weighted loss does not.
 
 The class-dependent sigmoid loss is extendable to a multiclass scenario where $K$ is the number of relevant classes and $0$ denotes the non-relevant class.
-The corresponding loss $l_{softmax}$ for an example, label pair $(x,y)$ with a model $f(\dot;\theta)$ is:
+The corresponding loss $l_{softmax}$ for an example, label pair $(x,y)$ with a model $f(\cdot;\theta)$ is:
 \begin{eqnarray}
 \resizebox{0.9\columnwidth}{!}{$
 l_{softmax}(x, y; \theta) =

@@ -39,7 +39,7 @@ Apart from the supervised pre-training, one can also perform unsupervised learni
 % A few studies \cite{erhan2009difficulty,erhan2010does,bengio2012deep} highlighted the advantage of unsupervised pre-training compared to the random initialization, connecting unsupervised pre-training to a norm of regularization and a method that help disentangle the sample variations.
 Though a few studies \cite{erhan2009difficulty,erhan2010does,bengio2012deep} discussed the advantage of unsupervised pre-trained features compared to random weights initialization, the difference between the two has been diminished ever since the arises of modern initialization strategies, namely Xavier initialization \cite{glorot2010understanding} and its variants.
 We used random weights initialization as the lower baseline for pre-training with noisy labels.
-Representations learned with supervision in the presence of label noises should at least outperform random weights because noisy information should be still better than no information.
+Representations learned with supervision in the presence of label noise should at least outperform random weights because noisy information should be still better than no information.
 % A proper method to learn features in the presence of label noise should at least outperform unsupervised pre-training because noisy information is still better than no information.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -52,8 +52,8 @@ The impact of randomly flipped labels on classification performance has been inv
 They both reported decreases in classification performance as the proportion of flipped labels increases for a fixed number of training samples.
 On the other hand, Rolnick et al. \cite{rolnick2017deep} argued that deep neural networks can learn robustly from noisy datasets as long as appropriate choices of hyperparameters were made.
 They studied the effect of label noise by diluting correct labels with errored labels instead of corrupting correct labels with errored ones and argued that collecting more labels is of more importance than correcting the obtained labels.
-None of these studies explored the influence of label noises on feature transferability.
-To the best of our knowledge, we are the first research to investigate representations robustness to label noises.
+None of these studies explored the influence of label noise on feature transferability.
+To the best of our knowledge, we are the first research to investigate representations robustness to label noise.
 
 To alleviate the negative effects on classification performance introduced by errored labels, a few methods were proposed for deep neural network models.
 Sukhbaatar et al. \cite{sukhbaatar2014training} introduced a linear noise layer on top of the model output, and Patrini et al. \cite{patrini2016making} proposed two forms of loss correction concerning the label observation bias.
